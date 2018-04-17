@@ -1,3 +1,4 @@
+
 import {vec3, vec4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
@@ -11,8 +12,9 @@ import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
-//import * as fs from 'fs';
+import * as fs from 'fs';
 
+//import { parseArrayBuffer } from 'midi-json-parser';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -21,14 +23,52 @@ const controls = {
   'Load Scene': loadScene // A function pointer, essentially
 };
 
+//midi-json-parser
+// let buff = new ArrayBuffer(8);
+
+// parseArrayBuffer(buff)
+//     .then((json: JSON) => {
+//       console.log(json.stringify);
+//     });
+
+//midi-parser-js
+// var midiParser  = require('midi-parser-js');
+
+// console.log("Reading ./test.mid as base64...")
+// fs.readFile('./music/BTS - Boy In Luv.midi', 'base64', function (err: Error, data: string | Buffer) {
+//   //if (err) throw new Error(err); 
+//   console.log("Done!");
+//   console.log("Converting base64 string to structured Array...")
+//   var midiArray = midiParser.parse(data);
+//   console.log("Done!");
+//   console.log(midiArray);
+// });
+
+//midi-file-parser
+// var midiFileParser = require('midi-file-parser');
+// var file = fs.readFileSync('BTS - Boy In Luv.midi', 'binary');
+// var midi = midiFileParser(file);
+
+//midiConvert
+var MidiConvert = require('./MidiConvert');
+//var fs = require('file-system');
+
+fs.readFile("BTS - Boy In Luv.midi", "binary", function(err: Error, midiBlob: ArrayBuffer|string) {
+  if (!err) {
+    var midi = MidiConvert.parse(midiBlob)
+  }
+})
+
+// MidiConvert.load("path/to/midi.mid", function(midi : string) {
+//   console.log(midi)
+// });
+
+
 //shapes
 let icosphere: Icosphere;
 let square: Square;
 let cube: Cube;
 
-let iteration: number;
-let axiom: string;
-let height: number;
 //time
 let count: number = 0.0;
 
@@ -37,8 +77,7 @@ function loadScene() {
   square.create();
 }
 
-function main() {
-    
+function main() { 
   // Initial display for framerate
   const stats = Stats();
   stats.setMode(0);
@@ -49,11 +88,6 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
-  gui.addColor(controls, 'color');
-  gui.add(controls, 'shaders', ['lambert']);
-  gui.add(controls, 'randomize', 0, 3).step(1);
-  gui.add(controls, 'iterations', 0, 5).step(1);
-  gui.add(controls, 'shape', ['coral']);
   gui.add(controls, 'Load Scene');
 
   // get canvas and webgl context
@@ -69,16 +103,15 @@ function main() {
   // Initial call to load scene
   loadScene();
   
-  const camera = new Camera(vec3.fromValues(-1000, 500, -1000), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(10, 30, 0), vec3.fromValues(0, 0, 0));
 
   const renderer = new OpenGLRenderer(canvas);
-  renderer.setClearColor(0.3, 0.7, 0.9, 1);
+  renderer.setClearColor(0.7, 0.7, 0.7, 1);
   gl.enable(gl.DEPTH_TEST);
 
-
-  const base_lambert = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/base-lambert-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/base-lambert-frag.glsl')),
+  const lambert = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
  
   // This function will be called every frame
@@ -87,7 +120,7 @@ function main() {
     //U_tIME
     count++;
     
-    let base_color = vec4.fromValues(64/255, 255/255, 255/255, 1);
+    let base_color = vec4.fromValues(255/255, 255/255, 255/255, 1);
       camera.update();
       stats.begin();
 
@@ -96,8 +129,8 @@ function main() {
       gl.viewport(0, 0, window.innerWidth, window.innerHeight);
       renderer.clear();
 
-      base_lambert.setGeometryColor(base_color);
-      renderer.render(camera, base_lambert, [square]);
+      lambert.setGeometryColor(base_color);
+      renderer.render(camera, lambert, [square]);
 
     stats.end();
 
