@@ -12,9 +12,14 @@ From 88 - 120, letter L
 These will have to be more randomized
 
 A button obj has letter, time mark, duration 
+The letter is the key that should be pressed. 
+Time Mark marks when the key comes up
+Duration is for how long the key lasts.
 
+I have to work on creating the layout of the buttons into a big mesh so that it can proceed as the program runs.
 
 demo link: https://sangeun44.github.io/Rhythm_Visualizer_Game/
+
 # Final Procedural Project  
 # Music Visualizer - BTS Super Star/Guitar Hero 
 
