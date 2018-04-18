@@ -1,5 +1,5 @@
 #MILESTONE UPDATE
-Instead of working with pure midi/mp3 files, since they don't have big/useable libraries/API,
+Instead of working with pure midi/mp3 files, since they don't have big/useable libraries/API, I tried multiple npm libraries, none worked.
 I just converted MIDI files to JSON files with Tone.js's MIDIConvert.
 With these json files, which is done in main.ts, I worked on the easy mode
 From 15 - 40, letter A

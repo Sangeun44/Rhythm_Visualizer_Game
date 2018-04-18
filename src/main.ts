@@ -19,7 +19,7 @@ const parseJson = require('parse-json');
 
 let jsonFile: string; //jsonFile name
 let obj0: string; //objString name
-let mesh0: Mesh;
+let mario: Mesh;
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -27,29 +27,18 @@ const controls = {
   'Load Scene': loadScene // A function pointer, essentially
 };
 
-//a button representation of a note
-const button = {
-  letter: "",
-  duration: 0,
-  color: vec3,
-}
-
 //list of buttons to create
 let buttons = Array<any>();
-
 //shapes
-let icosphere: Icosphere;
-let square: Square;
 let cube: Cube;
-
 //time
 let count: number = 0.0;
 
 function loadScene() {
-  cube = new Cube(vec3.fromValues(0,0,0));
-  cube.create();
-  mesh0 = new Mesh(obj0, vec3.fromValues(0, 0, 0));
-  mesh0.create();
+  // cube = new Cube(vec3.fromValues(0,0,0));
+  // cube.create();
+  mario = new Mesh(obj0, vec3.fromValues(0, 0, 0));
+  mario.create();
 }
 
 //read the JSON file determined by the user
@@ -136,7 +125,6 @@ for(let track of tracks) {
   }  
 }
 
-
 function createButtons() {
   //since you have a list of buttons, lets create them all at once
   //the user will travel forward on the line
@@ -206,7 +194,7 @@ function main() {
       renderer.clear();
 
       lambert.setGeometryColor(base_color);
-      renderer.render(camera, lambert, [cube, mesh0]);
+      renderer.render(camera, lambert, [cube, mario]);
 
     stats.end();
 
