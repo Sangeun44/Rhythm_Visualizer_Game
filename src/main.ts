@@ -17,18 +17,15 @@ import * as fs from 'fs';
 
 const parseJson = require('parse-json');
 
-let jsonFile: string;
-let obj0: string;
+let jsonFile: string; //jsonFile name
+let obj0: string; //objString name
 let mesh0: Mesh;
-
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  randomize: 2,
   'Load Scene': loadScene // A function pointer, essentially
 };
-
 
 //a button representation of a note
 const button = {
@@ -38,7 +35,7 @@ const button = {
 }
 
 //list of buttons to create
-let buttons = Array<object>();
+let buttons = Array<any>();
 
 //shapes
 let icosphere: Icosphere;
@@ -90,60 +87,48 @@ for(let track of tracks) {
         //for buttons that happen 0.3
         if(deltaTime > 0.28) {
           //cutoffs: 28, 40, 52, 64, 76, 88, 100
-          if(number > 28 && number < 40) {
-            var obj = {
+          if(number > 15 && number < 40) {
+            let obj = {
               letter: "A",
               mark: time,
               duration: duration
             }
             buttons.push(obj);
-            console.log(obj.mark);
-            console.log(obj.letter);
           } else if(number > 40 && number < 52) {
-            var obj = {
+            let obj = {
               letter: "S", 
               mark: time,
               duration: duration
             }
             buttons.push(obj);
-            console.log(obj.mark);
-            console.log(obj.letter);
           } else if(number > 52 && number < 64) {
-            var obj = {
+            let obj = {
               letter: "D", 
               mark: time,
               duration: duration
             }
             buttons.push(obj);
-            console.log(obj.mark);
-            console.log(obj.letter);
           } else if(number > 64 && number < 76) {
-            var obj = {
+            let obj = {
               letter: "J", 
               mark: time,
               duration: duration
             }
             buttons.push(obj);
-            console.log(obj.mark);
-            console.log(obj.letter);
           } else if(number > 76 && number < 88) {
-            var obj = {
+            let obj = {
               letter: "K", 
               mark: time,
               duration: duration
             }
             buttons.push(obj);
-            console.log(obj.mark);
-            console.log(obj.letter);
-          } else if(number > 88 && number < 100) {
-            var obj = {
+          } else if(number > 88 && number < 120) {
+            let obj = {
               letter: "L", 
               mark: time,
               duration: duration
             }
             buttons.push(obj);
-            console.log(obj.mark);
-            console.log(obj.letter);
           }
         }
       }
@@ -155,12 +140,19 @@ for(let track of tracks) {
 function createButtons() {
   //since you have a list of buttons, lets create them all at once
   //the user will travel forward on the line
-
+  for(let one of buttons) {
+    var letter = one.letter;
+    var duration = one.duration;
+    var time = one.mark;
+  }
 }
 
 function main() { 
   //parse JSON and get buttons
   parseJSON();
+
+  //buttons
+  createButtons();
 
   // Initial display for framerate
   const stats = Stats();
