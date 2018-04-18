@@ -1,3 +1,20 @@
+#MILESTONE UPDATE
+Instead of working with pure midi/mp3 files, since they don't have big/useable libraries/API,
+I just converted MIDI files to JSON files with Tone.js's MIDIConvert.
+With these json files, which is done in main.ts, I worked on the easy mode
+From 28 - 40, letter A
+From 40 - 52, letter S
+From 52 - 64, letter D
+From 64 - 78, letter J
+From 78 - 90, letter K
+From 90 - 102, letter L
+
+These will have to be more randomized
+
+A button obj has letter, time mark, duration 
+
+
+demo link: https://sangeun44.github.io/Rhythm_Visualizer_Game/
 # Final Procedural Project  
 # Music Visualizer - BTS Super Star/Guitar Hero 
 
