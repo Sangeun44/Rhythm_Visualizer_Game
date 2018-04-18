@@ -204,7 +204,7 @@ function main() {
   function tick() {
     
     //U_tIME
-    count += 0.2;
+    count ++;
 
     let base_color = vec4.fromValues(255/255, 255/255, 255/255, 1);
       camera.update();
