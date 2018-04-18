@@ -31,14 +31,14 @@ const controls = {
 
 
 //a button representation of a note
-var button = {
+const button = {
   letter: "",
   duration: 0,
   color: vec3,
 }
 
 //list of buttons to create
-let buttons = Array<Object>();
+let buttons = Array<object>();
 
 //shapes
 let icosphere: Icosphere;
@@ -153,13 +153,14 @@ for(let track of tracks) {
 
 
 function createButtons() {
-  //since you have a list of buttons, 
+  //since you have a list of buttons, lets create them all at once
+  //the user will travel forward on the line
+
 }
 
 function main() { 
   //parse JSON and get buttons
   parseJSON();
-
 
   // Initial display for framerate
   const stats = Stats();
@@ -190,7 +191,6 @@ function main() {
   loadScene();
   
   const camera = new Camera(vec3.fromValues(0, 15, 30), vec3.fromValues(0, 0, 0));
-
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.7, 0.7, 0.7, 1);
   gl.enable(gl.DEPTH_TEST);
@@ -204,8 +204,8 @@ function main() {
   function tick() {
     
     //U_tIME
-    count++;
-    
+    count += 0.2;
+
     let base_color = vec4.fromValues(255/255, 255/255, 255/255, 1);
       camera.update();
       stats.begin();
