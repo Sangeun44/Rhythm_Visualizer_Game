@@ -23,10 +23,10 @@ class Square extends Drawable {
                                    0, 0, 1, 0,
                                    0, 0, 1, 0,
                                    ]);
-  this.positions = new Float32Array([-10, -1, -10, 1,
-                                     10, -1, -10, 1,
-                                     10, -1, 10, 1,
-                                     -10, -1, 10, 1,
+  this.positions = new Float32Array([-10, 0, -30, 1,
+                                     10, 0, -30, 1,
+                                     10, 0, 10, 1,
+                                     -10, 0, 10, 1,
                                     ]);
 
     this.generateIdx();

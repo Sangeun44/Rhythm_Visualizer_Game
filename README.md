@@ -1,6 +1,7 @@
 #MILESTONE UPDATE
 Instead of working with pure midi/mp3 files, since they don't have big/useable libraries/API, I tried multiple npm libraries, none worked.
-I just converted MIDI files to JSON files with Tone.js's MIDIConvert.
+I just converted MIDI files to JSON files with Tone.js's MIDIConvert. The resources folder has all the json and mp3 that are needed.
+
 With these json files, which is done in main.ts, I worked on the easy mode
 From 15 - 40, letter A
 From 40 - 52, letter S
@@ -18,7 +19,11 @@ Duration is for how long the key lasts.
 
 I have to work on creating the layout of the buttons into a big mesh so that it can proceed as the program runs.
 
+Mario is in the background like a monument
+
 demo link: https://sangeun44.github.io/Rhythm_Visualizer_Game/
+
+![](1st.png)
 
 # Final Procedural Project  
 # Music Visualizer - BTS Super Star/Guitar Hero 
