@@ -269,10 +269,11 @@ function main() {
       gl.viewport(0, 0, window.innerWidth, window.innerHeight);
       renderer.clear();
      
+      let base_color = vec4.fromValues(200/255, 60/255, 200/255, 1);
+
       //mario
-     let base_color = vec4.fromValues(200/255, 60/255, 200/255, 1);
-     lambert.setGeometryColor(base_color);
-     renderer.render(camera, lambert, [mario]);
+    //  lambert.setGeometryColor(base_color);
+    //  renderer.render(camera, lambert, [mario]);
     //plate
     base_color = vec4.fromValues(150/255, 240/255, 255/255, 1);
     plate_lambert.setGeometryColor(base_color);
