@@ -3422,36 +3422,169 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-let jsonFile;
-jsonFile = Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* readTextFile */])('../resources/obj/BTS - RUN.json');
 const parseJson = __webpack_require__(67);
-//const json = '{\n\t"foo": true,\n}';
-const json = jsonFile;
-let obj0;
-let mesh0;
+let jsonFile; //jsonFile name
+//objects
+let marioString; //objString name
+let mario;
+let buttonAstr;
+let buttonA;
+let buttonFstr;
+let buttonF;
+let buttonSstr;
+let buttonS;
+let buttonDstr;
+let buttonD;
+let buttonJstr;
+let buttonJ;
+let buttonKstr;
+let buttonK;
+let buttonLstr;
+let buttonL;
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-    randomize: 2,
     'Load Scene': loadScene // A function pointer, essentially
 };
+//list of buttons to create
+let buttons = Array();
 //shapes
-let icosphere;
-let square;
 let cube;
+let square;
 //time
 let count = 0.0;
 function loadScene() {
+    //Mario 
+    marioString = Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* readTextFile */])('./resources/obj/wahoo.obj');
+    mario = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](marioString, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    mario.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, -5, -20));
+    mario.create();
     square = new __WEBPACK_IMPORTED_MODULE_4__geometry_Square__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
     square.create();
-    mesh0 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](obj0, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
-    mesh0.create();
+}
+function loadButtonsEasy() {
+    buttonSstr = Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonS = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonSstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonS.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, 0));
+    buttonS.create();
+    buttonDstr = Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonD = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonDstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonD.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, 0));
+    buttonD.create();
+    buttonFstr = Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonF = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonFstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonF.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, 0));
+    buttonF.create();
+    buttonJstr = Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonJ = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonJstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonJ.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, 0));
+    buttonJ.create();
+    buttonKstr = Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonK = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonKstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonK.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, 0));
+    buttonK.create();
+    buttonLstr = Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonL = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonLstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonL.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, 0));
+    buttonL.create();
+}
+//read the JSON file determined by the user
+//currntly doing a test midi json
+function parseJSON() {
+    jsonFile = Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* readTextFile */])('./resources/music/json/BTS - RUN.json');
+    const json = jsonFile;
+    var midi = parseJson(json);
+    var tracks = midi["tracks"];
+    parseTracks(tracks);
+}
+//easy version
+function parseTracks(tracks) {
+    //tracks are in an array
+    for (let track of tracks) {
+        //track's notes are in an array
+        let notes = [];
+        notes = track["notes"];
+        //if the track has notes to be played
+        if (notes.length > 0) {
+            var currTime = 0;
+            for (let note of notes) {
+                //name, midi, time, velocity, duration
+                //time passed per note
+                var time = note["time"];
+                var deltaTime = time - currTime;
+                currTime = time;
+                var number = note["midi"];
+                var duration = note["duration"];
+                //for buttons that happen 0.3
+                if (deltaTime > 0.28) {
+                    //cutoffs: 28, 40, 52, 64, 76, 88, 100
+                    if (number > 15 && number < 40) {
+                        let obj = {
+                            letter: "S",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 40 && number < 52) {
+                        let obj = {
+                            letter: "D",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 52 && number < 64) {
+                        let obj = {
+                            letter: "F",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 64 && number < 76) {
+                        let obj = {
+                            letter: "J",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 76 && number < 88) {
+                        let obj = {
+                            letter: "K",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 88 && number < 120) {
+                        let obj = {
+                            letter: "L",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                }
+            }
+        }
+    }
+}
+function createButtons() {
+    //since you have a list of buttons, lets create them all at once
+    //the user will travel forward on the line
+    for (let one of buttons) {
+        var letter = one.letter;
+        var duration = one.duration;
+        var time = one.mark;
+    }
 }
 function main() {
-    //JSON.parse(json);
-    //parseJson(json);
-    //parseJson(json, 'BTS - RUN.json');
-    obj0 = Object(__WEBPACK_IMPORTED_MODULE_5__globals__["b" /* readTextFile */])('./obj/wahoo.obj');
+    //parse JSON and get buttons
+    parseJSON();
+    //buttons
+    createButtons();
     // Initial display for framerate
     const stats = __WEBPACK_IMPORTED_MODULE_1_stats_js__();
     stats.setMode(0);
@@ -3473,26 +3606,54 @@ function main() {
     Object(__WEBPACK_IMPORTED_MODULE_5__globals__["c" /* setGL */])(gl);
     // Initial call to load scene
     loadScene();
-    const camera = new __WEBPACK_IMPORTED_MODULE_7__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(10, 30, 0), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    loadButtonsEasy();
+    const camera = new __WEBPACK_IMPORTED_MODULE_7__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 5, 7), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
-    renderer.setClearColor(0.7, 0.7, 0.7, 1);
+    renderer.setClearColor(0.4, 0.3, 0.9, 1);
     gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     const lambert = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(75)),
         new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(76)),
     ]);
+    const button_lambert = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(77)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(78)),
+    ]);
+    const plate_lambert = new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["b" /* default */]([
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(79)),
+        new __WEBPACK_IMPORTED_MODULE_8__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(80)),
+    ]);
+    //change fov
+    camera.fovy = 1.5;
     // This function will be called every frame
     function tick() {
+        //disable rollover controls
+        // camera.controls.rotationSpeed = 0;
+        // camera.controls.translationSpeed = 0;
+        // camera.controls.zoomSpeed = 0;    
         //U_tIME
         count++;
-        let base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(255 / 255, 255 / 255, 255 / 255, 1);
         camera.update();
         stats.begin();
-        var height = controls.randomize;
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
-        lambert.setGeometryColor(base_color);
-        renderer.render(camera, lambert, [square, mesh0]);
+        let base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(200 / 255, 60 / 255, 200 / 255, 1);
+        //mario
+        //  lambert.setGeometryColor(base_color);
+        //  renderer.render(camera, lambert, [mario]);
+        //plate
+        base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(150 / 255, 240 / 255, 255 / 255, 1);
+        plate_lambert.setGeometryColor(base_color);
+        renderer.render(camera, plate_lambert, [square]);
+        //current easy buttons
+        base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(200 / 255, 60 / 255, 200 / 255, 1);
+        button_lambert.setGeometryColor(base_color);
+        renderer.render(camera, button_lambert, [buttonS, buttonF, buttonJ, buttonK, buttonL]);
+        base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(100 / 255, 160 / 255, 200 / 255, 1);
+        button_lambert.setGeometryColor(base_color);
+        renderer.render(camera, button_lambert, [buttonD, buttonF, buttonJ, buttonK, buttonL]);
         stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
         requestAnimationFrame(tick);
@@ -3509,6 +3670,13 @@ function main() {
     tick();
 }
 main();
+this.rotationMatrix = function (axis, angle) {
+    axis = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].normalize(axis, axis);
+    var s = Math.sin(angle);
+    var c = Math.cos(angle);
+    var oc = 1.0 - c;
+    return __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["a" /* mat4 */].fromValues(oc * axis[0] * axis[0] + c, oc * axis[0] * axis[1] - axis[2] * s, oc * axis[2] * axis[0] + axis[1] * s, 0.0, oc * axis[0] * axis[1] + axis[2] * s, oc * axis[1] * axis[1] + c, oc * axis[1] * axis[2] - axis[0] * s, 0.0, oc * axis[2] * axis[0] - axis[1] * s, oc * axis[1] * axis[2] + axis[0] * s, oc * axis[2] * axis[2] + c, 0.0, 0.0, 0.0, 0.0, 1.0);
+};
 
 
 /***/ }),
@@ -12012,29 +12180,62 @@ dat.utils.common);
 class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* default */] {
     constructor(objString, center) {
         super(); // Call the constructor of the super class. This is required.
+        this.setInd = function (ind) {
+            this.idxTemp = Uint32Array.from(ind);
+        };
+        this.setNorm = function (norm) {
+            this.norTemp = Float32Array.from(norm);
+        };
+        this.setPos = function (pos) {
+            this.posTemp = Float32Array.from(pos);
+        };
         this.center = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(center[0], center[1], center[2], 1);
+        this.posTemp = Array();
+        this.norTemp = Array();
+        this.idxTemp = Array();
         this.objString = objString;
+        this.setUpMesh();
     }
-    create() {
-        let posTemp = [];
-        let norTemp = [];
-        let idxTemp = [];
+    getInd() {
+        return this.idxTemp;
+    }
+    getNorm() {
+        return this.norTemp;
+    }
+    getPos() {
+        return this.posTemp;
+    }
+    translateVertices(pos) {
+        for (var i = 0; i < this.posTemp.length; i = i + 4) {
+            //input vertex x, y, z
+            var xCom = this.posTemp[i];
+            var yCom = this.posTemp[i + 1];
+            var zCom = this.posTemp[i + 2];
+            var vert = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(xCom + pos[0], yCom + pos[1], zCom + pos[2]);
+            this.posTemp[i] = vert[0];
+            this.posTemp[i + 1] = vert[1];
+            this.posTemp[i + 2] = vert[2];
+            this.posTemp[i + 3] = 1;
+        }
+    }
+    setUpMesh() {
         var loadedMesh = new __WEBPACK_IMPORTED_MODULE_3_webgl_obj_loader__["Mesh"](this.objString);
-        //posTemp = loadedMesh.vertices;
         for (var i = 0; i < loadedMesh.vertices.length; i++) {
-            posTemp.push(loadedMesh.vertices[i]);
+            this.posTemp.push(loadedMesh.vertices[i]);
             if (i % 3 == 2)
-                posTemp.push(1.0);
+                this.posTemp.push(1.0);
         }
         for (var i = 0; i < loadedMesh.vertexNormals.length; i++) {
-            norTemp.push(loadedMesh.vertexNormals[i]);
+            this.norTemp.push(loadedMesh.vertexNormals[i]);
             if (i % 3 == 2)
-                norTemp.push(0.0);
+                this.norTemp.push(0.0);
         }
-        idxTemp = loadedMesh.indices;
-        this.indices = new Uint32Array(idxTemp);
-        this.normals = new Float32Array(norTemp);
-        this.positions = new Float32Array(posTemp);
+        this.idxTemp = loadedMesh.indices;
+    }
+    create() {
+        this.indices = new Uint32Array(this.idxTemp);
+        this.normals = new Float32Array(this.norTemp);
+        this.positions = new Float32Array(this.posTemp);
         this.generateIdx();
         this.generatePos();
         this.generateNor();
@@ -12084,10 +12285,10 @@ class Square extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /*
             0, 0, 1, 0,
             0, 0, 1, 0,
         ]);
-        this.positions = new Float32Array([-10, -1, -10, 1,
-            10, -1, -10, 1,
-            10, -1, 10, 1,
-            -10, -1, 10, 1,
+        this.positions = new Float32Array([-10, 0, -30, 1,
+            10, 0, -30, 1,
+            10, 0, 10, 1,
+            -10, 0, 10, 1,
         ]);
         this.generateIdx();
         this.generatePos();
@@ -16348,13 +16549,37 @@ function parseJson (txt, reviver, context) {
 /* 75 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 5, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
 
 /***/ }),
 /* 76 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = mix(diffuseColor.xyz, \n                        vec3(123.f/255.f, 136.f/255.f, 219.f/255.f), 1.) +\n                        mix(0.f, specularIntensity, 2.);\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(mix(color, color2, fs_Col.x) * lightIntensity, diffuseColor.a);\n}\n\n"
+
+/***/ }),
+/* 77 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+
+/***/ }),
+/* 78 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color2 * lightIntensity, diffuseColor.a);\n}\n\n"
+
+/***/ }),
+/* 79 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Pos;\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n    fs_Pos = vs_Pos;\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+
+/***/ }),
+/* 80 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color2 * lightIntensity, (1. / (-fs_Pos.z)));\n}\n\n"
 
 /***/ })
 /******/ ]);
