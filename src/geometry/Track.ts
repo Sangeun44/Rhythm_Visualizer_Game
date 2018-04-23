@@ -43,6 +43,22 @@ class City extends Drawable {
     return maxIndex;
 }
 
+translateVertices(pos : vec3) {
+  for(var i = 0; i < this.pos.length; i = i + 4) {
+      //input vertex x, y, z
+      var xCom = this.pos[i];
+      var yCom = this.pos[i+1];
+      var zCom = this.pos[i+2];
+      
+      var vert = vec3.fromValues(xCom + pos[0], yCom + pos[1], zCom+ pos[2]);
+
+      this.pos[i] = vert[0];
+      this.pos[i+1] = vert[1];
+      this.pos[i+2] = vert[2];
+      this.pos[i+3] = 1;
+  }
+}
+
   addMesh(mesh: Mesh) {
     var objInd = new Array<number>();
     objInd = mesh.getInd();
@@ -89,7 +105,7 @@ class City extends Drawable {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
     gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
 
-    console.log(`Created City`);
+    console.log(`Created Track`);
   }
 };
 

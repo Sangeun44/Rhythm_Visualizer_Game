@@ -5,6 +5,7 @@ import * as DAT from 'dat-gui';
 import * as fs from 'fs';
 
 import Mesh from './geometry/Mesh';
+import Track from './geometry/Track';
 import Icosphere from './geometry/Icosphere';
 import Square from './geometry/Square';
 import Cube from './geometry/Cube';
@@ -51,6 +52,7 @@ const controls = {
 
 //list of buttons to create
 let buttons = Array<any>();
+let track: Track;
 //shapes
 let cube: Cube;
 let square: Square;
@@ -58,6 +60,10 @@ let square: Square;
 let count: number = 0.0;
 
 function loadScene() {
+  //track 
+  track = new Track(vec3.fromValues(0,0,0));
+  loadTrackEasy();
+  track.create();
   //Mario 
   marioString = readTextFile('./resources/obj/wahoo.obj');
   mario = new Mesh(marioString, vec3.fromValues(0, 0, 0));
@@ -71,7 +77,7 @@ function loadScene() {
 function loadButtonsEasy() {
   buttonSstr = readTextFile('./resources/obj/button.obj');
   buttonS = new Mesh(buttonSstr, vec3.fromValues(0,0,0));
-  buttonS.translateVertices(vec3.fromValues(-2,0,0));
+  buttonS.translateVertices(vec3.fromValues(-7,0,0));
   buttonS.create();
 
   buttonDstr = readTextFile('./resources/obj/button.obj');
@@ -81,7 +87,7 @@ function loadButtonsEasy() {
 
   buttonFstr = readTextFile('./resources/obj/button.obj');
   buttonF = new Mesh(buttonFstr, vec3.fromValues(0,0,0));
-  buttonF.translateVertices(vec3.fromValues(-7,0,0));
+  buttonF.translateVertices(vec3.fromValues(-2,0,0));
   buttonF.create();
 
   buttonJstr = readTextFile('./resources/obj/button.obj');
@@ -184,22 +190,41 @@ for(let track of tracks) {
   }  
 }
 
-function createButtons() {
+function loadTrackEasy() {
+
+
   //since you have a list of buttons, lets create them all at once
   //the user will travel forward on the line
   for(let one of buttons) {
     var letter = one.letter;
     var duration = one.duration;
     var time = one.mark;
+
+    let buttonStr = readTextFile('./resources/obj/button.obj');
+    let button = new Mesh(buttonStr, vec3.fromValues(0,0,0));
+
+    if(letter == 'S') {
+      button.translateVertices(vec3.fromValues(-7,0, time * -1.1));
+    } else if(letter == 'D') {
+      button.translateVertices(vec3.fromValues(-4.5,0, time * -1.1));
+    } else if(letter == 'F') {
+      button.translateVertices(vec3.fromValues(-2,0, time * -1.1));
+    } else if(letter == 'J') {
+      button.translateVertices(vec3.fromValues(2,0, time * -1.1));
+    } else if(letter == 'K') {
+      button.translateVertices(vec3.fromValues(4.5,0, time * -1.1));
+    } else if(letter == 'L') {
+      button.translateVertices(vec3.fromValues(7,0, time * -1.1));
+    } 
+
+    track.addMesh(button);
   }
 }
+
 
 function main() { 
   //parse JSON and get buttons
   parseJSON();
-
-  //buttons
-  createButtons();
 
   // Initial display for framerate
   const stats = Stats();
@@ -223,12 +248,12 @@ function main() {
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
 
-
   // Initial call to load scene
   loadScene();
   loadButtonsEasy();
+  loadTrackEasy();
   
-  const camera = new Camera(vec3.fromValues(0, 5, 7), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0, 10, 15), vec3.fromValues(0, 0, 0));
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.4, 0.3, 0.9, 1);
 
@@ -246,13 +271,18 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/button-frag.glsl')),  
   ]);
 
+  const track_lambert = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/track-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/track-frag.glsl')),  
+  ]);
+
   const plate_lambert = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/plate-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/plate-frag.glsl')),  
   ]);
 
   //change fov
-  camera.fovy = 1.5;
+  //camera.fovy = 1.5;
 
   // This function will be called every frame
   function tick() {
@@ -268,24 +298,29 @@ function main() {
 
       gl.viewport(0, 0, window.innerWidth, window.innerHeight);
       renderer.clear();
-     
-      let base_color = vec4.fromValues(200/255, 60/255, 200/255, 1);
+       //none changing environment
 
-      //mario
-    //  lambert.setGeometryColor(base_color);
-    //  renderer.render(camera, lambert, [mario]);
+    let base_color = vec4.fromValues(200/255, 60/255, 200/255, 1);
+    
+    //mario
+    lambert.setGeometryColor(base_color);
+    renderer.render(camera, lambert, [mario]);
+
     //plate
     base_color = vec4.fromValues(150/255, 240/255, 255/255, 1);
     plate_lambert.setGeometryColor(base_color);
     renderer.render(camera, plate_lambert, [square]);
 
      //current easy buttons
-      base_color = vec4.fromValues(200/255, 60/255, 200/255, 1);
-      button_lambert.setGeometryColor(base_color);
-      renderer.render(camera, button_lambert, [buttonS, buttonF, buttonJ, buttonK, buttonL]);
-      base_color = vec4.fromValues(100/255, 160/255, 200/255, 1);
-      button_lambert.setGeometryColor(base_color);
-      renderer.render(camera, button_lambert, [buttonD, buttonF, buttonJ, buttonK, buttonL]);
+     base_color = vec4.fromValues(100/255, 160/255, 200/255, 1);
+     button_lambert.setGeometryColor(base_color);
+      renderer.render(camera, button_lambert, [buttonS, buttonD, buttonF, buttonJ, buttonK, buttonL]);
+   
+    //render track
+    base_color = vec4.fromValues(90/255, 160/255, 100/255, 1);
+    track_lambert.setTime(count);
+    track_lambert.setGeometryColor(base_color);
+    renderer.render(camera, track_lambert, [track]);
 
     stats.end();
 
