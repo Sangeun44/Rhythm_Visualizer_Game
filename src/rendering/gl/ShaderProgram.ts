@@ -31,9 +31,11 @@ class ShaderProgram {
   unifColor: WebGLUniformLocation;
   unifTime: WebGLUniformLocation;
   unifEye: WebGLUniformLocation;
+  unifPressed: WebGLUniformLocation;
 
   curr_color: vec4;
   time: number;
+  pressed: number;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -55,7 +57,7 @@ class ShaderProgram {
     this.unifColor      = gl.getUniformLocation(this.prog, "u_Color");
     this.unifTime       = gl.getUniformLocation(this.prog, "u_Time");
     this.unifEye       = gl.getUniformLocation(this.prog, "u_Eye");
-
+    this.unifPressed  = gl.getUniformLocation(this.prog, "u_Pressed");
   }
 
   use() {
@@ -96,9 +98,15 @@ class ShaderProgram {
   setTime(t: number) {
     this.use();
     if(this.unifTime !== -1) {
-      gl.uniform1f(this.unifTime, this.time);
+      gl.uniform1f(this.unifTime, t);
     }
-    this.time = t;
+}
+
+setPressed(t: number) {
+  this.use();
+  if(this.unifTime !== -1) {
+    gl.uniform1f(this.unifPressed, t);
+  }
 }
 
   setGeometryColor(color: vec4) {

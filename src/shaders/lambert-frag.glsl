@@ -61,4 +61,3 @@ void main()
 
         out_Col = vec4(mix(color, color2, fs_Col.x) * lightIntensity, diffuseColor.a);
 }
-

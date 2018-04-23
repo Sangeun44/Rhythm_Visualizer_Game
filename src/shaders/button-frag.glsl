@@ -13,6 +13,7 @@ precision highp float;
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
 uniform vec3 u_Eye;
+uniform float u_Pressed;
 
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
@@ -23,9 +24,6 @@ in vec4 fs_Pos;
 
 out vec4 out_Col; // This is the final output color that you will see on your
                   // screen for the pixel that is currently being processed.
-//	Simplex 3D Noise 
-//	by Ian McEwan, Ashima Arts
-//
 
 void main()
 {
@@ -35,7 +33,7 @@ void main()
         float specularIntensity;
 
         if(dot(fs_LightVec, fs_Nor) < 0.f) {
-            specularIntensity = 0.2f;
+            specularIntensity = 0.5f;
         } else {
             specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);
         }
@@ -54,11 +52,16 @@ void main()
                                                             //lit by our point light are not completely black.
 
         // Compute final shaded color
-        vec3 color = mix(diffuseColor.xyz, 
-                        vec3(100.f/255.f, 136.f/255.f, 100.f/255.f), 1.) +
-                        mix(0.f, specularIntensity, 1.);
+
         vec3 color2 = diffuseColor.xyz;
 
-        out_Col = vec4(mix(color, color2, fs_Col.x) * lightIntensity, diffuseColor.a);
+        float in3 = 0.5;
+
+        if(u_Pressed == 0.) {
+            in3 = 0.5;
+        } else {
+            in3 = 1.0;
+        }
+        out_Col = vec4(color2 * lightIntensity, in3);
 }
 
