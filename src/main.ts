@@ -216,9 +216,11 @@ function parseTracks(tracks : any) {
           var duration = note ["duration"];
 
           //for buttons that happen 0.3
-          if(deltaTime > 0.24) {
+          //connect - 0.35
+          //run - 0.3
+          if(deltaTime > 0.3) {
             //cutoffs: 28, 40, 52, 64, 76, 88, 100
-            if(number > 15 && number < 40) {
+            if(number > 10 && number < 35) {
               console.log("15 to 40");
               let obj = {
                letter: "S",
@@ -226,7 +228,7 @@ function parseTracks(tracks : any) {
                 duration: duration
               }
               buttons.push(obj);
-            } else if(number > 40 && number < 52) {
+            } else if(number > 35 && number < 45) {
               console.log("40 to 52");
               let obj = {
                 letter: "D", 
@@ -234,7 +236,7 @@ function parseTracks(tracks : any) {
                 duration: duration
               }
               buttons.push(obj);
-            } else if(number > 52 && number < 64) {
+            } else if(number > 50 && number < 64) {
               console.log("64 to 76");
               let obj = {
                 letter: "F", 
@@ -242,21 +244,21 @@ function parseTracks(tracks : any) {
                 duration: duration
               }
               buttons.push(obj);
-            } else if(number > 64 && number < 76) {
+            } else if(number > 64 && number < 80) {
               let obj = {
                 letter: "J", 
                 mark: time,
                 duration: duration
               }
               buttons.push(obj);
-            } else if(number > 76 && number < 88) {
+            } else if(number > 80 && number < 90) {
               let obj = {
                 letter: "K", 
                 mark: time,
                 duration: duration
               }
               buttons.push(obj);
-            } else if(number > 88 && number < 120) {
+            } else if(number > 90 && number < 127) {
              let obj = {
                 letter: "L", 
                 mark: time,
@@ -291,18 +293,20 @@ function loadTrackEasy() {
     let buttonStr = readTextFile('./resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0,0,0));
 
+    //connect = 
+    //bts run = -5.
     if(letter == 'S') {
-      button.translateVertices(vec3.fromValues(-7,0, time * -6.0));
+      button.translateVertices(vec3.fromValues(-7,0, time * -4));
     } else if(letter == 'D') {
-      button.translateVertices(vec3.fromValues(-4.5,0, time * -6.0));
+      button.translateVertices(vec3.fromValues(-4.5,0, time * -4));
     } else if(letter == 'F') {
-      button.translateVertices(vec3.fromValues(-2,0, time * -6.0));
+      button.translateVertices(vec3.fromValues(-2,0, time * -4));
     } else if(letter == 'J') {
-      button.translateVertices(vec3.fromValues(2,0, time * -6.0));
+      button.translateVertices(vec3.fromValues(2,0, time * -4));
     } else if(letter == 'K') {
-      button.translateVertices(vec3.fromValues(4.5,0, time * -6.0));
+      button.translateVertices(vec3.fromValues(4.5,0, time * -4));
     } else if(letter == 'L') {
-      button.translateVertices(vec3.fromValues(7,0, time * -6.0));
+      button.translateVertices(vec3.fromValues(7,0, time * -4));
     } 
 
     track.addMesh(button);
