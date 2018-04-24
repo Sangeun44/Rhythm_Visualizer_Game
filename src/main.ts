@@ -296,17 +296,17 @@ function loadTrackEasy() {
     //connect = 
     //bts run = -5.
     if(letter == 'S') {
-      button.translateVertices(vec3.fromValues(-7,0, time * -4));
+      button.translateVertices(vec3.fromValues(-7,0, time * -5));
     } else if(letter == 'D') {
-      button.translateVertices(vec3.fromValues(-4.5,0, time * -4));
+      button.translateVertices(vec3.fromValues(-4.5,0, time * -5));
     } else if(letter == 'F') {
-      button.translateVertices(vec3.fromValues(-2,0, time * -4));
+      button.translateVertices(vec3.fromValues(-2,0, time * -5));
     } else if(letter == 'J') {
-      button.translateVertices(vec3.fromValues(2,0, time * -4));
+      button.translateVertices(vec3.fromValues(2,0, time * -5));
     } else if(letter == 'K') {
-      button.translateVertices(vec3.fromValues(4.5,0, time * -4));
+      button.translateVertices(vec3.fromValues(4.5,0, time * -5));
     } else if(letter == 'L') {
-      button.translateVertices(vec3.fromValues(7,0, time * -4));
+      button.translateVertices(vec3.fromValues(7,0, time * -5));
     } 
 
     track.addMesh(button);
@@ -344,7 +344,7 @@ function main() {
   loadScene();
   loadButtonsEasy();
   loadTrack();
-  //play_music();
+  play_music();
 
   const camera = new Camera(vec3.fromValues(0, 10, 15), vec3.fromValues(0, 0, 0));
   const renderer = new OpenGLRenderer(canvas);
