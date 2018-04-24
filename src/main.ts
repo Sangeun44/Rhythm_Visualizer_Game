@@ -91,7 +91,7 @@ var JukeBox: AudioContext;
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
   Difficulty: "easy",
-  Song: "Run",
+  Song: "Connect",
   'Load Scene': loadScene // A function pointer, essentially
 };
 
@@ -417,6 +417,8 @@ function loadTrackEasy() {
 
     buttonTimes.push(time);
     buttonSpace.push(letter);
+    console.log("loading each button with: "  + letter);
+    //console.log("loading each button at: " + time);
 
     let buttonStr = readTextFile('./resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
@@ -452,7 +454,7 @@ function loadTrackHard() {
 
     buttonTimes.push(time);
     buttonSpace.push(letter);
-    
+
     let buttonStr = readTextFile('./resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
 
@@ -550,8 +552,7 @@ function main() {
     var timeSinceStart = timeRightNow - startTime;
     var timeSinceStartSec = timeSinceStart / 1000;
 
-    console.log("time counting: " + timeSinceStartSec);
-
+    //console.log("time counting: " + timeSinceStartSec);
 
     if(!startGame && controls.Difficulty == "easy") {
       console.log("load easy mesh buttons");
@@ -671,13 +672,13 @@ function main() {
           }
         }
 
-        if(health <= 0) {
-          console.log("health IS ZERIO");
-          var myWindow = window.open("", "MsgWindow", "width=200, height=100");
-          myWindow.document.write("<p>You Lose!</p>");
-          status.close();
-          JukeBox.close();
-        }
+        // if(health <= 0) {
+        //   console.log("health IS ZERIO");
+        //   var myWindow = window.open("", "MsgWindow", "width=200, height=100");
+        //   myWindow.document.write("<p>You Lose!</p>");
+        //   status.close();
+        //   JukeBox.close();
+        // }
 
         status.document.write("<p>Your Score: </p>" + "<p>" + points +"</p>");
         status.document.write("<p>Your Health: </p>" + "<p>" + health +"</p>");      
