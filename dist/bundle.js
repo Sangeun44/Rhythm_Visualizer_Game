@@ -3682,8 +3682,11 @@ function parseTracksHard(tracks) {
                 //for buttons that happen 0.3
                 //connect - 0.35
                 //run - 0.25
-                if (deltaTime > 0.04) {
-                    if (number > 0 && number < 60) {
+                var max = 3;
+                var min = -3;
+                var rand = Math.random() * (max - min) + min;
+                if (deltaTime > 0.4) {
+                    if (number > 0 + rand && number < 66 + rand) {
                         let obj = {
                             letter: "A",
                             mark: time,
@@ -3691,7 +3694,7 @@ function parseTracksHard(tracks) {
                         };
                     }
                     //cutoffs: 28, 40, 52, 64, 76, 88, 100
-                    if (number > 60 && number < 65) {
+                    if (number > 66 + rand && number < 69 + rand) {
                         let obj = {
                             letter: "S",
                             mark: time,
@@ -3699,7 +3702,7 @@ function parseTracksHard(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 65 && number < 70) {
+                    else if (number > 69 + rand && number < 73 + rand) {
                         let obj = {
                             letter: "D",
                             mark: time,
@@ -3707,7 +3710,7 @@ function parseTracksHard(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 75 && number < 80) {
+                    else if (number > 73 + rand && number < 77 + rand) {
                         let obj = {
                             letter: "F",
                             mark: time,
@@ -3715,7 +3718,7 @@ function parseTracksHard(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 80 && number < 85) {
+                    else if (number > 77 + rand && number < 79 + rand) {
                         let obj = {
                             letter: "J",
                             mark: time,
@@ -3723,7 +3726,7 @@ function parseTracksHard(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 85 && number < 95) {
+                    else if (number > 79 + rand && number < 82 + rand) {
                         let obj = {
                             letter: "K",
                             mark: time,
@@ -3731,7 +3734,7 @@ function parseTracksHard(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 95 && number < 100) {
+                    else if (number > 82 + rand && number < 85 + rand) {
                         let obj = {
                             letter: "L",
                             mark: time,
@@ -3739,7 +3742,7 @@ function parseTracksHard(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 100 && number < 127) {
+                    else if (number > 85 + rand && number < 127) {
                         let obj = {
                             letter: ";",
                             mark: time,
@@ -3902,12 +3905,6 @@ function main() {
             console.log("load hard mesh buttons");
             loadButtonsHard();
             loaded = true;
-        }
-        if (startGame && loaded) {
-            console.log("load track create");
-            loaded = false;
-            loadTrack();
-            //after loading track, stop loading track eveyr tick
         }
         //disable rollover controls
         camera.controls.rotationSpeed = 0;
@@ -4167,6 +4164,9 @@ function keyPressed(event) {
                 play_music();
                 parseJSON();
             }
+            console.log("load track create");
+            loaded = false;
+            loadTrack();
             play++;
             document.getElementById('visualizerInfo').style.visibility = "hidden";
             startGame = true;
