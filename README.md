@@ -62,6 +62,7 @@ The buttons will move towards you.
 The user has to tap the correct key at the correct time. 
 
 ## Visulization Decoration
+* buttons - will be transparent unless pressed, will have a special effect when pressed
 The background moves according to the music.
 
 It might be a bit distracting
@@ -75,7 +76,7 @@ It might be a bit distracting
 ## Sources
 Grace Xu Final Music Visualizer:  https://github.com/gracexu94/FinalProject
 * Web Audio API
-* Three.js
+* Tone.js
 * Node.js
 * web-audio-beat-detector
 
