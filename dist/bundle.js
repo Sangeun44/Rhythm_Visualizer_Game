@@ -3428,6 +3428,8 @@ const parseJson = __webpack_require__(68);
 let jsonFile; //jsonFile name
 //list of buttons to create
 let buttons = Array();
+let points = 0;
+let health = 0;
 let keyBoard = Array();
 let track;
 let gameDiff;
@@ -3906,6 +3908,7 @@ function main() {
             loadButtonsHard();
             loaded = true;
         }
+        var currTime = new Date();
         //disable rollover controls
         camera.controls.rotationSpeed = 0;
         camera.controls.translationSpeed = 0;
@@ -4163,10 +4166,10 @@ function keyPressed(event) {
             if (play == 0) {
                 play_music();
                 parseJSON();
+                console.log("load track create");
+                loaded = false;
+                loadTrack();
             }
-            console.log("load track create");
-            loaded = false;
-            loadTrack();
             play++;
             document.getElementById('visualizerInfo').style.visibility = "hidden";
             startGame = true;

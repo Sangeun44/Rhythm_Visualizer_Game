@@ -21,15 +21,22 @@ let jsonFile: string; //jsonFile name
 
 //list of buttons to create
 let buttons = Array<any>();
+let buttonTimes = Array<number>();
+let buttonSpace = Array<string>();
+
 let points = 0;
-let health = 0;
+let health = 20;
+let startTime = 0;
+let epsilon = 0.5;
+
+let status: Window;
+
 let keyBoard = Array<Mesh>();
 let track: Track;
 let gameDiff: string;
 let startGame = false;
 let loaded = false;
 let parse = false;
-
 
 let gameStartTime = 0;
 
@@ -77,6 +84,9 @@ let buttonPstr: string;
 let buttonP: Mesh;
 let downP: boolean;
 
+//music 
+var JukeBox: AudioContext;
+
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
@@ -86,10 +96,10 @@ const controls = {
 };
 
 function play_music() {
+  JukeBox = new AudioContext();
   var musicStr = controls.Song;
   var musicPath = './resources/music/mp3/' + musicStr + '.mp3';
 
-  var JukeBox = new AudioContext();
   fetch(musicPath)
     .then(r => r.arrayBuffer())
     .then(b => JukeBox.decodeAudioData(b))
@@ -203,9 +213,9 @@ function parseJSON() {
   const json = jsonFile;
 
   var midi = parseJson(json);
-  console.log(midi);
+  //console.log(midi);
   var tracks = midi["tracks"];
-  console.log("midi" + tracks.length);
+  //console.log("midi" + tracks.length);
   if(controls.Difficulty == 'easy') {
     parseTracksEasy(tracks);
   } else if (controls.Difficulty == 'hard') {
@@ -217,7 +227,7 @@ function parseJSON() {
 function parseTracksEasy(tracks: any) {
   //tracks are in an array
   for (let track of tracks) {
-    console.log("track" + track.length);
+    //console.log("track" + track.length);
     //track's notes are in an array
     let notes = [];
     notes = track["notes"];
@@ -237,33 +247,33 @@ function parseTracksEasy(tracks: any) {
         //for buttons that happen 0.3
         //connect - 0.35
         //run - 0.25
-        if (deltaTime > 0.28) {
+        if (deltaTime > 0.5) {
           //cutoffs: 28, 40, 52, 64, 76, 88, 100
-          if (number > 10 && number < 45) {
-            console.log("15 to 40");
+          if (number > 0 && number < 55) {
+            //console.log("15 to 40");
             let obj = {
               letter: "S",
               mark: time,
               duration: duration
             }
             buttons.push(obj);
-          } else if (number > 45 && number < 55) {
-            console.log("40 to 52");
+          } else if (number > 55 && number < 65) {
+            //console.log("40 to 52");
             let obj = {
               letter: "D",
               mark: time,
               duration: duration
             }
             buttons.push(obj);
-          } else if (number > 55 && number < 65) {
-            console.log("64 to 76");
+          } else if (number > 65 && number < 70) {
+            //console.log("64 to 76");
             let obj = {
               letter: "F",
               mark: time,
               duration: duration
             }
             buttons.push(obj);
-          } else if (number > 65 && number < 75) {
+          } else if (number > 70 && number < 75) {
             let obj = {
               letter: "J",
               mark: time,
@@ -391,19 +401,22 @@ function loadTrack() {
   } else if (controls.Difficulty == "hard") {
     loadTrackHard();
   }
-  console.log("track loads");
+  //console.log("track loads");
   track.create();
   //console.log("track positions" + track.pos);
 }
 
 function loadTrackEasy() {
-  console.log("buttons: " + buttons.length);
+  //console.log("buttons: " + buttons.length);
   //since you have a list of buttons, lets create them all at once
   //the user will travel forward on the line
   for (let one of buttons) {
     var letter = one.letter;
     var duration = one.duration;
     var time = one.mark;
+
+    buttonTimes.push(time);
+    buttonSpace.push(letter);
 
     let buttonStr = readTextFile('./resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
@@ -437,6 +450,9 @@ function loadTrackHard() {
     var duration = one.duration;
     var time = one.mark;
 
+    buttonTimes.push(time);
+    buttonSpace.push(letter);
+    
     let buttonStr = readTextFile('./resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
 
@@ -530,6 +546,13 @@ function main() {
 
   // This function will be called every frame
   function tick() {
+    var timeRightNow = Date.now();
+    var timeSinceStart = timeRightNow - startTime;
+    var timeSinceStartSec = timeSinceStart / 1000;
+
+    console.log("time counting: " + timeSinceStartSec);
+
+
     if(!startGame && controls.Difficulty == "easy") {
       console.log("load easy mesh buttons");
       //load easy mesh buttons
@@ -581,8 +604,90 @@ function main() {
 
     //user starts game
     if (startGame) {
-      //U_tIME
+      var displayButtonTime = buttonTimes[0] - 1.5;
+      //check for each button, if the user has pressed the correct button
+      if(displayButtonTime >= timeSinceStartSec - epsilon && displayButtonTime <= timeSinceStartSec + epsilon) {
+        console.log("time since start: " + timeSinceStartSec);
+        console.log("button time e: " + buttonTimes[0]);
+        
+        var letter = buttonSpace[0];
+        if(letter == 'A') {
+          if(downA) {
+            points++;
+          } else {
+            health--;
+          }
+        } else if(letter == 'S') {
+          console.log("letter pu: S + time " + timeSinceStartSec);
+          if(downS) {
+            points++;
+          } else {
+            health--;
+          }
+        } else if(letter == 'D') {
+          console.log("letter pu: D + time " + timeSinceStartSec);
+          if(downD) {
+            points++;
+          } else {
+            health--;
+          }
+        } else if(letter == 'F') {
+          console.log("letter pu: F + time " + timeSinceStartSec);
+          if(downF) {
+            points++;
+          } else {
+            health--;
+          }
+        } else if(letter == 'J') {
+          console.log("letter pu: J + time " + timeSinceStartSec);
+          if(downJ) {
+            console.log("point: " + points);
+            points++;
+          } else {
+            health--;
+          }
+        } else if(letter == 'K') {
+          console.log("letter pu: K + time " + timeSinceStartSec);
+          if(downK) {
+            console.log("point: " + points);
+            points++;
+          } else {
+            health--;
+          }
+        } else if(letter == 'L') {
+          console.log("letter pu: L + time " + timeSinceStartSec);
+          if(downL) {
+            console.log("point: " + points);
+            points++;
+          } else {
+            health--;
+          }
+        } else if(letter == ';') {
+          if(downP) {
+            console.log("letter pu: ;");
+            points++;
+          } else {
+            health--;
+          }
+        }
 
+        if(health <= 0) {
+          console.log("health IS ZERIO");
+          var myWindow = window.open("", "MsgWindow", "width=200, height=100");
+          myWindow.document.write("<p>You Lose!</p>");
+          status.close();
+          JukeBox.close();
+        }
+
+        status.document.write("<p>Your Score: </p>" + "<p>" + points +"</p>");
+        status.document.write("<p>Your Health: </p>" + "<p>" + health +"</p>");      
+        
+        //remove first element
+        buttonSpace.shift();
+        buttonTimes.shift();
+      }
+
+      //U_tIME
       count++;
       //  //current easy buttons
       if (controls.Difficulty == "easy") {
@@ -810,13 +915,26 @@ function keyPressed(event: KeyboardEvent) {
       break;
     case 86:
       if(play == 0) {
+        status = window.open("", "MsgWindow", "width=200, height=100");
+        status.document.write("<p>Your Score: </p>" + "<p>" + points +"</p>");
+        status.document.write("<p>Your Health: </p>" + "<p>" + health +"</p>");
         play_music();
         parseJSON();
+        console.log("load track create");
+        loadTrack();
       } 
 
-        console.log("load track create");
-        loaded = false;
-        loadTrack();
+      if(controls.Difficulty == "easy") {
+        epsilon = 0.5;
+      }
+      else if(controls.Difficulty == "hard") {
+        epsilon = 0.2;
+      }
+
+      
+      var d = Date.now();
+      startTime = d;
+      console.log("start Time " + startTime);
 
       play++;
       document.getElementById('visualizerInfo').style.visibility = "hidden";
