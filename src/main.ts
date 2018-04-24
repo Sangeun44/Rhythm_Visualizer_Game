@@ -25,7 +25,12 @@ let keyBoard = Array<Mesh>();
 let track: Track;
 let gameDiff: string;
 let startGame = false;
+let loaded = false;
+let parse = false;
 
+let gameStartTime = 0;
+
+let play = 0;
 //shapes
 let cube: Cube;
 let square: Square;
@@ -144,7 +149,7 @@ function loadButtonsEasy() {
 function loadButtonsHard() {
   buttonAstr = readTextFile('./resources/obj/button.obj');
   buttonA = new Mesh(buttonAstr, vec3.fromValues(0, 0, 0));
-  buttonA.translateVertices(vec3.fromValues(-8.5, 0, 0));
+  buttonA.translateVertices(vec3.fromValues(-9.5, 0, 0));
   buttonA.create();
 
   buttonSstr = readTextFile('./resources/obj/button.obj');
@@ -179,7 +184,7 @@ function loadButtonsHard() {
 
   buttonPstr = readTextFile('./resources/obj/button.obj');
   buttonP = new Mesh(buttonPstr, vec3.fromValues(0, 0, 0));
-  buttonP.translateVertices(vec3.fromValues(8.5, 0, 0));
+  buttonP.translateVertices(vec3.fromValues(9.5, 0, 0));
   buttonP.create();
 
   keyBoard.push(buttonA, buttonS, buttonD, buttonF, buttonJ, buttonK, buttonL, buttonP);
@@ -198,11 +203,15 @@ function parseJSON() {
   console.log(midi);
   var tracks = midi["tracks"];
   console.log("midi" + tracks.length);
-  parseTracks(tracks);
+  if(controls.Difficulty == 'easy') {
+    parseTracksEasy(tracks);
+  } else if (controls.Difficulty == 'hard') {
+    parseTracksHard(tracks);
+  }
 }
 
 //easy version
-function parseTracks(tracks: any) {
+function parseTracksEasy(tracks: any) {
   //tracks are in an array
   for (let track of tracks) {
     console.log("track" + track.length);
@@ -225,7 +234,7 @@ function parseTracks(tracks: any) {
         //for buttons that happen 0.3
         //connect - 0.35
         //run - 0.25
-        if (deltaTime > 0.25) {
+        if (deltaTime > 0.28) {
           //cutoffs: 28, 40, 52, 64, 76, 88, 100
           if (number > 10 && number < 45) {
             console.log("15 to 40");
@@ -258,16 +267,108 @@ function parseTracks(tracks: any) {
               duration: duration
             }
             buttons.push(obj);
-          } else if (number > 75 && number < 85) {
+          } else if (number > 75 && number < 83) {
             let obj = {
               letter: "K",
               mark: time,
               duration: duration
             }
             buttons.push(obj);
-          } else if (number > 85 && number < 127) {
+          } else if (number > 83 && number < 127) {
             let obj = {
               letter: "L",
+              mark: time,
+              duration: duration
+            }
+            buttons.push(obj);
+          }
+        }
+      }
+    }
+  }
+}
+
+//easy version
+function parseTracksHard(tracks: any) {
+  //tracks are in an array
+  for (let track of tracks) {
+    console.log("track" + track.length);
+    //track's notes are in an array
+    let notes = [];
+    notes = track["notes"];
+    //if the track has notes to be played
+    if (notes.length > 0) {
+      var currTime = 0;
+      for (let note of notes) {
+        //name, midi, time, velocity, duration
+        //time passed per note
+        var time = note["time"];
+        var deltaTime = time - currTime;
+        currTime = time;
+
+        var number = note["midi"];
+        var duration = note["duration"];
+
+        //for buttons that happen 0.3
+        //connect - 0.35
+        //run - 0.25
+        var max = 3;
+        var min = -3;
+        var rand = Math.random() * (max - min) + min;
+        if (deltaTime > 0.4) {
+          if(number > 0 + rand && number < 66 + rand) {
+            let obj = {
+              letter: "A",
+              mark: time,
+              duration: duration
+            }
+          }
+          //cutoffs: 28, 40, 52, 64, 76, 88, 100
+          if (number > 66 + rand && number < 69 + rand) {
+            let obj = {
+              letter: "S",
+              mark: time,
+              duration: duration
+            }
+            buttons.push(obj);
+          } else if (number > 69 + rand && number < 73 + rand) {
+            let obj = {
+              letter: "D",
+              mark: time,
+              duration: duration
+            }
+            buttons.push(obj);
+          } else if (number > 73 + rand && number < 77 +rand) {
+            let obj = {
+              letter: "F",
+              mark: time,
+              duration: duration
+            }
+            buttons.push(obj);
+          } else if (number > 77 + rand && number < 79 + rand) {
+            let obj = {
+              letter: "J",
+              mark: time,
+              duration: duration
+            }
+            buttons.push(obj);
+          } else if (number > 79 + rand && number < 82 + rand) {
+            let obj = {
+              letter: "K",
+              mark: time,
+              duration: duration
+            }
+            buttons.push(obj);
+          } else if (number > 82 + rand && number < 85 + rand) {
+            let obj = {
+              letter: "L",
+              mark: time,
+              duration: duration
+            }
+            buttons.push(obj);
+          } else if (number > 85 + rand && number < 127) {
+            let obj = {
+              letter: ";",
               mark: time,
               duration: duration
             }
@@ -282,7 +383,11 @@ function parseTracks(tracks: any) {
 function loadTrack() {
   //track 
   track = new Track(vec3.fromValues(0, 0, 0));
-  loadTrackEasy();
+  if(controls.Difficulty == "easy") {
+    loadTrackEasy();
+  } else if (controls.Difficulty == "hard") {
+    loadTrackHard();
+  }
   console.log("track loads");
   track.create();
   //console.log("track positions" + track.pos);
@@ -303,17 +408,53 @@ function loadTrackEasy() {
     //connect = 
     //bts run = -5
     if (letter == 'S') {
-      button.translateVertices(vec3.fromValues(-7, 0, time * -5.3));
+      button.translateVertices(vec3.fromValues(-7, 0, time * -5));
     } else if (letter == 'D') {
-      button.translateVertices(vec3.fromValues(-4.5, 0, time * -5.3));
+      button.translateVertices(vec3.fromValues(-4.5, 0, time * -5));
     } else if (letter == 'F') {
-      button.translateVertices(vec3.fromValues(-2, 0, time * -5.3));
+      button.translateVertices(vec3.fromValues(-2, 0, time * -5));
     } else if (letter == 'J') {
-      button.translateVertices(vec3.fromValues(2, 0, time * -5.3));
+      button.translateVertices(vec3.fromValues(2, 0, time * -5));
     } else if (letter == 'K') {
-      button.translateVertices(vec3.fromValues(4.5, 0, time * -5.3));
+      button.translateVertices(vec3.fromValues(4.5, 0, time * -5));
     } else if (letter == 'L') {
-      button.translateVertices(vec3.fromValues(7, 0, time * -5.3));
+      button.translateVertices(vec3.fromValues(7, 0, time * -5));
+    }
+
+    track.addMesh(button);
+  }
+}
+
+function loadTrackHard() {
+ // console.log("buttons: " + buttons.length);
+  //since you have a list of buttons, lets create them all at once
+  //the user will travel forward on the line
+  for (let one of buttons) {
+    var letter = one.letter;
+    var duration = one.duration;
+    var time = one.mark;
+
+    let buttonStr = readTextFile('./resources/obj/button.obj');
+    let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
+
+    //connect = 
+    //bts run = -5
+    if(letter == 'A') {
+      button.translateVertices(vec3.fromValues(-9.5, 0, time * -5));
+    } else if (letter == 'S') {
+      button.translateVertices(vec3.fromValues(-7, 0, time * -5));
+    } else if (letter == 'D') {
+      button.translateVertices(vec3.fromValues(-4.5, 0, time * -5));
+    } else if (letter == 'F') {
+      button.translateVertices(vec3.fromValues(-2, 0, time * -5));
+    } else if (letter == 'J') {
+      button.translateVertices(vec3.fromValues(2, 0, time * -5));
+    } else if (letter == 'K') {
+      button.translateVertices(vec3.fromValues(4.5, 0, time * -5));
+    } else if (letter == 'L') {
+      button.translateVertices(vec3.fromValues(7, 0, time * -5));
+    } else if (letter == ';') {
+      button.translateVertices(vec3.fromValues(9.5, 0, time * -5));
     }
 
     track.addMesh(button);
@@ -321,8 +462,6 @@ function loadTrackEasy() {
 }
 
 function main() {
-  //parse JSON and get buttons
-  parseJSON();
 
   // Initial display for framerate
   const stats = Stats();
@@ -350,8 +489,6 @@ function main() {
 
   // Initial call to load scene
   loadScene();
-  loadButtonsEasy();
-  loadTrack();
 
   const camera = new Camera(vec3.fromValues(0, 10, 15), vec3.fromValues(0, 0, 0));
   const renderer = new OpenGLRenderer(canvas);
@@ -390,7 +527,19 @@ function main() {
 
   // This function will be called every frame
   function tick() {
-    
+    if(!startGame && controls.Difficulty == "easy") {
+      console.log("load easy mesh buttons");
+      //load easy mesh buttons
+      loadButtonsEasy();
+      loaded = true;
+    } else if(!startGame && controls.Difficulty == "hard"){
+      //load 
+      console.log("load hard mesh buttons");
+      loadButtonsHard();
+      loaded = true;
+    }
+
+
     //disable rollover controls
     camera.controls.rotationSpeed = 0;
     camera.controls.translationSpeed = 0;
@@ -418,9 +567,12 @@ function main() {
     button_lambert.setGeometryColor(base_color);
 
     //user has not started game
-    if(!startGame) {
+    if(!startGame && controls.Difficulty == "easy") {
       button_lambert.setGeometryColor(base_color);
       renderer.render(camera, button_lambert, [buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL]);
+    } else if(!startGame && controls.Difficulty == "hard") {
+      button_lambert.setGeometryColor(base_color);
+      renderer.render(camera, button_lambert, [buttonA, buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL, buttonP]);
     }
 
     //user starts game
@@ -475,6 +627,68 @@ function main() {
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonL]);
+        }
+      } else if (controls.Difficulty == "hard") {
+        if (downA) {
+          button_lambert.setPressed(1);
+          renderer.render(camera, button_lambert, [buttonA]);
+        } else {
+          button_lambert.setPressed(0);
+          renderer.render(camera, button_lambert, [buttonA]);
+        }
+        if (downS) {
+          button_lambert.setPressed(1);
+          renderer.render(camera, button_lambert, [buttonS]);
+        } else {
+          button_lambert.setPressed(0);
+          renderer.render(camera, button_lambert, [buttonS]);
+        }
+        if (downD) {
+          button_lambert.setPressed(1);
+          renderer.render(camera, button_lambert, [buttonD]);
+        } else {
+          button_lambert.setPressed(0);
+          renderer.render(camera, button_lambert, [buttonD]);
+        }
+
+        if (downF) {
+          button_lambert.setPressed(1);
+          renderer.render(camera, button_lambert, [buttonF]);
+        } else {
+          button_lambert.setPressed(0);
+          renderer.render(camera, button_lambert, [buttonF]);
+        }
+
+        if (downJ) {
+          button_lambert.setPressed(1);
+          renderer.render(camera, button_lambert, [buttonJ]);
+        } else {
+          button_lambert.setPressed(0);
+          renderer.render(camera, button_lambert, [buttonJ]);
+        }
+
+        if (downK) {
+          button_lambert.setPressed(1);
+          renderer.render(camera, button_lambert, [buttonK]);
+        } else {
+          button_lambert.setPressed(0);
+          renderer.render(camera, button_lambert, [buttonK]);
+        }
+
+        if (downL) {
+          button_lambert.setPressed(1);
+          renderer.render(camera, button_lambert, [buttonL]);
+        } else {
+          button_lambert.setPressed(0);
+          renderer.render(camera, button_lambert, [buttonL]);
+        }  
+        
+        if (downP) {
+          button_lambert.setPressed(1);
+          renderer.render(camera, button_lambert, [buttonP]);
+        } else {
+          button_lambert.setPressed(0);
+          renderer.render(camera, button_lambert, [buttonP]);
         }
       }
 
@@ -591,8 +805,15 @@ function keyPressed(event: KeyboardEvent) {
       startGame = false;
       break;
     case 86:
+      if(play == 0) {
         play_music();
-      
+        parseJSON();
+      } 
+      console.log("load track create");
+      loaded = false;
+      loadTrack();
+    
+      play++;
       document.getElementById('visualizerInfo').style.visibility = "hidden";
       startGame = true;
       break;

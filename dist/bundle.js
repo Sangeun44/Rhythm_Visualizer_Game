@@ -3426,41 +3426,72 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 const parseJson = __webpack_require__(68);
 let jsonFile; //jsonFile name
-//objects
-let marioString; //objString name
-let mario;
-let buttonAstr;
-let buttonA;
-let buttonFstr;
-let buttonF;
-let buttonSstr;
-let buttonS;
-let buttonDstr;
-let buttonD;
-let buttonJstr;
-let buttonJ;
-let buttonKstr;
-let buttonK;
-let buttonLstr;
-let buttonL;
-// Define an object with application parameters and button callbacks
-// This will be referred to by dat.GUI's functions that add GUI elements.
-const controls = {
-    'Load Scene': loadScene // A function pointer, essentially
-};
 //list of buttons to create
 let buttons = Array();
+let keyBoard = Array();
 let track;
+let gameDiff;
+let startGame = false;
+let loaded = false;
+let parse = false;
+let gameStartTime = 0;
+let play = 0;
 //shapes
 let cube;
 let square;
 //time
 let count = 0.0;
+//objects
+let marioString; //objString name
+let mario;
+let buttonAstr;
+let buttonA;
+let downA;
+let buttonFstr;
+let buttonF;
+let downF;
+let buttonSstr;
+let buttonS;
+let downS;
+let buttonDstr;
+let buttonD;
+let downD;
+let buttonJstr;
+let buttonJ;
+let downJ;
+let buttonKstr;
+let buttonK;
+let downK;
+let buttonLstr;
+let buttonL;
+let downL;
+let buttonPstr;
+let buttonP;
+let downP;
+// Define an object with application parameters and button callbacks
+// This will be referred to by dat.GUI's functions that add GUI elements.
+const controls = {
+    Difficulty: "easy",
+    Song: "Run",
+    'Load Scene': loadScene // A function pointer, essentially
+};
+function play_music() {
+    var musicStr = controls.Song;
+    var musicPath = './resources/music/mp3/' + musicStr + '.mp3';
+    var JukeBox = new AudioContext();
+    fetch(musicPath)
+        .then(r => r.arrayBuffer())
+        .then(b => JukeBox.decodeAudioData(b))
+        .then(data => {
+        const audio_buf = JukeBox.createBufferSource();
+        audio_buf.buffer = data;
+        audio_buf.loop = true;
+        audio_buf.connect(JukeBox.destination);
+        audio_buf.start(0);
+    });
+    console.log(`Music On!`);
+}
 function loadScene() {
-    //track 
-    track = new __WEBPACK_IMPORTED_MODULE_4__geometry_Track__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
-    loadTrackEasy();
-    track.create();
     //Mario 
     marioString = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/wahoo.obj');
     mario = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](marioString, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
@@ -3494,20 +3525,66 @@ function loadButtonsEasy() {
     buttonL = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonLstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
     buttonL.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, 0));
     buttonL.create();
+    keyBoard.push(buttonS, buttonD, buttonF, buttonJ, buttonK, buttonL);
+}
+function loadButtonsHard() {
+    buttonAstr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonA = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonAstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonA.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-9.5, 0, 0));
+    buttonA.create();
+    buttonSstr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonS = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonSstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonS.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, 0));
+    buttonS.create();
+    buttonDstr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonD = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonDstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonD.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, 0));
+    buttonD.create();
+    buttonFstr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonF = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonFstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonF.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, 0));
+    buttonF.create();
+    buttonJstr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonJ = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonJstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonJ.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, 0));
+    buttonJ.create();
+    buttonKstr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonK = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonKstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonK.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, 0));
+    buttonK.create();
+    buttonLstr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonL = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonLstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonL.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, 0));
+    buttonL.create();
+    buttonPstr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+    buttonP = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonPstr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    buttonP.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(9.5, 0, 0));
+    buttonP.create();
+    keyBoard.push(buttonA, buttonS, buttonD, buttonF, buttonJ, buttonK, buttonL, buttonP);
 }
 //read the JSON file determined by the user
 //currntly doing a test midi json
 function parseJSON() {
-    jsonFile = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/music/json/BTS - RUN.json');
+    var musicStr = controls.Song;
+    var musicPath = './resources/music/json/' + musicStr + '.json';
+    jsonFile = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])(musicPath);
     const json = jsonFile;
     var midi = parseJson(json);
+    console.log(midi);
     var tracks = midi["tracks"];
-    parseTracks(tracks);
+    console.log("midi" + tracks.length);
+    if (controls.Difficulty == 'easy') {
+        parseTracksEasy(tracks);
+    }
+    else if (controls.Difficulty == 'hard') {
+        parseTracksHard(tracks);
+    }
 }
 //easy version
-function parseTracks(tracks) {
+function parseTracksEasy(tracks) {
     //tracks are in an array
     for (let track of tracks) {
+        console.log("track" + track.length);
         //track's notes are in an array
         let notes = [];
         notes = track["notes"];
@@ -3523,9 +3600,12 @@ function parseTracks(tracks) {
                 var number = note["midi"];
                 var duration = note["duration"];
                 //for buttons that happen 0.3
+                //connect - 0.35
+                //run - 0.25
                 if (deltaTime > 0.28) {
                     //cutoffs: 28, 40, 52, 64, 76, 88, 100
-                    if (number > 15 && number < 40) {
+                    if (number > 10 && number < 45) {
+                        console.log("15 to 40");
                         let obj = {
                             letter: "S",
                             mark: time,
@@ -3533,7 +3613,8 @@ function parseTracks(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 40 && number < 52) {
+                    else if (number > 45 && number < 55) {
+                        console.log("40 to 52");
                         let obj = {
                             letter: "D",
                             mark: time,
@@ -3541,7 +3622,8 @@ function parseTracks(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 52 && number < 64) {
+                    else if (number > 55 && number < 65) {
+                        console.log("64 to 76");
                         let obj = {
                             letter: "F",
                             mark: time,
@@ -3549,7 +3631,7 @@ function parseTracks(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 64 && number < 76) {
+                    else if (number > 65 && number < 75) {
                         let obj = {
                             letter: "J",
                             mark: time,
@@ -3557,7 +3639,7 @@ function parseTracks(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 76 && number < 88) {
+                    else if (number > 75 && number < 83) {
                         let obj = {
                             letter: "K",
                             mark: time,
@@ -3565,7 +3647,7 @@ function parseTracks(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 88 && number < 120) {
+                    else if (number > 83 && number < 127) {
                         let obj = {
                             letter: "L",
                             mark: time,
@@ -3578,7 +3660,113 @@ function parseTracks(tracks) {
         }
     }
 }
+//easy version
+function parseTracksHard(tracks) {
+    //tracks are in an array
+    for (let track of tracks) {
+        console.log("track" + track.length);
+        //track's notes are in an array
+        let notes = [];
+        notes = track["notes"];
+        //if the track has notes to be played
+        if (notes.length > 0) {
+            var currTime = 0;
+            for (let note of notes) {
+                //name, midi, time, velocity, duration
+                //time passed per note
+                var time = note["time"];
+                var deltaTime = time - currTime;
+                currTime = time;
+                var number = note["midi"];
+                var duration = note["duration"];
+                //for buttons that happen 0.3
+                //connect - 0.35
+                //run - 0.25
+                if (deltaTime > 0.04) {
+                    if (number > 0 && number < 60) {
+                        let obj = {
+                            letter: "A",
+                            mark: time,
+                            duration: duration
+                        };
+                    }
+                    //cutoffs: 28, 40, 52, 64, 76, 88, 100
+                    if (number > 60 && number < 65) {
+                        let obj = {
+                            letter: "S",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 65 && number < 70) {
+                        let obj = {
+                            letter: "D",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 75 && number < 80) {
+                        let obj = {
+                            letter: "F",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 80 && number < 85) {
+                        let obj = {
+                            letter: "J",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 85 && number < 95) {
+                        let obj = {
+                            letter: "K",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 95 && number < 100) {
+                        let obj = {
+                            letter: "L",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                    else if (number > 100 && number < 127) {
+                        let obj = {
+                            letter: ";",
+                            mark: time,
+                            duration: duration
+                        };
+                        buttons.push(obj);
+                    }
+                }
+            }
+        }
+    }
+}
+function loadTrack() {
+    //track 
+    track = new __WEBPACK_IMPORTED_MODULE_4__geometry_Track__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    if (controls.Difficulty == "easy") {
+        loadTrackEasy();
+    }
+    else if (controls.Difficulty == "hard") {
+        loadTrackHard();
+    }
+    console.log("track loads");
+    track.create();
+    //console.log("track positions" + track.pos);
+}
 function loadTrackEasy() {
+    console.log("buttons: " + buttons.length);
     //since you have a list of buttons, lets create them all at once
     //the user will travel forward on the line
     for (let one of buttons) {
@@ -3587,30 +3775,69 @@ function loadTrackEasy() {
         var time = one.mark;
         let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
         let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+        //connect = 
+        //bts run = -5
         if (letter == 'S') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * -1.1));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * -5));
         }
         else if (letter == 'D') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * -1.1));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * -5));
         }
         else if (letter == 'F') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * -1.1));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * -5));
         }
         else if (letter == 'J') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * -1.1));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * -5));
         }
         else if (letter == 'K') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * -1.1));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * -5));
         }
         else if (letter == 'L') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * -1.1));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * -5));
+        }
+        track.addMesh(button);
+    }
+}
+function loadTrackHard() {
+    // console.log("buttons: " + buttons.length);
+    //since you have a list of buttons, lets create them all at once
+    //the user will travel forward on the line
+    for (let one of buttons) {
+        var letter = one.letter;
+        var duration = one.duration;
+        var time = one.mark;
+        let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
+        let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+        //connect = 
+        //bts run = -5
+        if (letter == 'A') {
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-9.5, 0, time * -5));
+        }
+        else if (letter == 'S') {
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * -5));
+        }
+        else if (letter == 'D') {
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * -5));
+        }
+        else if (letter == 'F') {
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * -5));
+        }
+        else if (letter == 'J') {
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * -5));
+        }
+        else if (letter == 'K') {
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * -5));
+        }
+        else if (letter == 'L') {
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * -5));
+        }
+        else if (letter == ';') {
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(9.5, 0, time * -5));
         }
         track.addMesh(button);
     }
 }
 function main() {
-    //parse JSON and get buttons
-    parseJSON();
     // Initial display for framerate
     const stats = __WEBPACK_IMPORTED_MODULE_1_stats_js__();
     stats.setMode(0);
@@ -3620,6 +3847,8 @@ function main() {
     document.body.appendChild(stats.domElement);
     // Add controls to the gui
     const gui = new __WEBPACK_IMPORTED_MODULE_2_dat_gui__["GUI"]();
+    gui.add(controls, 'Difficulty', ['easy', 'hard']);
+    gui.add(controls, 'Song', ['Run', 'Connect', 'Connect-Goofy', 'Cheerup']);
     gui.add(controls, 'Load Scene');
     // get canvas and webgl context
     const canvas = document.getElementById('canvas');
@@ -3632,26 +3861,28 @@ function main() {
     Object(__WEBPACK_IMPORTED_MODULE_6__globals__["c" /* setGL */])(gl);
     // Initial call to load scene
     loadScene();
-    loadButtonsEasy();
-    loadTrackEasy();
     const camera = new __WEBPACK_IMPORTED_MODULE_8__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 10, 15), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_7__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
     renderer.setClearColor(0.4, 0.3, 0.9, 1);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    //mario
     const lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(76)),
         new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(77)),
     ]);
+    //key buttons
     const button_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(78)),
         new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(79)),
     ]);
+    //the track buttons
     const track_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(80)),
         new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(81)),
     ]);
+    //transparent
     const plate_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(82)),
         new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(83)),
@@ -3660,17 +3891,32 @@ function main() {
     //camera.fovy = 1.5;
     // This function will be called every frame
     function tick() {
+        if (!startGame && controls.Difficulty == "easy") {
+            console.log("load easy mesh buttons");
+            //load easy mesh buttons
+            loadButtonsEasy();
+            loaded = true;
+        }
+        else if (!startGame && controls.Difficulty == "hard") {
+            //load 
+            console.log("load hard mesh buttons");
+            loadButtonsHard();
+            loaded = true;
+        }
+        if (startGame && loaded) {
+            console.log("load track create");
+            loaded = false;
+            loadTrack();
+            //after loading track, stop loading track eveyr tick
+        }
         //disable rollover controls
-        // camera.controls.rotationSpeed = 0;
-        // camera.controls.translationSpeed = 0;
-        // camera.controls.zoomSpeed = 0;    
-        //U_tIME
-        count++;
+        camera.controls.rotationSpeed = 0;
+        camera.controls.translationSpeed = 0;
+        camera.controls.zoomSpeed = 0;
         camera.update();
         stats.begin();
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
-        //none changing environment
         let base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(200 / 255, 60 / 255, 200 / 255, 1);
         //mario
         lambert.setGeometryColor(base_color);
@@ -3679,15 +3925,145 @@ function main() {
         base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(150 / 255, 240 / 255, 255 / 255, 1);
         plate_lambert.setGeometryColor(base_color);
         renderer.render(camera, plate_lambert, [square]);
-        //current easy buttons
-        base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(100 / 255, 160 / 255, 200 / 255, 1);
+        //buttons
+        base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(255 / 255, 160 / 255, 200 / 255, 1);
         button_lambert.setGeometryColor(base_color);
-        renderer.render(camera, button_lambert, [buttonS, buttonD, buttonF, buttonJ, buttonK, buttonL]);
-        //render track
-        base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(90 / 255, 160 / 255, 100 / 255, 1);
-        track_lambert.setTime(count);
-        track_lambert.setGeometryColor(base_color);
-        renderer.render(camera, track_lambert, [track]);
+        //user has not started game
+        if (!startGame && controls.Difficulty == "easy") {
+            button_lambert.setGeometryColor(base_color);
+            renderer.render(camera, button_lambert, [buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL]);
+        }
+        else if (!startGame && controls.Difficulty == "hard") {
+            button_lambert.setGeometryColor(base_color);
+            renderer.render(camera, button_lambert, [buttonA, buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL, buttonP]);
+        }
+        //user starts game
+        if (startGame) {
+            //U_tIME
+            count++;
+            //  //current easy buttons
+            if (controls.Difficulty == "easy") {
+                if (downS) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonS]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonS]);
+                }
+                if (downD) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonD]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonD]);
+                }
+                if (downF) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonF]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonF]);
+                }
+                if (downJ) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonJ]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonJ]);
+                }
+                if (downK) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonK]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonK]);
+                }
+                if (downL) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonL]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonL]);
+                }
+            }
+            else if (controls.Difficulty == "hard") {
+                if (downA) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonA]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonA]);
+                }
+                if (downS) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonS]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonS]);
+                }
+                if (downD) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonD]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonD]);
+                }
+                if (downF) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonF]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonF]);
+                }
+                if (downJ) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonJ]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonJ]);
+                }
+                if (downK) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonK]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonK]);
+                }
+                if (downL) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonL]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonL]);
+                }
+                if (downP) {
+                    button_lambert.setPressed(1);
+                    renderer.render(camera, button_lambert, [buttonP]);
+                }
+                else {
+                    button_lambert.setPressed(0);
+                    renderer.render(camera, button_lambert, [buttonP]);
+                }
+            }
+            //render track
+            base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(65 / 255, 105 / 255, 225 / 255, 1);
+            track_lambert.setTime(count);
+            track_lambert.setGeometryColor(base_color);
+            renderer.render(camera, track_lambert, [track]);
+        }
         stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
         requestAnimationFrame(tick);
@@ -3697,6 +4073,9 @@ function main() {
         camera.setAspectRatio(window.innerWidth / window.innerHeight);
         camera.updateProjectionMatrix();
     }, false);
+    //listen to key press
+    window.addEventListener('keydown', keyPressed, false);
+    window.addEventListener('keyup', keyReleased, false);
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.setAspectRatio(window.innerWidth / window.innerHeight);
     camera.updateProjectionMatrix();
@@ -3704,13 +4083,96 @@ function main() {
     tick();
 }
 main();
-this.rotationMatrix = function (axis, angle) {
-    axis = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].normalize(axis, axis);
-    var s = Math.sin(angle);
-    var c = Math.cos(angle);
-    var oc = 1.0 - c;
-    return __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["a" /* mat4 */].fromValues(oc * axis[0] * axis[0] + c, oc * axis[0] * axis[1] - axis[2] * s, oc * axis[2] * axis[0] + axis[1] * s, 0.0, oc * axis[0] * axis[1] + axis[2] * s, oc * axis[1] * axis[1] + c, oc * axis[1] * axis[2] - axis[0] * s, 0.0, oc * axis[2] * axis[0] - axis[1] * s, oc * axis[1] * axis[2] + axis[0] * s, oc * axis[2] * axis[2] + c, 0.0, 0.0, 0.0, 0.0, 1.0);
-};
+function keyReleased(event) {
+    console.log("key released");
+    console.log("key released" + event.keyCode);
+    switch (event.keyCode) {
+        case 65:
+            //A
+            downA = false;
+            break;
+        case 83:
+            //S
+            downS = false;
+            break;
+        case 68:
+            //D
+            downD = false;
+            break;
+        case 70:
+            //F
+            downF = false;
+            break;
+        case 74:
+            //J
+            downJ = false;
+            break;
+        case 75:
+            //K
+            downK = false;
+            break;
+        case 76:
+            //L
+            downL = false;
+            break;
+        case 186:
+            //;
+            downP = false;
+            break;
+    }
+}
+function keyPressed(event) {
+    console.log("key pressed");
+    console.log("key pressed" + event.keyCode);
+    switch (event.keyCode) {
+        case 65:
+            //A
+            downA = true;
+            break;
+        case 83:
+            //S
+            downS = true;
+            break;
+        case 68:
+            //D
+            downD = true;
+            break;
+        case 70:
+            //F
+            downF = true;
+            break;
+        case 74:
+            //J
+            downJ = true;
+            break;
+        case 75:
+            //K
+            downK = true;
+            break;
+        case 76:
+            //L
+            downL = true;
+            break;
+        case 186:
+            //;
+            downP = true;
+            break;
+        case 32:
+            //space bar
+            //pause
+            startGame = false;
+            break;
+        case 86:
+            if (play == 0) {
+                play_music();
+                parseJSON();
+            }
+            play++;
+            document.getElementById('visualizerInfo').style.visibility = "hidden";
+            startGame = true;
+            break;
+    }
+}
 
 
 /***/ }),
@@ -15542,6 +16004,7 @@ class ShaderProgram {
         this.unifColor = __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].getUniformLocation(this.prog, "u_Color");
         this.unifTime = __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].getUniformLocation(this.prog, "u_Time");
         this.unifEye = __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].getUniformLocation(this.prog, "u_Eye");
+        this.unifPressed = __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].getUniformLocation(this.prog, "u_Pressed");
     }
     use() {
         if (activeProgram !== this.prog) {
@@ -15576,9 +16039,14 @@ class ShaderProgram {
     setTime(t) {
         this.use();
         if (this.unifTime !== -1) {
-            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].uniform1f(this.unifTime, this.time);
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].uniform1f(this.unifTime, t);
         }
-        this.time = t;
+    }
+    setPressed(t) {
+        this.use();
+        if (this.unifTime !== -1) {
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].uniform1f(this.unifPressed, t);
+        }
     }
     setGeometryColor(color) {
         this.use();
@@ -16684,19 +17152,19 @@ module.exports = "#version 300 es\n\n//This is a vertex shader. While it is call
 /* 77 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = mix(diffuseColor.xyz, \n                        vec3(123.f/255.f, 136.f/255.f, 219.f/255.f), 1.) +\n                        mix(0.f, specularIntensity, 2.);\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(mix(color, color2, fs_Col.x) * lightIntensity, diffuseColor.a);\n}\n\n"
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = mix(diffuseColor.xyz, \n                        vec3(123.f/255.f, 136.f/255.f, 219.f/255.f), 1.) +\n                        mix(0.f, specularIntensity, 2.);\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(mix(color, color2, fs_Col.x) * lightIntensity, diffuseColor.a);\n}\n"
 
 /***/ }),
 /* 78 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Time; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n    \n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Time; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Pos;\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n    \n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n    fs_Pos = gl_Position;\n}   \n"
 
 /***/ }),
 /* 79 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.2f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = mix(diffuseColor.xyz, \n                        vec3(100.f/255.f, 136.f/255.f, 100.f/255.f), 1.) +\n                        mix(0.f, specularIntensity, 1.);\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(mix(color, color2, fs_Col.x) * lightIntensity, diffuseColor.a);\n}\n\n"
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Pressed;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        float in3 = 0.5;\n\n        if(u_Pressed == 0.) {\n            in3 = 0.5;\n        } else {\n            in3 = 1.0;\n        }\n        out_Col = vec4(color2 * lightIntensity, in3);\n}\n\n"
 
 /***/ }),
 /* 80 */
