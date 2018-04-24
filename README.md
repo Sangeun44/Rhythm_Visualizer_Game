@@ -59,6 +59,8 @@ Buttons to smash will show on the screen like guitar hero.
 
 The buttons will move towards you. 
 
+The buttons are all in one Mesh. This Mesh moves as time goes by in the shader
+
 The user has to tap the correct key at the correct time. 
 
 ## Visulization Decoration

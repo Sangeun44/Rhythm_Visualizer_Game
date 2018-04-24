@@ -21,12 +21,15 @@ let jsonFile: string; //jsonFile name
 
 //list of buttons to create
 let buttons = Array<any>();
+let points = 0;
+let health = 0;
 let keyBoard = Array<Mesh>();
 let track: Track;
 let gameDiff: string;
 let startGame = false;
 let loaded = false;
 let parse = false;
+
 
 let gameStartTime = 0;
 
@@ -539,6 +542,7 @@ function main() {
       loaded = true;
     }
 
+    var currTime = new Date();
 
     //disable rollover controls
     camera.controls.rotationSpeed = 0;
@@ -809,10 +813,11 @@ function keyPressed(event: KeyboardEvent) {
         play_music();
         parseJSON();
       } 
-      console.log("load track create");
-      loaded = false;
-      loadTrack();
-    
+
+        console.log("load track create");
+        loaded = false;
+        loadTrack();
+
       play++;
       document.getElementById('visualizerInfo').style.visibility = "hidden";
       startGame = true;
