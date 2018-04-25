@@ -21,15 +21,13 @@ let jsonFile: string; //jsonFile name
 
 //list of buttons to create
 let buttons = Array<any>();
-let buttonTimes = Array<number>();
-let buttonSpace = Array<string>();
+let buttonPos = Array<vec3>();
+let buttonType = Array<string>();
 
 let points = 0;
 let health = 20;
 let startTime = 0;
 let epsilon = 0.5;
-
-let status: Window;
 
 let keyBoard = Array<Mesh>();
 let track: Track;
@@ -417,8 +415,7 @@ function loadTrackEasy() {
     var time = one.mark;
     var spacing = -6;
 
-    buttonTimes.push(time);
-    buttonSpace.push(letter);
+    buttonType.push(letter);
     //console.log("loading each button with: "  + letter);
     //console.log("loading each button at: " + time);
 
@@ -427,22 +424,31 @@ function loadTrackEasy() {
 
     //connect = 
     //bts run = -5
+    var pos = vec3.fromValues(0,0,0);
+
     if (letter == 'S') {
       //console.log("loading each button with: "  + 'S');
-      button.translateVertices(vec3.fromValues(-7, 0, time * spacing));
+      pos = vec3.fromValues(-7, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'D') {
       //console.log("loading each button with: "  + 'D');
-      button.translateVertices(vec3.fromValues(-4.5, 0, time * spacing));
+      pos = vec3.fromValues(-4.5, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'F') {
-      button.translateVertices(vec3.fromValues(-2, 0, time * spacing));
+      pos = vec3.fromValues(-2, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'J') {
-      button.translateVertices(vec3.fromValues(2, 0, time * spacing));
+      pos = vec3.fromValues(2, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'K') {
-      button.translateVertices(vec3.fromValues(4.5, 0, time * spacing));
+      pos = vec3.fromValues(4.5, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'L') {
-      button.translateVertices(vec3.fromValues(7, 0, time * spacing));
+      pos = vec3.fromValues(7, 0, time * spacing);
+      button.translateVertices(pos);
     }
-
+    buttonPos.push(pos);
+   
     track.addMesh(button);
   }
 }
@@ -456,31 +462,41 @@ function loadTrackHard() {
     var duration = one.duration;
     var time = one.mark;
     var spacing = -5;
-    buttonTimes.push(time);
-    buttonSpace.push(letter);
+    buttonType.push(letter);
 
     let buttonStr = readTextFile('./resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
 
     //connect = 
     //bts run = -5
+    var pos = vec3.fromValues(0,0,0);
+
     if(letter == 'A') {
-      button.translateVertices(vec3.fromValues(-9.5, 0, time * spacing));
+      pos = vec3.fromValues(-9.5, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'S') {
-      button.translateVertices(vec3.fromValues(-7, 0, time * spacing));
+      pos = vec3.fromValues(-7, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'D') {
-      button.translateVertices(vec3.fromValues(-4.5, 0, time * spacing));
+      pos = vec3.fromValues(-4.5, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'F') {
-      button.translateVertices(vec3.fromValues(-2, 0, time * spacing));
+      pos = vec3.fromValues(-2, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'J') {
-      button.translateVertices(vec3.fromValues(2, 0, time * spacing));
+      pos = vec3.fromValues(2, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'K') {
-      button.translateVertices(vec3.fromValues(4.5, 0, time * spacing));
+      pos = vec3.fromValues(4.5, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == 'L') {
-      button.translateVertices(vec3.fromValues(7, 0, time * spacing));
+      pos = vec3.fromValues(7, 0, time * spacing);
+      button.translateVertices(pos);
     } else if (letter == ';') {
-      button.translateVertices(vec3.fromValues(9.5, 0, time * spacing));
+      pos = vec3.fromValues(9.5, 0, time * spacing);
+      button.translateVertices(pos);    
     }
+    buttonPos.push(pos);
 
     track.addMesh(button);
   }
@@ -515,7 +531,7 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(0, 10, 15), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0, 5, 10), vec3.fromValues(0, 0, 0));
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.4, 0.3, 0.9, 1);
 
@@ -548,10 +564,11 @@ function main() {
   ]);
 
   //change fov
-  //camera.fovy = 1.5;
+  camera.fovy = 1.5;
 
   // This function will be called every frame
   function tick() {
+
     var timeRightNow = Date.now();
     var timeSinceStart = timeRightNow - startTime;
     var timeSinceStartSec = timeSinceStart / 1000;
@@ -609,17 +626,31 @@ function main() {
 
     //user starts game
     if (startGame) {
-      // console.log("button times: " + buttonTimes.length);
-      // console.log("buttons space: " + buttonSpace.length);
+      console.log("positions: " + buttonPos.length);
+      console.log("types: " + buttonType.length);
 
-      var displayButtonTime = buttonTimes[0] - 1;
+      //calculate the buttons positions as the track moves across
+      //U_tIME
+      count++;
+
+      var temp = Array<vec3>();
+      for(let buttonPosi of buttonPos) {
+        var originalPos = buttonPosi;
+        var newPos = vec3.fromValues(buttonPosi[0], buttonPosi[1], buttonPosi[2] + count * 0.0008); 
+        temp.push(newPos);
+      }
+      buttonPos = temp;
+
+      var currentPos = buttonPos[0];
+      //console.log(currentPos);
       //check for each button, if the user has pressed the correct button
-      if(displayButtonTime >= timeSinceStartSec - epsilon && displayButtonTime <= timeSinceStartSec + epsilon) {
+      if(currentPos[2] >= 0 - epsilon && currentPos[2] <= 0 + epsilon) {
         // console.log("time since start: " + timeSinceStartSec);
         // console.log("button time e: " + buttonTimes[0]);
         
-        var letter = buttonSpace[0];
+        var letter = buttonType[0];
         if(letter == 'A') {
+          console.log("letter pu: A + time " + timeSinceStartSec);
           if(downA) {
             points++;
           } else {
@@ -679,31 +710,29 @@ function main() {
         } 
         if(letter == ';') {
           if(downP) {
-            console.log("letter pu: ;");
+            console.log("letter pu: ; + time " + timeSinceStartSec);
             points++;
           } else {
             health--;
           }
         }
+        
+        document.getElementById("health").innerHTML = "Health: " + health;
+        document.getElementById("points").innerHTML = "Score: " + points;
 
         if(health <= 0) {
-          console.log("health IS ZERIO");
-          var myWindow = window.open("", "MsgWindow", "width=200, height=100");
-          myWindow.document.write("<p>You Lose!</p>");
-          status.close();
+          console.log("health IS zero");
+          document.getElementById("game").innerHTML = "YOU LOSE!";
+          startGame = false;
           JukeBox.close();
         }
 
-        status.document.write("<p>Your Score: </p>" + "<p>" + points +"</p>");
-        status.document.write("<p>Your Health: </p>" + "<p>" + health +"</p>");      
-        
         //remove first element
-        buttonSpace.shift();
-        buttonTimes.shift();
+        buttonType.shift();
+        buttonPos.shift();
       }
 
-      //U_tIME
-      count++;
+ 
       //  //current easy buttons
       if (controls.Difficulty == "easy") {
         if (downS) {
@@ -930,9 +959,6 @@ function keyPressed(event: KeyboardEvent) {
       break;
     case 86:
       if(play == 0) {
-        status = window.open("", "MsgWindow", "width=200, height=100");
-        status.document.write("<p>Your Score: </p>" + "<p>" + points +"</p>");
-        status.document.write("<p>Your Health: </p>" + "<p>" + health +"</p>");
         play_music();
         parseJSON();
         console.log("load track create");
@@ -943,12 +969,16 @@ function keyPressed(event: KeyboardEvent) {
       } 
 
       if(controls.Difficulty == "easy") {
-        epsilon = 0.5;
+        epsilon = 1.5;
       }
       else if(controls.Difficulty == "hard") {
-        epsilon = 0.2;
+        epsilon = 1.2;
       }
-
+      
+      //display status
+      document.getElementById("game").innerHTML = "In progress: " + controls.Song;
+      document.getElementById("health").innerHTML = "Health: " + health;
+      document.getElementById("points").innerHTML = "Score: " + points;
       
       var d = Date.now();
       startTime = d;
