@@ -27,7 +27,7 @@ demo link: https://sangeun44.github.io/Rhythm_Visualizer_Game/
 
 # Final Procedural Project  
 # Music Visualizer - BTS Super Star/Guitar Hero 
-
+![](gamescreen.png)
 # WRITE UP
 * Pennkey: eunsang
 * Name: Sang Lee
