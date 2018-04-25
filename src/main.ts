@@ -16,6 +16,17 @@ import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import ShaderProgram, { Shader } from './rendering/gl/ShaderProgram';
 
+import { analyze } from 'web-audio-beat-detector';
+
+// analyze(framework.audioSourceBuffer.buffer).then((bpm) => {
+//   // the bpm could be analyzed 
+//   framework.songBPM = bpm;
+// })
+// .catch((err) => {
+//   // something went wrong 
+//   console.log("couldn't detect BPM");
+// });
+
 const parseJson = require('parse-json');
 let jsonFile: string; //jsonFile name
 
@@ -25,7 +36,7 @@ let buttonPos = Array<vec3>();
 let buttonType = Array<string>();
 
 let points = 0;
-let health = 20;
+let health = 100;
 let startTime = 0;
 let epsilon = 0.5;
 
@@ -419,14 +430,14 @@ function loadTrackEasy() {
     var letter = one.letter;
     var duration = one.duration;
     var time = one.mark;
-    var spacing = -6;
+    var spacing = -5;
     console.log("parse letters to make into:" + letter);
 
-    buttonType.push(letter);
+    buttonType.push("letter 4 each: " + letter);
     //console.log("loading each button with: "  + letter);
     //console.log("loading each button at: " + time);
 
-    let buttonStr = readTextFile('./resources/obj/button.obj');
+    let buttonStr = readTextFile('./src/resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
 
     //connect = 
@@ -471,7 +482,7 @@ function loadTrackHard() {
     var spacing = -5;
     buttonType.push(letter);
 
-    let buttonStr = readTextFile('./resources/obj/button.obj');
+    let buttonStr = readTextFile('./src/resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
 
     //connect = 
@@ -511,9 +522,8 @@ function loadTrackHard() {
 }
 
 function main() {
-  for(let button of buttons) {
-   console.log("b" + button.letter);
-  }
+
+
   // Initial display for framerate
   const stats = Stats();
   stats.setMode(0);
@@ -576,10 +586,8 @@ function main() {
   //change fov
   //camera.fovy = 1.5;
 
-
   // This function will be called every frame
   function tick() {
-
     var timeRightNow = Date.now();
     var timeSinceStart = timeRightNow - startTime;
     var timeSinceStartSec = timeSinceStart / 1000;
@@ -634,21 +642,22 @@ function main() {
       button_lambert.setGeometryColor(base_color);
       renderer.render(camera, button_lambert, [buttonA, buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL, buttonP]);
     }
-    console.log("count: " + count);
 
        //U_tIME
     //user starts game
     if (startGame) {
+
       // console.log("positions: " + buttonPos.length);
       // console.log("types: " + buttonType.length);
 
       //calculate the buttons positions as the track moves across
-      count++;
+      count = timeSinceStartSec;
 
       var temp = Array<vec3>();
       for(let buttonPosi of buttonPos) {
         var originalPos = buttonPosi;
-        var newPos = vec3.fromValues(buttonPosi[0], buttonPosi[1], buttonPosi[2] + count * 0.01); 
+        var newPos = vec3.fromValues(originalPos[0], originalPos[1], originalPos[2] + count * 0.1); 
+        // console.log("new position: " + newPos);
         temp.push(newPos);
       }
       buttonPos = temp;
@@ -662,7 +671,7 @@ function main() {
         
         var letter = buttonType[0];
         if(letter == 'A') {
-          console.log("letter pu: A + time " + timeSinceStartSec);
+          console.log("letter pu: A + time " + timeSinceStartSec + "position: " + currentPos);
           if(downA) {
             points++;
           } else {
@@ -670,7 +679,7 @@ function main() {
           }
         } 
         if(letter == 'S') {
-          console.log("letter pu: S + time " + timeSinceStartSec);
+          console.log("letter pu: S + time " + timeSinceStartSec+ "position: " + currentPos);
           if(downS) {
             points++;
           } else {
@@ -678,7 +687,7 @@ function main() {
           }
         } 
         if(letter == 'D') {
-          console.log("letter pu: D + time " + timeSinceStartSec);
+          console.log("letter pu: D + time " + timeSinceStartSec+ "position: " + currentPos);
           if(downD) {
             points++;
           } else {
@@ -686,7 +695,7 @@ function main() {
           }
         } 
         if(letter == 'F') {
-          console.log("letter pu: F + time " + timeSinceStartSec);
+          console.log("letter pu: F + time " + timeSinceStartSec+ "position: " + currentPos);
           if(downF) {
             points++;
           } else {
@@ -694,7 +703,7 @@ function main() {
           }
         } 
         if(letter == 'J') {
-          console.log("letter pu: J + time " + timeSinceStartSec);
+          console.log("letter pu: J + time " + timeSinceStartSec+ "position: " + currentPos);
           if(downJ) {
             console.log("point: " + points);
             points++;
@@ -703,7 +712,7 @@ function main() {
           }
         } 
         if(letter == 'K') {
-          console.log("letter pu: K + time " + timeSinceStartSec);
+          console.log("letter pu: K + time " + timeSinceStartSec+ "position: " + currentPos);
           if(downK) {
             console.log("point: " + points);
             points++;
@@ -712,7 +721,7 @@ function main() {
           }
         } 
         if(letter == 'L') {
-          console.log("letter pu: L + time " + timeSinceStartSec);
+          console.log("letter pu: L + time " + timeSinceStartSec+ "position: " + currentPos);
           if(downL) {
             console.log("point: " + points);
             points++;
@@ -722,7 +731,7 @@ function main() {
         } 
         if(letter == ';') {
           if(downP) {
-            console.log("letter pu: ; + time " + timeSinceStartSec);
+            console.log("letter pu: ; + time " + timeSinceStartSec+ "position: " + currentPos);
             points++;
           } else {
             health--;
@@ -999,7 +1008,6 @@ function keyPressed(event: KeyboardEvent) {
       
       var d = Date.now();
       startTime = d;
-      console.log("start Time " + startTime);
 
       play++;
       document.getElementById('visualizerInfo').style.visibility = "hidden";

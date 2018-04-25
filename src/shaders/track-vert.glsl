@@ -45,7 +45,7 @@ void main()
                                                             // perpendicular to the surface after the surface is transformed by
                                                             // the model matrix.
 
-    vec4 vs_Pos2 = vec4(vs_Pos.x, vs_Pos.y, vs_Pos.z + u_Time * 0.05, vs_Pos.w);
+    vec4 vs_Pos2 = vec4(vs_Pos.x, vs_Pos.y, vs_Pos.z + u_Time, vs_Pos.w);
 
     vec4 modelposition = u_Model * vs_Pos2;   // Temporarily store the transformed vertex positions for use below
 
