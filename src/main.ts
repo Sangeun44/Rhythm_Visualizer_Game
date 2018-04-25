@@ -47,8 +47,6 @@ let startGame = false;
 let loaded = false;
 let parse = false;
 
-let gameStartTime = 0;
-
 let play = 0;
 //shapes
 let cube: Cube;
@@ -103,7 +101,6 @@ const controls = {
   Song: "Run",
   'Load Scene': loadScene // A function pointer, essentially
 };
-
 
 function play_music() {
   JukeBox = new AudioContext();
@@ -250,13 +247,13 @@ function parseTracksEasy(tracks: any) {
         var time = note["time"];
         var deltaTime = time - currTime;
         currTime = time;
-
         var number = note["midi"];
         var duration = note["duration"];
 
         //for buttons that happen 0.3
         //connect - 0.35
         //run - 0.25
+        //if the time difference between one note and the other is :
         if (deltaTime > 0.5) {
           //cutoffs: 28, 40, 52, 64, 76, 88, 100
           if (number > 0 && number < 55) {
@@ -448,20 +445,25 @@ function loadTrackEasy() {
       //console.log("loading each button with: "  + 'S');
       pos = vec3.fromValues(-7, 0, time * spacing);
       button.translateVertices(pos);
-    } else if (letter == 'D') {
+    } 
+    if (letter == 'D') {
       //console.log("loading each button with: "  + 'D');
       pos = vec3.fromValues(-4.5, 0, time * spacing);
       button.translateVertices(pos);
-    } else if (letter == 'F') {
+    } 
+    if (letter == 'F') {
       pos = vec3.fromValues(-2, 0, time * spacing);
       button.translateVertices(pos);
-    } else if (letter == 'J') {
+    }
+    if (letter == 'J') {
       pos = vec3.fromValues(2, 0, time * spacing);
       button.translateVertices(pos);
-    } else if (letter == 'K') {
+    } 
+    if (letter == 'K') {
       pos = vec3.fromValues(4.5, 0, time * spacing);
       button.translateVertices(pos);
-    } else if (letter == 'L') {
+    } 
+    if (letter == 'L') {
       pos = vec3.fromValues(7, 0, time * spacing);
       button.translateVertices(pos);
     }
@@ -605,8 +607,6 @@ function main() {
       loadButtonsHard();
       loaded = true;
     }
-
-    var currTime = new Date();
 
     //disable rollover controls
     camera.controls.rotationSpeed = 0;
