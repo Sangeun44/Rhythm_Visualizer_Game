@@ -19,7 +19,7 @@ Duration is for how long the key lasts.
 
 I have to work on creating the layout of the buttons into a big mesh so that it can proceed as the program runs.
 
-Mario is in the background like a monument
+Mario is in the background like a monument, the metal shader is referenced from Alexis' Metal Shader.
 
 demo link: https://sangeun44.github.io/Rhythm_Visualizer_Game/
 

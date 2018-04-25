@@ -31,32 +31,34 @@ out vec4 out_Col; // This is the final output color that you will see on your
 void main()
 {
         vec4 diffuseColor = u_Color;
-        float specularIntensity;
+        float specularIntensity;        
+        float ambientTerm = 0.4;
 
-        float angle = dot(fs_LightVec + vec4(cos(u_Time)), fs_Nor);
+        float angle = dot(fs_LightVec, fs_Nor);
         if(angle < 0.5f) {
             specularIntensity = .1f;
+            ambientTerm = 0.25;
         } else {
             vec4 norm = normalize(fs_Nor);
             vec4 fs_Light = normalize(fs_LightVec);
             float intensity = pow(dot(fs_Light, norm), 5.f);
             specularIntensity = max(intensity, 0.f);
+            ambientTerm = 0.4;
         }
         
         // diffuse term for Lambert 
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
+
         // Avoid negative lighting values
         diffuseTerm = min(diffuseTerm, 1.0);
         diffuseTerm = max(diffuseTerm, 0.0);
 
-        float ambientTerm = 0.4;
-
-        float lightIntensity = diffuseTerm * 0.4 + ambientTerm;   //Add a small float value to the color multiplier
+        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier
                                                             //to simulate ambient lighting. This ensures that faces that are not
                                                             //lit by our point light are not completely black.
 
         // Compute final shaded color
-        vec3 color = vec3(0.5, 0.3, 0.7) + specularIntensity * 6.;
+        vec3 color = vec3(0.5, 0.5, 0.7) + specularIntensity * 6.;
         vec3 color2 = diffuseColor.xyz;
 
         out_Col = vec4(color * lightIntensity, 1.);

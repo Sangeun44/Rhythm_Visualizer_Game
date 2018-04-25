@@ -16,7 +16,7 @@ import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import ShaderProgram, { Shader } from './rendering/gl/ShaderProgram';
 
-import { analyze } from 'web-audio-beat-detector';
+// import { analyze } from './web-audio-beat-detector';
 
 // analyze(framework.audioSourceBuffer.buffer).then((bpm) => {
 //   // the bpm could be analyzed 
