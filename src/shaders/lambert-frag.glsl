@@ -33,7 +33,7 @@ void main()
         vec4 diffuseColor = u_Color;
         float specularIntensity;
 
-        float angle = dot(fs_LightVec, fs_Nor);
+        float angle = dot(fs_LightVec + vec4(cos(u_Time)), fs_Nor);
         if(angle < 0.5f) {
             specularIntensity = .1f;
         } else {

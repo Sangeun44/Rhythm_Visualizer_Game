@@ -97,7 +97,7 @@ const controls = {
 function play_music() {
   JukeBox = new AudioContext();
   var musicStr = controls.Song;
-  var musicPath = './resources/music/mp3/' + musicStr + '.mp3';
+  var musicPath = './src/resources/music/mp3/' + musicStr + '.mp3';
 
   fetch(musicPath)
     .then(r => r.arrayBuffer())
@@ -115,7 +115,7 @@ function play_music() {
 
 function loadScene() {
   //Mario 
-  marioString = readTextFile('./resources/obj/wahoo.obj');
+  marioString = readTextFile('./src/resources/obj/wahoo.obj');
   mario = new Mesh(marioString, vec3.fromValues(0, 0, 0));
   mario.translateVertices(vec3.fromValues(0, -5, -20));
   mario.create();
@@ -125,32 +125,32 @@ function loadScene() {
 }
 
 function loadButtonsEasy() {
-  buttonSstr = readTextFile('./resources/obj/button.obj');
+  buttonSstr = readTextFile('./src/resources/obj/button.obj');
   buttonS = new Mesh(buttonSstr, vec3.fromValues(0, 0, 0));
   buttonS.translateVertices(vec3.fromValues(-7, 0, 0));
   buttonS.create();
 
-  buttonDstr = readTextFile('./resources/obj/button.obj');
+  buttonDstr = readTextFile('./src/resources/obj/button.obj');
   buttonD = new Mesh(buttonDstr, vec3.fromValues(0, 0, 0));
   buttonD.translateVertices(vec3.fromValues(-4.5, 0, 0));
   buttonD.create();
 
-  buttonFstr = readTextFile('./resources/obj/button.obj');
+  buttonFstr = readTextFile('./src/resources/obj/button.obj');
   buttonF = new Mesh(buttonFstr, vec3.fromValues(0, 0, 0));
   buttonF.translateVertices(vec3.fromValues(-2, 0, 0));
   buttonF.create();
 
-  buttonJstr = readTextFile('./resources/obj/button.obj');
+  buttonJstr = readTextFile('./src/resources/obj/button.obj');
   buttonJ = new Mesh(buttonJstr, vec3.fromValues(0, 0, 0));
   buttonJ.translateVertices(vec3.fromValues(2, 0, 0));
   buttonJ.create();
 
-  buttonKstr = readTextFile('./resources/obj/button.obj');
+  buttonKstr = readTextFile('./src/resources/obj/button.obj');
   buttonK = new Mesh(buttonKstr, vec3.fromValues(0, 0, 0));
   buttonK.translateVertices(vec3.fromValues(4.5, 0, 0));
   buttonK.create();
 
-  buttonLstr = readTextFile('./resources/obj/button.obj');
+  buttonLstr = readTextFile('./src/resources/obj/button.obj');
   buttonL = new Mesh(buttonLstr, vec3.fromValues(0, 0, 0));
   buttonL.translateVertices(vec3.fromValues(7, 0, 0));
   buttonL.create();
@@ -159,42 +159,42 @@ function loadButtonsEasy() {
 }
 
 function loadButtonsHard() {
-  buttonAstr = readTextFile('./resources/obj/button.obj');
+  buttonAstr = readTextFile('./src/resources/obj/button.obj');
   buttonA = new Mesh(buttonAstr, vec3.fromValues(0, 0, 0));
   buttonA.translateVertices(vec3.fromValues(-9.5, 0, 0));
   buttonA.create();
 
-  buttonSstr = readTextFile('./resources/obj/button.obj');
+  buttonSstr = readTextFile('./src/resources/obj/button.obj');
   buttonS = new Mesh(buttonSstr, vec3.fromValues(0, 0, 0));
   buttonS.translateVertices(vec3.fromValues(-7, 0, 0));
   buttonS.create();
 
-  buttonDstr = readTextFile('./resources/obj/button.obj');
+  buttonDstr = readTextFile('./src/resources/obj/button.obj');
   buttonD = new Mesh(buttonDstr, vec3.fromValues(0, 0, 0));
   buttonD.translateVertices(vec3.fromValues(-4.5, 0, 0));
   buttonD.create();
 
-  buttonFstr = readTextFile('./resources/obj/button.obj');
+  buttonFstr = readTextFile('./src/resources/obj/button.obj');
   buttonF = new Mesh(buttonFstr, vec3.fromValues(0, 0, 0));
   buttonF.translateVertices(vec3.fromValues(-2, 0, 0));
   buttonF.create();
 
-  buttonJstr = readTextFile('./resources/obj/button.obj');
+  buttonJstr = readTextFile('./src/resources/obj/button.obj');
   buttonJ = new Mesh(buttonJstr, vec3.fromValues(0, 0, 0));
   buttonJ.translateVertices(vec3.fromValues(2, 0, 0));
   buttonJ.create();
 
-  buttonKstr = readTextFile('./resources/obj/button.obj');
+  buttonKstr = readTextFile('./src/resources/obj/button.obj');
   buttonK = new Mesh(buttonKstr, vec3.fromValues(0, 0, 0));
   buttonK.translateVertices(vec3.fromValues(4.5, 0, 0));
   buttonK.create();
 
-  buttonLstr = readTextFile('./resources/obj/button.obj');
+  buttonLstr = readTextFile('./src/resources/obj/button.obj');
   buttonL = new Mesh(buttonLstr, vec3.fromValues(0, 0, 0));
   buttonL.translateVertices(vec3.fromValues(7, 0, 0));
   buttonL.create();
 
-  buttonPstr = readTextFile('./resources/obj/button.obj');
+  buttonPstr = readTextFile('./src/resources/obj/button.obj');
   buttonP = new Mesh(buttonPstr, vec3.fromValues(0, 0, 0));
   buttonP.translateVertices(vec3.fromValues(9.5, 0, 0));
   buttonP.create();
@@ -206,7 +206,7 @@ function loadButtonsHard() {
 //currntly doing a test midi json
 function parseJSON() {
   var musicStr = controls.Song;
-  var musicPath = './resources/music/json/' + musicStr + '.json';
+  var musicPath = './src/resources/music/json/' + musicStr + '.json';
 
   jsonFile = readTextFile(musicPath);
   const json = jsonFile;
@@ -250,6 +250,7 @@ function parseTracksEasy(tracks: any) {
           //cutoffs: 28, 40, 52, 64, 76, 88, 100
           if (number > 0 && number < 55) {
             //console.log("15 to 40");
+            console.log("parse S");
             let obj = {
               letter: "S",
               mark: time,
@@ -258,6 +259,7 @@ function parseTracksEasy(tracks: any) {
             buttons.push(obj);
           } else if (number > 55 && number < 65) {
             //console.log("40 to 52");
+            console.log("parse D");
             let obj = {
               letter: "D",
               mark: time,
@@ -266,6 +268,7 @@ function parseTracksEasy(tracks: any) {
             buttons.push(obj);
           } else if (number > 65 && number < 70) {
             //console.log("64 to 76");
+            console.log("parse F");
             let obj = {
               letter: "F",
               mark: time,
@@ -273,6 +276,7 @@ function parseTracksEasy(tracks: any) {
             }
             buttons.push(obj);
           } else if (number > 70 && number < 75) {
+            console.log("parse J");
             let obj = {
               letter: "J",
               mark: time,
@@ -280,6 +284,7 @@ function parseTracksEasy(tracks: any) {
             }
             buttons.push(obj);
           } else if (number > 75 && number < 83) {
+            console.log("parse K");
             let obj = {
               letter: "K",
               mark: time,
@@ -287,6 +292,7 @@ function parseTracksEasy(tracks: any) {
             }
             buttons.push(obj);
           } else if (number > 83 && number < 127) {
+            console.log("parse L");
             let obj = {
               letter: "L",
               mark: time,
@@ -414,6 +420,7 @@ function loadTrackEasy() {
     var duration = one.duration;
     var time = one.mark;
     var spacing = -6;
+    console.log("parse letters to make into:" + letter);
 
     buttonType.push(letter);
     //console.log("loading each button with: "  + letter);
@@ -569,6 +576,7 @@ function main() {
   //change fov
   //camera.fovy = 1.5;
 
+
   // This function will be called every frame
   function tick() {
 
@@ -626,6 +634,7 @@ function main() {
       button_lambert.setGeometryColor(base_color);
       renderer.render(camera, button_lambert, [buttonA, buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL, buttonP]);
     }
+    console.log("count: " + count);
 
        //U_tIME
     //user starts game
@@ -635,12 +644,11 @@ function main() {
 
       //calculate the buttons positions as the track moves across
       count++;
-      console.log("count: " + count);
 
       var temp = Array<vec3>();
       for(let buttonPosi of buttonPos) {
         var originalPos = buttonPosi;
-        var newPos = vec3.fromValues(buttonPosi[0], buttonPosi[1], buttonPosi[2] + count * 0.1); 
+        var newPos = vec3.fromValues(buttonPosi[0], buttonPosi[1], buttonPosi[2] + count * 0.01); 
         temp.push(newPos);
       }
       buttonPos = temp;
@@ -875,7 +883,7 @@ function main() {
   camera.updateProjectionMatrix();
 
   // Start the render loop
-  tick();
+ tick();
 }
 
 main();
@@ -978,6 +986,12 @@ function keyPressed(event: KeyboardEvent) {
         epsilon = 1.2;
       }
       
+      console.log("print track");
+      for(var i = 0; i< 100; i++) {
+        console.log("track: " + buttonType[i]);
+        console.log("track2: " + buttonPos[i]);
+      }
+
       //display status
       document.getElementById("game").innerHTML = "In progress: " + controls.Song;
       document.getElementById("health").innerHTML = "Health: " + health;
