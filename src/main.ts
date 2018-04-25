@@ -95,6 +95,7 @@ const controls = {
   'Load Scene': loadScene // A function pointer, essentially
 };
 
+
 function play_music() {
   JukeBox = new AudioContext();
   var musicStr = controls.Song;

@@ -29,35 +29,39 @@ out vec4 out_Col; // This is the final output color that you will see on your
 
 void main()
 {
-    vec3 eye = vec3(0, 5, 0);
-    // Material base color (before shading)
         vec4 diffuseColor = u_Color;
-        vec4 avg = (fs_LightVec + vec4(eye, 0.f)) / 2.f;
         float specularIntensity;
 
-        if(dot(fs_LightVec, fs_Nor) < 0.f) {
+        float angle = dot(fs_LightVec, fs_Nor);
+        if(angle < 0.5f) {
             specularIntensity = .1f;
         } else {
-            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 8.f), 0.f);
+            vec4 norm = normalize(fs_Nor);
+            vec4 fs_Light = normalize(fs_LightVec);
+            float intensity = pow(dot(fs_Light, norm), 4.f);
+            specularIntensity = max(intensity, 0.f);
         }
         
-        // Calculate the diffuse term for Lambert shading
+        // diffuse term for Lambert 
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
         // Avoid negative lighting values
         diffuseTerm = min(diffuseTerm, 1.0);
         diffuseTerm = max(diffuseTerm, 0.0);
 
-        float ambientTerm = 0.4;
+        float ambientTerm = 0.1;
 
-        float lightIntensity = diffuseTerm * 0.9 + ambientTerm;   //Add a small float value to the color multiplier
+        float lightIntensity = diffuseTerm * 0.3 + ambientTerm;   //Add a small float value to the color multiplier
                                                             //to simulate ambient lighting. This ensures that faces that are not
                                                             //lit by our point light are not completely black.
 
         // Compute final shaded color
-        vec3 color = mix(diffuseColor.xyz, 
-                        vec3(100.f/255.f, 100.f/255.f, 200.f/255.f), 1.) +
-                        mix(0.f, specularIntensity, 2.);
+        vec3 color = mix(
+                        diffuseColor.xyz, 
+                        vec3(0.5, 0.3, 0.7), 
+                        1.f
+                    ) 
+                        + specularIntensity * 10.;
         vec3 color2 = diffuseColor.xyz;
 
-        out_Col = vec4(mix(color, color2, fs_Col.z) * lightIntensity, 0.9);
+        out_Col = vec4(mix(color, color2, fs_Col.y) * lightIntensity, 1.);
 }
