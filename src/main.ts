@@ -496,6 +496,7 @@ function loadTrackHard() {
       pos = vec3.fromValues(9.5, 0, time * spacing);
       button.translateVertices(pos);    
     }
+
     buttonPos.push(pos);
 
     track.addMesh(button);
@@ -503,7 +504,9 @@ function loadTrackHard() {
 }
 
 function main() {
-
+  for(let button of buttons) {
+   console.log("b" + button.letter);
+  }
   // Initial display for framerate
   const stats = Stats();
   stats.setMode(0);
@@ -531,7 +534,7 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(0, 5, 10), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0, 5, 15), vec3.fromValues(0, 0, 0));
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.4, 0.3, 0.9, 1);
 
@@ -564,7 +567,7 @@ function main() {
   ]);
 
   //change fov
-  camera.fovy = 1.5;
+  //camera.fovy = 1.5;
 
   // This function will be called every frame
   function tick() {
@@ -624,19 +627,20 @@ function main() {
       renderer.render(camera, button_lambert, [buttonA, buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL, buttonP]);
     }
 
+       //U_tIME
     //user starts game
     if (startGame) {
-      console.log("positions: " + buttonPos.length);
-      console.log("types: " + buttonType.length);
+      // console.log("positions: " + buttonPos.length);
+      // console.log("types: " + buttonType.length);
 
       //calculate the buttons positions as the track moves across
-      //U_tIME
       count++;
+      console.log("count: " + count);
 
       var temp = Array<vec3>();
       for(let buttonPosi of buttonPos) {
         var originalPos = buttonPosi;
-        var newPos = vec3.fromValues(buttonPosi[0], buttonPosi[1], buttonPosi[2] + count * 0.0008); 
+        var newPos = vec3.fromValues(buttonPosi[0], buttonPosi[1], buttonPosi[2] + count * 0.1); 
         temp.push(newPos);
       }
       buttonPos = temp;
@@ -732,7 +736,6 @@ function main() {
         buttonPos.shift();
       }
 
- 
       //  //current easy buttons
       if (controls.Difficulty == "easy") {
         if (downS) {

@@ -13,6 +13,7 @@ precision highp float;
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
 uniform vec3 u_Eye;
+uniform float u_Time;
 
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
@@ -38,7 +39,7 @@ void main()
         } else {
             vec4 norm = normalize(fs_Nor);
             vec4 fs_Light = normalize(fs_LightVec);
-            float intensity = pow(dot(fs_Light, norm), 4.f);
+            float intensity = pow(dot(fs_Light, norm), 5.f);
             specularIntensity = max(intensity, 0.f);
         }
         
@@ -48,20 +49,15 @@ void main()
         diffuseTerm = min(diffuseTerm, 1.0);
         diffuseTerm = max(diffuseTerm, 0.0);
 
-        float ambientTerm = 0.1;
+        float ambientTerm = 0.4;
 
-        float lightIntensity = diffuseTerm * 0.3 + ambientTerm;   //Add a small float value to the color multiplier
+        float lightIntensity = diffuseTerm * 0.4 + ambientTerm;   //Add a small float value to the color multiplier
                                                             //to simulate ambient lighting. This ensures that faces that are not
                                                             //lit by our point light are not completely black.
 
         // Compute final shaded color
-        vec3 color = mix(
-                        diffuseColor.xyz, 
-                        vec3(0.5, 0.3, 0.7), 
-                        1.f
-                    ) 
-                        + specularIntensity * 10.;
+        vec3 color = vec3(0.5, 0.3, 0.7) + specularIntensity * 6.;
         vec3 color2 = diffuseColor.xyz;
 
-        out_Col = vec4(mix(color, color2, fs_Col.y) * lightIntensity, 1.);
+        out_Col = vec4(color * lightIntensity, 1.);
 }
