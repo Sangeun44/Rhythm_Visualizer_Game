@@ -91,7 +91,7 @@ var JukeBox: AudioContext;
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
   Difficulty: "easy",
-  Song: "Connect",
+  Song: "Run",
   'Load Scene': loadScene // A function pointer, essentially
 };
 
@@ -111,7 +111,7 @@ function play_music() {
       audio_buf.start(0);
     });
 
-  console.log(`Music On!`);
+  console.log(`Music On!` + musicStr);
 }
 
 function loadScene() {
@@ -414,10 +414,11 @@ function loadTrackEasy() {
     var letter = one.letter;
     var duration = one.duration;
     var time = one.mark;
+    var spacing = -6;
 
     buttonTimes.push(time);
     buttonSpace.push(letter);
-    console.log("loading each button with: "  + letter);
+    //console.log("loading each button with: "  + letter);
     //console.log("loading each button at: " + time);
 
     let buttonStr = readTextFile('./resources/obj/button.obj');
@@ -426,17 +427,19 @@ function loadTrackEasy() {
     //connect = 
     //bts run = -5
     if (letter == 'S') {
-      button.translateVertices(vec3.fromValues(-7, 0, time * -5));
+      //console.log("loading each button with: "  + 'S');
+      button.translateVertices(vec3.fromValues(-7, 0, time * spacing));
     } else if (letter == 'D') {
-      button.translateVertices(vec3.fromValues(-4.5, 0, time * -5));
+      //console.log("loading each button with: "  + 'D');
+      button.translateVertices(vec3.fromValues(-4.5, 0, time * spacing));
     } else if (letter == 'F') {
-      button.translateVertices(vec3.fromValues(-2, 0, time * -5));
+      button.translateVertices(vec3.fromValues(-2, 0, time * spacing));
     } else if (letter == 'J') {
-      button.translateVertices(vec3.fromValues(2, 0, time * -5));
+      button.translateVertices(vec3.fromValues(2, 0, time * spacing));
     } else if (letter == 'K') {
-      button.translateVertices(vec3.fromValues(4.5, 0, time * -5));
+      button.translateVertices(vec3.fromValues(4.5, 0, time * spacing));
     } else if (letter == 'L') {
-      button.translateVertices(vec3.fromValues(7, 0, time * -5));
+      button.translateVertices(vec3.fromValues(7, 0, time * spacing));
     }
 
     track.addMesh(button);
@@ -451,7 +454,7 @@ function loadTrackHard() {
     var letter = one.letter;
     var duration = one.duration;
     var time = one.mark;
-
+    var spacing = -5;
     buttonTimes.push(time);
     buttonSpace.push(letter);
 
@@ -461,21 +464,21 @@ function loadTrackHard() {
     //connect = 
     //bts run = -5
     if(letter == 'A') {
-      button.translateVertices(vec3.fromValues(-9.5, 0, time * -5));
+      button.translateVertices(vec3.fromValues(-9.5, 0, time * spacing));
     } else if (letter == 'S') {
-      button.translateVertices(vec3.fromValues(-7, 0, time * -5));
+      button.translateVertices(vec3.fromValues(-7, 0, time * spacing));
     } else if (letter == 'D') {
-      button.translateVertices(vec3.fromValues(-4.5, 0, time * -5));
+      button.translateVertices(vec3.fromValues(-4.5, 0, time * spacing));
     } else if (letter == 'F') {
-      button.translateVertices(vec3.fromValues(-2, 0, time * -5));
+      button.translateVertices(vec3.fromValues(-2, 0, time * spacing));
     } else if (letter == 'J') {
-      button.translateVertices(vec3.fromValues(2, 0, time * -5));
+      button.translateVertices(vec3.fromValues(2, 0, time * spacing));
     } else if (letter == 'K') {
-      button.translateVertices(vec3.fromValues(4.5, 0, time * -5));
+      button.translateVertices(vec3.fromValues(4.5, 0, time * spacing));
     } else if (letter == 'L') {
-      button.translateVertices(vec3.fromValues(7, 0, time * -5));
+      button.translateVertices(vec3.fromValues(7, 0, time * spacing));
     } else if (letter == ';') {
-      button.translateVertices(vec3.fromValues(9.5, 0, time * -5));
+      button.translateVertices(vec3.fromValues(9.5, 0, time * spacing));
     }
 
     track.addMesh(button);
@@ -490,12 +493,12 @@ function main() {
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.left = '0px';
   stats.domElement.style.top = '0px';
-  document.body.appendChild(stats.domElement);
+  //document.body.appendChild(stats.domElement);
 
   // Add controls to the gui
   const gui = new DAT.GUI();
   gui.add(controls, 'Difficulty', ['easy', 'hard']);
-  gui.add(controls, 'Song', ['Run', 'Connect', 'Connect-Goofy', 'Cheerup']);
+  gui.add(controls, 'Song', ['Run', 'Connect', 'Connect-Goofy', 'Cheerup', 'Megalovania']);
   gui.add(controls, 'Load Scene');
 
   // get canvas and webgl context
@@ -605,11 +608,14 @@ function main() {
 
     //user starts game
     if (startGame) {
-      var displayButtonTime = buttonTimes[0] - 1.5;
+      // console.log("button times: " + buttonTimes.length);
+      // console.log("buttons space: " + buttonSpace.length);
+
+      var displayButtonTime = buttonTimes[0] - 1;
       //check for each button, if the user has pressed the correct button
       if(displayButtonTime >= timeSinceStartSec - epsilon && displayButtonTime <= timeSinceStartSec + epsilon) {
-        console.log("time since start: " + timeSinceStartSec);
-        console.log("button time e: " + buttonTimes[0]);
+        // console.log("time since start: " + timeSinceStartSec);
+        // console.log("button time e: " + buttonTimes[0]);
         
         var letter = buttonSpace[0];
         if(letter == 'A') {
@@ -618,28 +624,32 @@ function main() {
           } else {
             health--;
           }
-        } else if(letter == 'S') {
+        } 
+        if(letter == 'S') {
           console.log("letter pu: S + time " + timeSinceStartSec);
           if(downS) {
             points++;
           } else {
             health--;
           }
-        } else if(letter == 'D') {
+        } 
+        if(letter == 'D') {
           console.log("letter pu: D + time " + timeSinceStartSec);
           if(downD) {
             points++;
           } else {
             health--;
           }
-        } else if(letter == 'F') {
+        } 
+        if(letter == 'F') {
           console.log("letter pu: F + time " + timeSinceStartSec);
           if(downF) {
             points++;
           } else {
             health--;
           }
-        } else if(letter == 'J') {
+        } 
+        if(letter == 'J') {
           console.log("letter pu: J + time " + timeSinceStartSec);
           if(downJ) {
             console.log("point: " + points);
@@ -647,7 +657,8 @@ function main() {
           } else {
             health--;
           }
-        } else if(letter == 'K') {
+        } 
+        if(letter == 'K') {
           console.log("letter pu: K + time " + timeSinceStartSec);
           if(downK) {
             console.log("point: " + points);
@@ -655,7 +666,8 @@ function main() {
           } else {
             health--;
           }
-        } else if(letter == 'L') {
+        } 
+        if(letter == 'L') {
           console.log("letter pu: L + time " + timeSinceStartSec);
           if(downL) {
             console.log("point: " + points);
@@ -663,7 +675,8 @@ function main() {
           } else {
             health--;
           }
-        } else if(letter == ';') {
+        } 
+        if(letter == ';') {
           if(downP) {
             console.log("letter pu: ;");
             points++;
@@ -672,13 +685,13 @@ function main() {
           }
         }
 
-        // if(health <= 0) {
-        //   console.log("health IS ZERIO");
-        //   var myWindow = window.open("", "MsgWindow", "width=200, height=100");
-        //   myWindow.document.write("<p>You Lose!</p>");
-        //   status.close();
-        //   JukeBox.close();
-        // }
+        if(health <= 0) {
+          console.log("health IS ZERIO");
+          var myWindow = window.open("", "MsgWindow", "width=200, height=100");
+          myWindow.document.write("<p>You Lose!</p>");
+          status.close();
+          JukeBox.close();
+        }
 
         status.document.write("<p>Your Score: </p>" + "<p>" + points +"</p>");
         status.document.write("<p>Your Health: </p>" + "<p>" + health +"</p>");      
@@ -923,6 +936,9 @@ function keyPressed(event: KeyboardEvent) {
         parseJSON();
         console.log("load track create");
         loadTrack();
+        for(let button of buttons) {
+          console.log("track record:" + button.letter);
+        }
       } 
 
       if(controls.Difficulty == "easy") {

@@ -3428,8 +3428,13 @@ const parseJson = __webpack_require__(68);
 let jsonFile; //jsonFile name
 //list of buttons to create
 let buttons = Array();
+let buttonTimes = Array();
+let buttonSpace = Array();
 let points = 0;
-let health = 0;
+let health = 20;
+let startTime = 0;
+let epsilon = 0.5;
+let status;
 let keyBoard = Array();
 let track;
 let gameDiff;
@@ -3470,6 +3475,8 @@ let downL;
 let buttonPstr;
 let buttonP;
 let downP;
+//music 
+var JukeBox;
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
@@ -3478,9 +3485,9 @@ const controls = {
     'Load Scene': loadScene // A function pointer, essentially
 };
 function play_music() {
+    JukeBox = new AudioContext();
     var musicStr = controls.Song;
     var musicPath = './resources/music/mp3/' + musicStr + '.mp3';
-    var JukeBox = new AudioContext();
     fetch(musicPath)
         .then(r => r.arrayBuffer())
         .then(b => JukeBox.decodeAudioData(b))
@@ -3491,7 +3498,7 @@ function play_music() {
         audio_buf.connect(JukeBox.destination);
         audio_buf.start(0);
     });
-    console.log(`Music On!`);
+    console.log(`Music On!` + musicStr);
 }
 function loadScene() {
     //Mario 
@@ -3572,9 +3579,9 @@ function parseJSON() {
     jsonFile = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])(musicPath);
     const json = jsonFile;
     var midi = parseJson(json);
-    console.log(midi);
+    //console.log(midi);
     var tracks = midi["tracks"];
-    console.log("midi" + tracks.length);
+    //console.log("midi" + tracks.length);
     if (controls.Difficulty == 'easy') {
         parseTracksEasy(tracks);
     }
@@ -3586,7 +3593,7 @@ function parseJSON() {
 function parseTracksEasy(tracks) {
     //tracks are in an array
     for (let track of tracks) {
-        console.log("track" + track.length);
+        //console.log("track" + track.length);
         //track's notes are in an array
         let notes = [];
         notes = track["notes"];
@@ -3604,10 +3611,10 @@ function parseTracksEasy(tracks) {
                 //for buttons that happen 0.3
                 //connect - 0.35
                 //run - 0.25
-                if (deltaTime > 0.28) {
+                if (deltaTime > 0.5) {
                     //cutoffs: 28, 40, 52, 64, 76, 88, 100
-                    if (number > 10 && number < 45) {
-                        console.log("15 to 40");
+                    if (number > 0 && number < 55) {
+                        //console.log("15 to 40");
                         let obj = {
                             letter: "S",
                             mark: time,
@@ -3615,8 +3622,8 @@ function parseTracksEasy(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 45 && number < 55) {
-                        console.log("40 to 52");
+                    else if (number > 55 && number < 65) {
+                        //console.log("40 to 52");
                         let obj = {
                             letter: "D",
                             mark: time,
@@ -3624,8 +3631,8 @@ function parseTracksEasy(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 55 && number < 65) {
-                        console.log("64 to 76");
+                    else if (number > 65 && number < 70) {
+                        //console.log("64 to 76");
                         let obj = {
                             letter: "F",
                             mark: time,
@@ -3633,7 +3640,7 @@ function parseTracksEasy(tracks) {
                         };
                         buttons.push(obj);
                     }
-                    else if (number > 65 && number < 75) {
+                    else if (number > 70 && number < 75) {
                         let obj = {
                             letter: "J",
                             mark: time,
@@ -3766,39 +3773,46 @@ function loadTrack() {
     else if (controls.Difficulty == "hard") {
         loadTrackHard();
     }
-    console.log("track loads");
+    //console.log("track loads");
     track.create();
     //console.log("track positions" + track.pos);
 }
 function loadTrackEasy() {
-    console.log("buttons: " + buttons.length);
+    //console.log("buttons: " + buttons.length);
     //since you have a list of buttons, lets create them all at once
     //the user will travel forward on the line
     for (let one of buttons) {
         var letter = one.letter;
         var duration = one.duration;
         var time = one.mark;
+        var spacing = -6;
+        buttonTimes.push(time);
+        buttonSpace.push(letter);
+        //console.log("loading each button with: "  + letter);
+        //console.log("loading each button at: " + time);
         let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
         let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
         //connect = 
         //bts run = -5
         if (letter == 'S') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * -5));
+            //console.log("loading each button with: "  + 'S');
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * spacing));
         }
         else if (letter == 'D') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * -5));
+            //console.log("loading each button with: "  + 'D');
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * spacing));
         }
         else if (letter == 'F') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * spacing));
         }
         else if (letter == 'J') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * spacing));
         }
         else if (letter == 'K') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * spacing));
         }
         else if (letter == 'L') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * spacing));
         }
         track.addMesh(button);
     }
@@ -3811,33 +3825,36 @@ function loadTrackHard() {
         var letter = one.letter;
         var duration = one.duration;
         var time = one.mark;
+        var spacing = 0;
+        buttonTimes.push(time);
+        buttonSpace.push(letter);
         let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./resources/obj/button.obj');
         let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
         //connect = 
         //bts run = -5
         if (letter == 'A') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-9.5, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-9.5, 0, time * spacing));
         }
         else if (letter == 'S') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * spacing));
         }
         else if (letter == 'D') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * spacing));
         }
         else if (letter == 'F') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * spacing));
         }
         else if (letter == 'J') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * spacing));
         }
         else if (letter == 'K') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * spacing));
         }
         else if (letter == 'L') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * spacing));
         }
         else if (letter == ';') {
-            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(9.5, 0, time * -5));
+            button.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(9.5, 0, time * spacing));
         }
         track.addMesh(button);
     }
@@ -3849,11 +3866,11 @@ function main() {
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '0px';
     stats.domElement.style.top = '0px';
-    document.body.appendChild(stats.domElement);
+    //document.body.appendChild(stats.domElement);
     // Add controls to the gui
     const gui = new __WEBPACK_IMPORTED_MODULE_2_dat_gui__["GUI"]();
     gui.add(controls, 'Difficulty', ['easy', 'hard']);
-    gui.add(controls, 'Song', ['Run', 'Connect', 'Connect-Goofy', 'Cheerup']);
+    gui.add(controls, 'Song', ['Run', 'Connect', 'Connect-Goofy', 'Cheerup', 'Megalovania']);
     gui.add(controls, 'Load Scene');
     // get canvas and webgl context
     const canvas = document.getElementById('canvas');
@@ -3896,6 +3913,10 @@ function main() {
     //camera.fovy = 1.5;
     // This function will be called every frame
     function tick() {
+        var timeRightNow = Date.now();
+        var timeSinceStart = timeRightNow - startTime;
+        var timeSinceStartSec = timeSinceStart / 1000;
+        //console.log("time counting: " + timeSinceStartSec);
         if (!startGame && controls.Difficulty == "easy") {
             console.log("load easy mesh buttons");
             //load easy mesh buttons
@@ -3939,6 +3960,101 @@ function main() {
         }
         //user starts game
         if (startGame) {
+            // console.log("button times: " + buttonTimes.length);
+            // console.log("buttons space: " + buttonSpace.length);
+            var displayButtonTime = buttonTimes[0] - 1;
+            //check for each button, if the user has pressed the correct button
+            if (displayButtonTime >= timeSinceStartSec - epsilon && displayButtonTime <= timeSinceStartSec + epsilon) {
+                // console.log("time since start: " + timeSinceStartSec);
+                // console.log("button time e: " + buttonTimes[0]);
+                var letter = buttonSpace[0];
+                if (letter == 'A') {
+                    if (downA) {
+                        points++;
+                    }
+                    else {
+                        health--;
+                    }
+                }
+                if (letter == 'S') {
+                    console.log("letter pu: S + time " + timeSinceStartSec);
+                    if (downS) {
+                        points++;
+                    }
+                    else {
+                        health--;
+                    }
+                }
+                if (letter == 'D') {
+                    console.log("letter pu: D + time " + timeSinceStartSec);
+                    if (downD) {
+                        points++;
+                    }
+                    else {
+                        health--;
+                    }
+                }
+                if (letter == 'F') {
+                    console.log("letter pu: F + time " + timeSinceStartSec);
+                    if (downF) {
+                        points++;
+                    }
+                    else {
+                        health--;
+                    }
+                }
+                if (letter == 'J') {
+                    console.log("letter pu: J + time " + timeSinceStartSec);
+                    if (downJ) {
+                        console.log("point: " + points);
+                        points++;
+                    }
+                    else {
+                        health--;
+                    }
+                }
+                if (letter == 'K') {
+                    console.log("letter pu: K + time " + timeSinceStartSec);
+                    if (downK) {
+                        console.log("point: " + points);
+                        points++;
+                    }
+                    else {
+                        health--;
+                    }
+                }
+                if (letter == 'L') {
+                    console.log("letter pu: L + time " + timeSinceStartSec);
+                    if (downL) {
+                        console.log("point: " + points);
+                        points++;
+                    }
+                    else {
+                        health--;
+                    }
+                }
+                if (letter == ';') {
+                    if (downP) {
+                        console.log("letter pu: ;");
+                        points++;
+                    }
+                    else {
+                        health--;
+                    }
+                }
+                if (health <= 0) {
+                    console.log("health IS ZERIO");
+                    var myWindow = window.open("", "MsgWindow", "width=200, height=100");
+                    myWindow.document.write("<p>You Lose!</p>");
+                    status.close();
+                    JukeBox.close();
+                }
+                status.document.write("<p>Your Score: </p>" + "<p>" + points + "</p>");
+                status.document.write("<p>Your Health: </p>" + "<p>" + health + "</p>");
+                //remove first element
+                buttonSpace.shift();
+                buttonTimes.shift();
+            }
             //U_tIME
             count++;
             //  //current easy buttons
@@ -4164,12 +4280,26 @@ function keyPressed(event) {
             break;
         case 86:
             if (play == 0) {
+                status = window.open("", "MsgWindow", "width=200, height=100");
+                status.document.write("<p>Your Score: </p>" + "<p>" + points + "</p>");
+                status.document.write("<p>Your Health: </p>" + "<p>" + health + "</p>");
                 play_music();
                 parseJSON();
                 console.log("load track create");
-                loaded = false;
                 loadTrack();
+                for (let button of buttons) {
+                    console.log("track record:" + button.letter);
+                }
             }
+            if (controls.Difficulty == "easy") {
+                epsilon = 0.5;
+            }
+            else if (controls.Difficulty == "hard") {
+                epsilon = 0.2;
+            }
+            var d = Date.now();
+            startTime = d;
+            console.log("start Time " + startTime);
             play++;
             document.getElementById('visualizerInfo').style.visibility = "hidden";
             startGame = true;
@@ -17155,7 +17285,7 @@ module.exports = "#version 300 es\n\n//This is a vertex shader. While it is call
 /* 77 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = mix(diffuseColor.xyz, \n                        vec3(123.f/255.f, 136.f/255.f, 219.f/255.f), 1.) +\n                        mix(0.f, specularIntensity, 2.);\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(mix(color, color2, fs_Col.x) * lightIntensity, diffuseColor.a);\n}\n"
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    vec3 eye = vec3(0, 5, 0);\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(eye, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = .1f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 8.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.9 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = mix(diffuseColor.xyz, \n                        vec3(100.f/255.f, 100.f/255.f, 200.f/255.f), 1.) +\n                        mix(0.f, specularIntensity, 2.);\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(mix(color, color2, fs_Col.z) * lightIntensity, 0.9);\n}\n"
 
 /***/ }),
 /* 78 */

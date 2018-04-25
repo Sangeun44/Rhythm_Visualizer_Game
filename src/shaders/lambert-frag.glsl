@@ -29,15 +29,16 @@ out vec4 out_Col; // This is the final output color that you will see on your
 
 void main()
 {
+    vec3 eye = vec3(0, 5, 0);
     // Material base color (before shading)
         vec4 diffuseColor = u_Color;
-        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;
+        vec4 avg = (fs_LightVec + vec4(eye, 0.f)) / 2.f;
         float specularIntensity;
 
         if(dot(fs_LightVec, fs_Nor) < 0.f) {
-            specularIntensity = 0.5f;
+            specularIntensity = .1f;
         } else {
-            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);
+            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 8.f), 0.f);
         }
         
         // Calculate the diffuse term for Lambert shading
@@ -45,19 +46,18 @@ void main()
         // Avoid negative lighting values
         diffuseTerm = min(diffuseTerm, 1.0);
         diffuseTerm = max(diffuseTerm, 0.0);
-        // diffuseTerm = clamp(diffuseTerm, 0, 1);
 
         float ambientTerm = 0.4;
 
-        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier
+        float lightIntensity = diffuseTerm * 0.9 + ambientTerm;   //Add a small float value to the color multiplier
                                                             //to simulate ambient lighting. This ensures that faces that are not
                                                             //lit by our point light are not completely black.
 
         // Compute final shaded color
         vec3 color = mix(diffuseColor.xyz, 
-                        vec3(123.f/255.f, 136.f/255.f, 219.f/255.f), 1.) +
+                        vec3(100.f/255.f, 100.f/255.f, 200.f/255.f), 1.) +
                         mix(0.f, specularIntensity, 2.);
         vec3 color2 = diffuseColor.xyz;
 
-        out_Col = vec4(mix(color, color2, fs_Col.x) * lightIntensity, diffuseColor.a);
+        out_Col = vec4(mix(color, color2, fs_Col.z) * lightIntensity, 0.9);
 }
