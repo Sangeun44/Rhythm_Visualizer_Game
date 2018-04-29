@@ -16,6 +16,8 @@ import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import ShaderProgram, { Shader } from './rendering/gl/ShaderProgram';
 
+import Button from './Button';
+
 // import { analyze } from './web-audio-beat-detector';
 
 // analyze(framework.audioSourceBuffer.buffer).then((bpm) => {
@@ -31,14 +33,16 @@ const parseJson = require('parse-json');
 let jsonFile: string; //jsonFile name
 
 //list of buttons to create
-let buttons = Array<any>();
-let buttonPos = Array<vec3>();
-let buttonType = Array<string>();
+let buttons = Array<Button>();
 
 let points = 0;
 let health = 100;
 let startTime = 0;
 let epsilon = 0.5;
+
+let startTick = 0;
+let endTick = 0;
+let tickFrame = 0;
 
 let keyBoard = Array<Mesh>();
 let track: Track;
@@ -223,11 +227,22 @@ function parseJSON() {
   //console.log(midi);
   var tracks = midi["tracks"];
   //console.log("midi" + tracks.length);
-  if(controls.Difficulty == 'easy') {
+
+  if (controls.Difficulty == 'easy') {
     parseTracksEasy(tracks);
   } else if (controls.Difficulty == 'hard') {
     parseTracksHard(tracks);
   }
+
+  // fetch('file.json')
+  // .then(response => response.json())
+  // .then(jsonResponse => console.log(jsonResponse))
+
+  // console.log("parse" + buttons.length);
+  buttons.sort(function (a: any, b: any) {
+    return a.getTime() - b.getTime();
+  });
+  // console.log("parse" + buttons.length);
 }
 
 //easy version
@@ -257,56 +272,32 @@ function parseTracksEasy(tracks: any) {
         if (deltaTime > 0.5) {
           //cutoffs: 28, 40, 52, 64, 76, 88, 100
           if (number > 0 && number < 55) {
-            //console.log("15 to 40");
-            console.log("parse S");
-            let obj = {
-              letter: "S",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            //console.log("15 to 40"); 
+            // console.log("parse S" + " time: " + time);
+            var b = new Button("S", time);
+            buttons.push(b);
           } else if (number > 55 && number < 65) {
             //console.log("40 to 52");
-            console.log("parse D");
-            let obj = {
-              letter: "D",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            // console.log("parse D" + " time: " + time);
+            var b = new Button("D", time);
+            buttons.push(b);
           } else if (number > 65 && number < 70) {
             //console.log("64 to 76");
-            console.log("parse F");
-            let obj = {
-              letter: "F",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            // console.log("parse F" + " time: " + time);
+            var b = new Button("F", time);
+            buttons.push(b);
           } else if (number > 70 && number < 75) {
-            console.log("parse J");
-            let obj = {
-              letter: "J",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            // console.log("parse J" + " time: " + time);
+            var b = new Button("J", time);
+            buttons.push(b);
           } else if (number > 75 && number < 83) {
-            console.log("parse K");
-            let obj = {
-              letter: "K",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            // console.log("parse K" + " time: " + time);
+            var b = new Button("K", time);
+            buttons.push(b);
           } else if (number > 83 && number < 127) {
-            console.log("parse L");
-            let obj = {
-              letter: "L",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            // console.log("parse L" + " time: " + time);
+            var b = new Button("L", time);
+            buttons.push(b);
           }
         }
       }
@@ -318,7 +309,7 @@ function parseTracksEasy(tracks: any) {
 function parseTracksHard(tracks: any) {
   //tracks are in an array
   for (let track of tracks) {
-    console.log("track" + track.length);
+    // console.log("track" + track.length);
     //track's notes are in an array
     let notes = [];
     notes = track["notes"];
@@ -342,63 +333,30 @@ function parseTracksHard(tracks: any) {
         var min = -3;
         var rand = Math.random() * (max - min) + min;
         if (deltaTime > 0.4) {
-          if(number > 0 + rand && number < 66 + rand) {
-            let obj = {
-              letter: "A",
-              mark: time,
-              duration: duration
-            }
-          }
-          //cutoffs: 28, 40, 52, 64, 76, 88, 100
-          if (number > 66 + rand && number < 69 + rand) {
-            let obj = {
-              letter: "S",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+          if (number > 0 + rand && number < 66 + rand) {
+            var b = new Button("A", time);
+            buttons.push(b);
+          } else if (number > 66 + rand && number < 69 + rand) {
+            var b = new Button("S", time);
+            buttons.push(b);
           } else if (number > 69 + rand && number < 73 + rand) {
-            let obj = {
-              letter: "D",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
-          } else if (number > 73 + rand && number < 77 +rand) {
-            let obj = {
-              letter: "F",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            var b = new Button("D", time);
+            buttons.push(b);
+          } else if (number > 73 + rand && number < 77 + rand) {
+            var b = new Button("F", time);
+            buttons.push(b);
           } else if (number > 77 + rand && number < 79 + rand) {
-            let obj = {
-              letter: "J",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            var b = new Button("J", time);
+            buttons.push(b);
           } else if (number > 79 + rand && number < 82 + rand) {
-            let obj = {
-              letter: "K",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            var b = new Button("K", time);
+            buttons.push(b);
           } else if (number > 82 + rand && number < 85 + rand) {
-            let obj = {
-              letter: "L",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            var b = new Button("L", time);
+            buttons.push(b);
           } else if (number > 85 + rand && number < 127) {
-            let obj = {
-              letter: ";",
-              mark: time,
-              duration: duration
-            }
-            buttons.push(obj);
+            var b = new Button(";", time);
+            buttons.push(b);
           }
         }
       }
@@ -409,89 +367,83 @@ function parseTracksHard(tracks: any) {
 function loadTrack() {
   //track 
   track = new Track(vec3.fromValues(0, 0, 0));
-  if(controls.Difficulty == "easy") {
-    loadTrackEasy();
+  if (controls.Difficulty == "easy") {
+    loadInitialPositionsEasy();
+    loadOnly10Easy();
   } else if (controls.Difficulty == "hard") {
-    loadTrackHard();
+    loadInitialPositionsHard();
+    loadOnly10Hard();
   }
-  //console.log("track loads");
   track.create();
-  //console.log("track positions" + track.pos);
 }
 
-function loadTrackEasy() {
-  //console.log("buttons: " + buttons.length);
-  //since you have a list of buttons, lets create them all at once
-  //the user will travel forward on the line
+function loadInitialPositionsEasy() {
   for (let one of buttons) {
-    var letter = one.letter;
-    var duration = one.duration;
-    var time = one.mark;
-    var spacing = -5;
-    console.log("parse letters to make into:" + letter);
-
-    buttonType.push("letter 4 each: " + letter);
-    //console.log("loading each button with: "  + letter);
-    //console.log("loading each button at: " + time);
+    var letter = one.getLetter();
+    var time = one.getTime();
+    var spacing = -1;
+    //console.log("parse letters to make into:" + letter);
 
     let buttonStr = readTextFile('./src/resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
 
-    //connect = 
-    //bts run = -5
-    var pos = vec3.fromValues(0,0,0);
-
+    var pos = vec3.fromValues(0, 0, 0);
     if (letter == 'S') {
-      //console.log("loading each button with: "  + 'S');
       pos = vec3.fromValues(-7, 0, time * spacing);
-      button.translateVertices(pos);
-    } 
-    if (letter == 'D') {
-      //console.log("loading each button with: "  + 'D');
+    } else if (letter == 'D') {
       pos = vec3.fromValues(-4.5, 0, time * spacing);
-      button.translateVertices(pos);
-    } 
-    if (letter == 'F') {
+    } else if (letter == 'F') {
       pos = vec3.fromValues(-2, 0, time * spacing);
-      button.translateVertices(pos);
-    }
-    if (letter == 'J') {
+    } else if (letter == 'J') {
       pos = vec3.fromValues(2, 0, time * spacing);
-      button.translateVertices(pos);
-    } 
-    if (letter == 'K') {
+    } else if (letter == 'K') {
       pos = vec3.fromValues(4.5, 0, time * spacing);
-      button.translateVertices(pos);
-    } 
-    if (letter == 'L') {
+    } else if (letter == 'L') {
       pos = vec3.fromValues(7, 0, time * spacing);
-      button.translateVertices(pos);
     }
-    buttonPos.push(pos);
-   
+    button.translateVertices(pos);
+    one.setPosition(pos);
+    // console.log("set positions initally: " + pos);
+    // track.addMesh(button);
+  }
+}
+
+function loadOnly10Easy() {
+  //from the list of buttons
+  //only load 10 onto the track
+  //update each time
+  for (var i = 0; i < 10; i++) {
+    var currButt = buttons[i];
+    // var letter = currButt.getLetter();
+    //console.log("parse letters to make into:" + letter);
+
+    let buttonStr = readTextFile('./src/resources/obj/button.obj');
+    let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
+    
+    var pos = currButt.getPosition();
+    button.translateVertices(pos);
+    buttons[i].setPosition(pos);
+
+    console.log("get time: " + i + " " + currButt.getTime());
+    console.log("set positions: " + i  + " " + pos);
+    
     track.addMesh(button);
   }
 }
 
-function loadTrackHard() {
- // console.log("buttons: " + buttons.length);
-  //since you have a list of buttons, lets create them all at once
-  //the user will travel forward on the line
+function loadInitialPositionsHard() {
+  //set the initial position of the buttons
   for (let one of buttons) {
-    var letter = one.letter;
-    var duration = one.duration;
-    var time = one.mark;
-    var spacing = -5;
-    buttonType.push(letter);
+    var letter = one.getLetter();
+    var time = one.getTime();
+    var spacing = -1;
 
     let buttonStr = readTextFile('./src/resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
 
-    //connect = 
-    //bts run = -5
-    var pos = vec3.fromValues(0,0,0);
+    var pos = vec3.fromValues(0, 0, 0);
 
-    if(letter == 'A') {
+    if (letter == 'A') {
       pos = vec3.fromValues(-9.5, 0, time * spacing);
       button.translateVertices(pos);
     } else if (letter == 'S') {
@@ -514,25 +466,43 @@ function loadTrackHard() {
       button.translateVertices(pos);
     } else if (letter == ';') {
       pos = vec3.fromValues(9.5, 0, time * spacing);
-      button.translateVertices(pos);    
+      button.translateVertices(pos);
     }
+    one.setPosition(pos);
+   // console.log("set positions initally: " + pos);
+    // track.addMesh(button);
+  }
+}
 
-    buttonPos.push(pos);
+function loadOnly10Hard() {
+  //from the list of buttons
+  //only load 10 onto the track
+  for (var i = 0; i < 10; i++) {
+    var currButt = buttons[i];
+    // var letter = currButt.getLetter();
+    // console.log("parse letters to make into:" + letter);
 
+    let buttonStr = readTextFile('./src/resources/obj/button.obj');
+    let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
+
+    var pos = currButt.getPosition();
+    button.translateVertices(pos);
+
+    buttons[i].setPosition(pos);
+    //console.log("set positions initally: " + pos);
     track.addMesh(button);
   }
 }
 
 function main() {
-
-
+  //debugger;
   // Initial display for framerate
   const stats = Stats();
   stats.setMode(0);
   stats.domElement.style.position = 'absolute';
   stats.domElement.style.left = '0px';
   stats.domElement.style.top = '0px';
-  //document.body.appendChild(stats.domElement);
+  document.body.appendChild(stats.domElement);
 
   // Add controls to the gui
   const gui = new DAT.GUI();
@@ -590,20 +560,21 @@ function main() {
 
   // This function will be called every frame
   function tick() {
+    startTick = Date.now();
+
     var timeRightNow = Date.now();
     var timeSinceStart = timeRightNow - startTime;
     var timeSinceStartSec = timeSinceStart / 1000;
-
     //console.log("time counting: " + timeSinceStartSec);
 
-    if(!startGame && controls.Difficulty == "easy") {
-      console.log("load easy mesh buttons");
+    if (!startGame && controls.Difficulty == "easy") {
+      // console.log("load easy mesh buttons");
       //load easy mesh buttons
       loadButtonsEasy();
       loaded = true;
-    } else if(!startGame && controls.Difficulty == "hard"){
+    } else if (!startGame && controls.Difficulty == "hard") {
       //load 
-      console.log("load hard mesh buttons");
+      // console.log("load hard mesh buttons");
       loadButtonsHard();
       loaded = true;
     }
@@ -635,122 +606,119 @@ function main() {
     button_lambert.setGeometryColor(base_color);
 
     //user has not started game
-    if(!startGame && controls.Difficulty == "easy") {
+    if (!startGame && controls.Difficulty == "easy") {
       button_lambert.setGeometryColor(base_color);
       renderer.render(camera, button_lambert, [buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL]);
-    } else if(!startGame && controls.Difficulty == "hard") {
+    } else if (!startGame && controls.Difficulty == "hard") {
       button_lambert.setGeometryColor(base_color);
       renderer.render(camera, button_lambert, [buttonA, buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL, buttonP]);
     }
 
-       //U_tIME
     //user starts game
     if (startGame) {
-
-      // console.log("positions: " + buttonPos.length);
-      // console.log("types: " + buttonType.length);
-
       //calculate the buttons positions as the track moves across
-      count = timeSinceStartSec;
+      var rate = 0.05;
+      var distance = tickFrame * rate;
+      console.log("tick: " + tickFrame);
+      //render track
+      base_color = vec4.fromValues(65 / 255, 105 / 255, 225 / 255, 1);
+      track_lambert.setGeometryColor(base_color);
+      renderer.render(camera, track_lambert, [track]);
 
-      var temp = Array<vec3>();
-      for(let buttonPosi of buttonPos) {
-        var originalPos = buttonPosi;
-        var newPos = vec3.fromValues(originalPos[0], originalPos[1], originalPos[2] + count * 0.1); 
-        // console.log("new position: " + newPos);
-        temp.push(newPos);
+      //update the position of all buttons
+      for (let button of buttons) {
+        var originalPos = button.getPosition();
+        var newPos = vec3.fromValues(originalPos[0], originalPos[1], originalPos[2] + distance);
+        button.setPosition(newPos);
+        console.log("new Positions: " + newPos);
       }
-      buttonPos = temp;
 
-      var currentPos = buttonPos[0];
-      //console.log(currentPos);
-      //check for each button, if the user has pressed the correct button
-      if(currentPos[2] >= 0 - epsilon && currentPos[2] <= 0 + epsilon) {
-        // console.log("time since start: " + timeSinceStartSec);
-        // console.log("button time e: " + buttonTimes[0]);
-        
-        var letter = buttonType[0];
-        if(letter == 'A') {
-          console.log("letter pu: A + time " + timeSinceStartSec + "position: " + currentPos);
-          if(downA) {
-            points++;
-          } else {
-            health--;
+      //reload the track
+      if(controls.Difficulty == 'easy') {
+        loadOnly10Easy();
+      } else {
+        loadOnly10Hard();
+      }
+
+      for (var i = 0; i < 5; i++) {
+        var curr = buttons[i];
+        console.log("check: " + curr.getLetter() + " " + curr.getPosition());
+        var position = curr.getPosition();
+        if (position[2] >= 0 - epsilon && position[2] <= 0 + epsilon) {
+          // console.log("new: " + position[2]);
+          // console.log("a button passed z: " + position + " " + letter);
+          var letter = curr.getLetter();
+          if (letter == 'A') {
+            if (downA) {
+              points++;
+            } else {
+              health--;
+            }
           }
-        } 
-        if(letter == 'S') {
-          console.log("letter pu: S + time " + timeSinceStartSec+ "position: " + currentPos);
-          if(downS) {
-            points++;
-          } else {
-            health--;
+          if (letter == 'S') {
+            if (downS) {
+              points++;
+            } else {
+              health--;
+            }
           }
-        } 
-        if(letter == 'D') {
-          console.log("letter pu: D + time " + timeSinceStartSec+ "position: " + currentPos);
-          if(downD) {
-            points++;
-          } else {
-            health--;
+          if (letter == 'D') {
+            if (downD) {
+              points++;
+            } else {
+              health--;
+            }
           }
-        } 
-        if(letter == 'F') {
-          console.log("letter pu: F + time " + timeSinceStartSec+ "position: " + currentPos);
-          if(downF) {
-            points++;
-          } else {
-            health--;
+          if (letter == 'F') {
+            if (downF) {
+              points++;
+            } else {
+              health--;
+            }
           }
-        } 
-        if(letter == 'J') {
-          console.log("letter pu: J + time " + timeSinceStartSec+ "position: " + currentPos);
-          if(downJ) {
-            console.log("point: " + points);
-            points++;
-          } else {
-            health--;
+          if (letter == 'J') {
+            if (downJ) {
+              console.log("point: " + points);
+              points++;
+            } else {
+              health--;
+            }
           }
-        } 
-        if(letter == 'K') {
-          console.log("letter pu: K + time " + timeSinceStartSec+ "position: " + currentPos);
-          if(downK) {
-            console.log("point: " + points);
-            points++;
-          } else {
-            health--;
+          if (letter == 'K') {
+            if (downK) {
+              console.log("point: " + points);
+              points++;
+            } else {
+              health--;
+            }
           }
-        } 
-        if(letter == 'L') {
-          console.log("letter pu: L + time " + timeSinceStartSec+ "position: " + currentPos);
-          if(downL) {
-            console.log("point: " + points);
-            points++;
-          } else {
-            health--;
+          if (letter == 'L') {
+            if (downL) {
+              console.log("point: " + points);
+              points++;
+            } else {
+              health--;
+            }
           }
-        } 
-        if(letter == ';') {
-          if(downP) {
-            console.log("letter pu: ; + time " + timeSinceStartSec+ "position: " + currentPos);
-            points++;
-          } else {
-            health--;
+          if (letter == ';') {
+            if (downP) {
+              points++;
+            } else {
+              health--;
+            }
           }
+
+          document.getElementById("health").innerHTML = "Health: " + health;
+          document.getElementById("points").innerHTML = "Score: " + points;
+          
+          if (health <= 0) {
+            console.log("health IS zero");
+            document.getElementById("game").innerHTML = "YOU LOSE!";
+            startGame = false;
+            JukeBox.close();
+          }
+          // buttons.shift();
         }
-        
-        document.getElementById("health").innerHTML = "Health: " + health;
-        document.getElementById("points").innerHTML = "Score: " + points;
-
-        if(health <= 0) {
-          console.log("health IS zero");
-          document.getElementById("game").innerHTML = "YOU LOSE!";
-          startGame = false;
-          JukeBox.close();
-        }
-
-        //remove first element
-        buttonType.shift();
-        buttonPos.shift();
       }
 
       //  //current easy buttons
@@ -854,8 +822,8 @@ function main() {
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonL]);
-        }  
-        
+        }
+
         if (downP) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonP]);
@@ -864,18 +832,16 @@ function main() {
           renderer.render(camera, button_lambert, [buttonP]);
         }
       }
-
-      //render track
-      base_color = vec4.fromValues(65 / 255, 105 / 255, 225 / 255, 1);
-      track_lambert.setTime(count);
-      track_lambert.setGeometryColor(base_color);
-      renderer.render(camera, track_lambert, [track]);
     }
+
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
     requestAnimationFrame(tick);
+    endTick = Date.now();
   }
+
+  tickFrame = endTick - startTick;
 
   window.addEventListener('resize', function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -892,14 +858,12 @@ function main() {
   camera.updateProjectionMatrix();
 
   // Start the render loop
- tick();
+  tick();
 }
 
 main();
 
 function keyReleased(event: KeyboardEvent) {
-  console.log("key released");
-  console.log("key released" + event.keyCode);
   switch (event.keyCode) {
     case 65:
       //A
@@ -937,8 +901,6 @@ function keyReleased(event: KeyboardEvent) {
 }
 
 function keyPressed(event: KeyboardEvent) {
-  console.log("key pressed");
-  console.log("key pressed" + event.keyCode);
   switch (event.keyCode) {
     case 65:
       //A
@@ -978,39 +940,36 @@ function keyPressed(event: KeyboardEvent) {
       startGame = false;
       break;
     case 86:
-      if(play == 0) {
+      if (play == 0) {
+        //start music
         play_music();
+        //parse JSON file
         parseJSON();
-        console.log("load track create");
-        loadTrack();
-        for(let button of buttons) {
-          console.log("track record:" + button.letter);
-        }
-      } 
 
-      if(controls.Difficulty == "easy") {
-        epsilon = 1.5;
+        //create track mesh
+        loadTrack();
+        console.log("load track create");
       }
-      else if(controls.Difficulty == "hard") {
-        epsilon = 1.2;
+
+      if (controls.Difficulty == "easy") {
+        epsilon = .2;
       }
-      
-      console.log("print track");
-      for(var i = 0; i< 100; i++) {
-        console.log("track: " + buttonType[i]);
-        console.log("track2: " + buttonPos[i]);
+      else if (controls.Difficulty == "hard") {
+        epsilon = .2;
       }
 
       //display status
       document.getElementById("game").innerHTML = "In progress: " + controls.Song;
       document.getElementById("health").innerHTML = "Health: " + health;
       document.getElementById("points").innerHTML = "Score: " + points;
-      
+
       var d = Date.now();
       startTime = d;
 
       play++;
+
       document.getElementById('visualizerInfo').style.visibility = "hidden";
+
       startGame = true;
       break;
   }

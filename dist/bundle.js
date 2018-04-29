@@ -145,35 +145,6 @@ function equals(a, b) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return gl; });
-/* harmony export (immutable) */ __webpack_exports__["c"] = setGL;
-/* harmony export (immutable) */ __webpack_exports__["b"] = readTextFile;
-var gl;
-function setGL(_gl) {
-    gl = _gl;
-}
-function readTextFile(file) {
-    var text = "";
-    var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", file, false);
-    rawFile.onreadystatechange = function () {
-        if (rawFile.readyState === 4) {
-            if (rawFile.status === 200 || rawFile.status == 0) {
-                var allText = rawFile.responseText;
-                text = allText;
-            }
-        }
-    };
-    rawFile.send(null);
-    return text;
-}
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gl_matrix_common__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__gl_matrix_mat2__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__gl_matrix_mat2d__ = __webpack_require__(22);
@@ -230,6 +201,35 @@ THE SOFTWARE. */
 
 
 
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return gl; });
+/* harmony export (immutable) */ __webpack_exports__["c"] = setGL;
+/* harmony export (immutable) */ __webpack_exports__["b"] = readTextFile;
+var gl;
+function setGL(_gl) {
+    gl = _gl;
+}
+function readTextFile(file) {
+    var text = "";
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function () {
+        if (rawFile.readyState === 4) {
+            if (rawFile.status === 200 || rawFile.status == 0) {
+                var allText = rawFile.responseText;
+                text = allText;
+            }
+        }
+    };
+    rawFile.send(null);
+    return text;
+}
 
 
 /***/ }),
@@ -297,7 +297,7 @@ function invert(out, a) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__globals__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__globals__ = __webpack_require__(2);
 
 class Drawable {
     constructor() {
@@ -3401,7 +3401,7 @@ function determinant(a) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_stats_js__ = __webpack_require__(26);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_stats_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_stats_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_dat_gui__ = __webpack_require__(27);
@@ -3409,10 +3409,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__geometry_Track__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__geometry_Square__ = __webpack_require__(33);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__globals__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__globals__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__rendering_gl_OpenGLRenderer__ = __webpack_require__(34);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Camera__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__Button__ = __webpack_require__(68);
+throw new Error("Cannot find module \"./web-audio-beat-detector\"");
 
 
 
@@ -3424,32 +3426,33 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-// import { analyze } from './web-audio-beat-detector';
-// analyze(framework.audioSourceBuffer.buffer).then((bpm) => {
-//   // the bpm could be analyzed 
-//   framework.songBPM = bpm;
-// })
-// .catch((err) => {
-//   // something went wrong 
-//   console.log("couldn't detect BPM");
-// });
-const parseJson = __webpack_require__(68);
+
+
+Object(__WEBPACK_IMPORTED_MODULE_11__web_audio_beat_detector__["analyze"])(framework.audioSourceBuffer.buffer).then((bpm) => {
+    // the bpm could be analyzed 
+    framework.songBPM = bpm;
+})
+    .catch((err) => {
+    // something went wrong 
+    console.log("couldn't detect BPM");
+});
+const parseJson = __webpack_require__(69);
 let jsonFile; //jsonFile name
 //list of buttons to create
 let buttons = Array();
-let buttonPos = Array();
-let buttonType = Array();
 let points = 0;
 let health = 100;
 let startTime = 0;
 let epsilon = 0.5;
+let startTick = 0;
+let endTick = 0;
+let tickFrame = 0;
 let keyBoard = Array();
 let track;
 let gameDiff;
 let startGame = false;
 let loaded = false;
 let parse = false;
-let gameStartTime = 0;
 let play = 0;
 //shapes
 let cube;
@@ -3596,6 +3599,11 @@ function parseJSON() {
     else if (controls.Difficulty == 'hard') {
         parseTracksHard(tracks);
     }
+    // console.log("parse" + buttons.length);
+    buttons.sort(function (a, b) {
+        return a.getTime() - b.getTime();
+    });
+    // console.log("parse" + buttons.length);
 }
 //easy version
 function parseTracksEasy(tracks) {
@@ -3619,64 +3627,41 @@ function parseTracksEasy(tracks) {
                 //for buttons that happen 0.3
                 //connect - 0.35
                 //run - 0.25
+                //if the time difference between one note and the other is :
                 if (deltaTime > 0.5) {
                     //cutoffs: 28, 40, 52, 64, 76, 88, 100
                     if (number > 0 && number < 55) {
-                        //console.log("15 to 40");
-                        console.log("parse S");
-                        let obj = {
-                            letter: "S",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        //console.log("15 to 40"); 
+                        // console.log("parse S" + " time: " + time);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("S", time);
+                        buttons.push(b);
                     }
                     else if (number > 55 && number < 65) {
                         //console.log("40 to 52");
-                        console.log("parse D");
-                        let obj = {
-                            letter: "D",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        // console.log("parse D" + " time: " + time);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("D", time);
+                        buttons.push(b);
                     }
                     else if (number > 65 && number < 70) {
                         //console.log("64 to 76");
-                        console.log("parse F");
-                        let obj = {
-                            letter: "F",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        // console.log("parse F" + " time: " + time);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("F", time);
+                        buttons.push(b);
                     }
                     else if (number > 70 && number < 75) {
-                        console.log("parse J");
-                        let obj = {
-                            letter: "J",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        // console.log("parse J" + " time: " + time);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("J", time);
+                        buttons.push(b);
                     }
                     else if (number > 75 && number < 83) {
-                        console.log("parse K");
-                        let obj = {
-                            letter: "K",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        // console.log("parse K" + " time: " + time);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("K", time);
+                        buttons.push(b);
                     }
                     else if (number > 83 && number < 127) {
-                        console.log("parse L");
-                        let obj = {
-                            letter: "L",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        // console.log("parse L" + " time: " + time);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("L", time);
+                        buttons.push(b);
                     }
                 }
             }
@@ -3687,7 +3672,7 @@ function parseTracksEasy(tracks) {
 function parseTracksHard(tracks) {
     //tracks are in an array
     for (let track of tracks) {
-        console.log("track" + track.length);
+        // console.log("track" + track.length);
         //track's notes are in an array
         let notes = [];
         notes = track["notes"];
@@ -3710,68 +3695,36 @@ function parseTracksHard(tracks) {
                 var rand = Math.random() * (max - min) + min;
                 if (deltaTime > 0.4) {
                     if (number > 0 + rand && number < 66 + rand) {
-                        let obj = {
-                            letter: "A",
-                            mark: time,
-                            duration: duration
-                        };
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("A", time);
+                        buttons.push(b);
                     }
-                    //cutoffs: 28, 40, 52, 64, 76, 88, 100
-                    if (number > 66 + rand && number < 69 + rand) {
-                        let obj = {
-                            letter: "S",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                    else if (number > 66 + rand && number < 69 + rand) {
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("S", time);
+                        buttons.push(b);
                     }
                     else if (number > 69 + rand && number < 73 + rand) {
-                        let obj = {
-                            letter: "D",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("D", time);
+                        buttons.push(b);
                     }
                     else if (number > 73 + rand && number < 77 + rand) {
-                        let obj = {
-                            letter: "F",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("F", time);
+                        buttons.push(b);
                     }
                     else if (number > 77 + rand && number < 79 + rand) {
-                        let obj = {
-                            letter: "J",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("J", time);
+                        buttons.push(b);
                     }
                     else if (number > 79 + rand && number < 82 + rand) {
-                        let obj = {
-                            letter: "K",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("K", time);
+                        buttons.push(b);
                     }
                     else if (number > 82 + rand && number < 85 + rand) {
-                        let obj = {
-                            letter: "L",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("L", time);
+                        buttons.push(b);
                     }
                     else if (number > 85 + rand && number < 127) {
-                        let obj = {
-                            letter: ";",
-                            mark: time,
-                            duration: duration
-                        };
-                        buttons.push(obj);
+                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */](";", time);
+                        buttons.push(b);
                     }
                 }
             }
@@ -3782,77 +3735,74 @@ function loadTrack() {
     //track 
     track = new __WEBPACK_IMPORTED_MODULE_4__geometry_Track__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
     if (controls.Difficulty == "easy") {
-        loadTrackEasy();
+        loadInitialPositionsEasy();
+        loadOnly10Easy();
     }
     else if (controls.Difficulty == "hard") {
-        loadTrackHard();
+        loadInitialPositionsHard();
+        loadOnly10Hard();
     }
-    //console.log("track loads");
     track.create();
-    //console.log("track positions" + track.pos);
 }
-function loadTrackEasy() {
-    //console.log("buttons: " + buttons.length);
-    //since you have a list of buttons, lets create them all at once
-    //the user will travel forward on the line
+function loadInitialPositionsEasy() {
     for (let one of buttons) {
-        var letter = one.letter;
-        var duration = one.duration;
-        var time = one.mark;
-        var spacing = -5;
-        console.log("parse letters to make into:" + letter);
-        buttonType.push("letter 4 each: " + letter);
-        //console.log("loading each button with: "  + letter);
-        //console.log("loading each button at: " + time);
+        var letter = one.getLetter();
+        var time = one.getTime();
+        var spacing = -1;
+        //console.log("parse letters to make into:" + letter);
         let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
         let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
-        //connect = 
-        //bts run = -5
         var pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0);
         if (letter == 'S') {
-            //console.log("loading each button with: "  + 'S');
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'D') {
-            //console.log("loading each button with: "  + 'D');
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'F') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'J') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'K') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'L') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * spacing);
-            button.translateVertices(pos);
         }
-        buttonPos.push(pos);
+        button.translateVertices(pos);
+        one.setPosition(pos);
+        // console.log("set positions initally: " + pos);
+        // track.addMesh(button);
+    }
+}
+function loadOnly10Easy() {
+    //from the list of buttons
+    //only load 10 onto the track
+    //update each time
+    for (var i = 0; i < 10; i++) {
+        var currButt = buttons[i];
+        // var letter = currButt.getLetter();
+        //console.log("parse letters to make into:" + letter);
+        let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
+        let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+        var pos = currButt.getPosition();
+        button.translateVertices(pos);
+        buttons[i].setPosition(pos);
+        console.log("get time: " + i + " " + currButt.getTime());
+        console.log("set positions: " + i + " " + pos);
         track.addMesh(button);
     }
 }
-function loadTrackHard() {
-    // console.log("buttons: " + buttons.length);
-    //since you have a list of buttons, lets create them all at once
-    //the user will travel forward on the line
+function loadInitialPositionsHard() {
+    //set the initial position of the buttons
     for (let one of buttons) {
-        var letter = one.letter;
-        var duration = one.duration;
-        var time = one.mark;
-        var spacing = -5;
-        buttonType.push(letter);
+        var letter = one.getLetter();
+        var time = one.getTime();
+        var spacing = -1;
         let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
         let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
-        //connect = 
-        //bts run = -5
         var pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0);
         if (letter == 'A') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-9.5, 0, time * spacing);
@@ -3886,18 +3836,36 @@ function loadTrackHard() {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(9.5, 0, time * spacing);
             button.translateVertices(pos);
         }
-        buttonPos.push(pos);
+        one.setPosition(pos);
+        // console.log("set positions initally: " + pos);
+        // track.addMesh(button);
+    }
+}
+function loadOnly10Hard() {
+    //from the list of buttons
+    //only load 10 onto the track
+    for (var i = 0; i < 10; i++) {
+        var currButt = buttons[i];
+        // var letter = currButt.getLetter();
+        // console.log("parse letters to make into:" + letter);
+        let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
+        let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+        var pos = currButt.getPosition();
+        button.translateVertices(pos);
+        buttons[i].setPosition(pos);
+        //console.log("set positions initally: " + pos);
         track.addMesh(button);
     }
 }
 function main() {
+    //debugger;
     // Initial display for framerate
     const stats = __WEBPACK_IMPORTED_MODULE_1_stats_js__();
     stats.setMode(0);
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '0px';
     stats.domElement.style.top = '0px';
-    //document.body.appendChild(stats.domElement);
+    document.body.appendChild(stats.domElement);
     // Add controls to the gui
     const gui = new __WEBPACK_IMPORTED_MODULE_2_dat_gui__["GUI"]();
     gui.add(controls, 'Difficulty', ['easy', 'hard']);
@@ -3922,45 +3890,45 @@ function main() {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     //mario
     const lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(77)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(78)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(78)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(79)),
     ]);
     //key buttons
     const button_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(79)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(80)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(80)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(81)),
     ]);
     //the track buttons
     const track_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(81)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(82)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(82)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(83)),
     ]);
     //transparent
     const plate_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(83)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(84)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(84)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(85)),
     ]);
     //change fov
     //camera.fovy = 1.5;
     // This function will be called every frame
     function tick() {
+        startTick = Date.now();
         var timeRightNow = Date.now();
         var timeSinceStart = timeRightNow - startTime;
         var timeSinceStartSec = timeSinceStart / 1000;
         //console.log("time counting: " + timeSinceStartSec);
         if (!startGame && controls.Difficulty == "easy") {
-            console.log("load easy mesh buttons");
+            // console.log("load easy mesh buttons");
             //load easy mesh buttons
             loadButtonsEasy();
             loaded = true;
         }
         else if (!startGame && controls.Difficulty == "hard") {
             //load 
-            console.log("load hard mesh buttons");
+            // console.log("load hard mesh buttons");
             loadButtonsHard();
             loaded = true;
         }
-        var currTime = new Date();
         //disable rollover controls
         camera.controls.rotationSpeed = 0;
         camera.controls.translationSpeed = 0;
@@ -3989,114 +3957,115 @@ function main() {
             button_lambert.setGeometryColor(base_color);
             renderer.render(camera, button_lambert, [buttonA, buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL, buttonP]);
         }
-        //U_tIME
         //user starts game
         if (startGame) {
-            // console.log("positions: " + buttonPos.length);
-            // console.log("types: " + buttonType.length);
             //calculate the buttons positions as the track moves across
-            count = timeSinceStartSec;
-            var temp = Array();
-            for (let buttonPosi of buttonPos) {
-                var originalPos = buttonPosi;
-                var newPos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(originalPos[0], originalPos[1], originalPos[2] + count * 0.1);
-                // console.log("new position: " + newPos);
-                temp.push(newPos);
+            var rate = 0.05;
+            var distance = tickFrame * rate;
+            console.log("tick: " + tickFrame);
+            //render track
+            base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(65 / 255, 105 / 255, 225 / 255, 1);
+            track_lambert.setGeometryColor(base_color);
+            renderer.render(camera, track_lambert, [track]);
+            //update the position of all buttons
+            for (let button of buttons) {
+                var originalPos = button.getPosition();
+                var newPos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(originalPos[0], originalPos[1], originalPos[2] + distance);
+                button.setPosition(newPos);
+                console.log("new Positions: " + newPos);
             }
-            buttonPos = temp;
-            var currentPos = buttonPos[0];
-            //console.log(currentPos);
-            //check for each button, if the user has pressed the correct button
-            if (currentPos[2] >= 0 - epsilon && currentPos[2] <= 0 + epsilon) {
-                // console.log("time since start: " + timeSinceStartSec);
-                // console.log("button time e: " + buttonTimes[0]);
-                var letter = buttonType[0];
-                if (letter == 'A') {
-                    console.log("letter pu: A + time " + timeSinceStartSec + "position: " + currentPos);
-                    if (downA) {
-                        points++;
+            //reload the track
+            if (controls.Difficulty == 'easy') {
+                loadOnly10Easy();
+            }
+            else {
+                loadOnly10Hard();
+            }
+            for (var i = 0; i < 5; i++) {
+                var curr = buttons[i];
+                console.log("check: " + curr.getLetter() + " " + curr.getPosition());
+                var position = curr.getPosition();
+                if (position[2] >= 0 - epsilon && position[2] <= 0 + epsilon) {
+                    // console.log("new: " + position[2]);
+                    // console.log("a button passed z: " + position + " " + letter);
+                    var letter = curr.getLetter();
+                    if (letter == 'A') {
+                        if (downA) {
+                            points++;
+                        }
+                        else {
+                            health--;
+                        }
                     }
-                    else {
-                        health--;
+                    if (letter == 'S') {
+                        if (downS) {
+                            points++;
+                        }
+                        else {
+                            health--;
+                        }
                     }
+                    if (letter == 'D') {
+                        if (downD) {
+                            points++;
+                        }
+                        else {
+                            health--;
+                        }
+                    }
+                    if (letter == 'F') {
+                        if (downF) {
+                            points++;
+                        }
+                        else {
+                            health--;
+                        }
+                    }
+                    if (letter == 'J') {
+                        if (downJ) {
+                            console.log("point: " + points);
+                            points++;
+                        }
+                        else {
+                            health--;
+                        }
+                    }
+                    if (letter == 'K') {
+                        if (downK) {
+                            console.log("point: " + points);
+                            points++;
+                        }
+                        else {
+                            health--;
+                        }
+                    }
+                    if (letter == 'L') {
+                        if (downL) {
+                            console.log("point: " + points);
+                            points++;
+                        }
+                        else {
+                            health--;
+                        }
+                    }
+                    if (letter == ';') {
+                        if (downP) {
+                            points++;
+                        }
+                        else {
+                            health--;
+                        }
+                    }
+                    document.getElementById("health").innerHTML = "Health: " + health;
+                    document.getElementById("points").innerHTML = "Score: " + points;
+                    if (health <= 0) {
+                        console.log("health IS zero");
+                        document.getElementById("game").innerHTML = "YOU LOSE!";
+                        startGame = false;
+                        JukeBox.close();
+                    }
+                    // buttons.shift();
                 }
-                if (letter == 'S') {
-                    console.log("letter pu: S + time " + timeSinceStartSec + "position: " + currentPos);
-                    if (downS) {
-                        points++;
-                    }
-                    else {
-                        health--;
-                    }
-                }
-                if (letter == 'D') {
-                    console.log("letter pu: D + time " + timeSinceStartSec + "position: " + currentPos);
-                    if (downD) {
-                        points++;
-                    }
-                    else {
-                        health--;
-                    }
-                }
-                if (letter == 'F') {
-                    console.log("letter pu: F + time " + timeSinceStartSec + "position: " + currentPos);
-                    if (downF) {
-                        points++;
-                    }
-                    else {
-                        health--;
-                    }
-                }
-                if (letter == 'J') {
-                    console.log("letter pu: J + time " + timeSinceStartSec + "position: " + currentPos);
-                    if (downJ) {
-                        console.log("point: " + points);
-                        points++;
-                    }
-                    else {
-                        health--;
-                    }
-                }
-                if (letter == 'K') {
-                    console.log("letter pu: K + time " + timeSinceStartSec + "position: " + currentPos);
-                    if (downK) {
-                        console.log("point: " + points);
-                        points++;
-                    }
-                    else {
-                        health--;
-                    }
-                }
-                if (letter == 'L') {
-                    console.log("letter pu: L + time " + timeSinceStartSec + "position: " + currentPos);
-                    if (downL) {
-                        console.log("point: " + points);
-                        points++;
-                    }
-                    else {
-                        health--;
-                    }
-                }
-                if (letter == ';') {
-                    if (downP) {
-                        console.log("letter pu: ; + time " + timeSinceStartSec + "position: " + currentPos);
-                        points++;
-                    }
-                    else {
-                        health--;
-                    }
-                }
-                document.getElementById("health").innerHTML = "Health: " + health;
-                document.getElementById("points").innerHTML = "Score: " + points;
-                if (health <= 0) {
-                    console.log("health IS zero");
-                    document.getElementById("game").innerHTML = "YOU LOSE!";
-                    startGame = false;
-                    JukeBox.close();
-                }
-                //remove first element
-                buttonType.shift();
-                buttonPos.shift();
             }
             //  //current easy buttons
             if (controls.Difficulty == "easy") {
@@ -4215,16 +4184,13 @@ function main() {
                     renderer.render(camera, button_lambert, [buttonP]);
                 }
             }
-            //render track
-            base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(65 / 255, 105 / 255, 225 / 255, 1);
-            track_lambert.setTime(count);
-            track_lambert.setGeometryColor(base_color);
-            renderer.render(camera, track_lambert, [track]);
         }
         stats.end();
         // Tell the browser to call `tick` again whenever it renders a new frame
         requestAnimationFrame(tick);
+        endTick = Date.now();
     }
+    tickFrame = endTick - startTick;
     window.addEventListener('resize', function () {
         renderer.setSize(window.innerWidth, window.innerHeight);
         camera.setAspectRatio(window.innerWidth / window.innerHeight);
@@ -4241,8 +4207,6 @@ function main() {
 }
 main();
 function keyReleased(event) {
-    console.log("key released");
-    console.log("key released" + event.keyCode);
     switch (event.keyCode) {
         case 65:
             //A
@@ -4279,8 +4243,6 @@ function keyReleased(event) {
     }
 }
 function keyPressed(event) {
-    console.log("key pressed");
-    console.log("key pressed" + event.keyCode);
     switch (event.keyCode) {
         case 65:
             //A
@@ -4321,24 +4283,19 @@ function keyPressed(event) {
             break;
         case 86:
             if (play == 0) {
+                //start music
                 play_music();
+                //parse JSON file
                 parseJSON();
-                console.log("load track create");
+                //create track mesh
                 loadTrack();
-                for (let button of buttons) {
-                    console.log("track record:" + button.letter);
-                }
+                console.log("load track create");
             }
             if (controls.Difficulty == "easy") {
-                epsilon = 1.5;
+                epsilon = .2;
             }
             else if (controls.Difficulty == "hard") {
-                epsilon = 1.2;
-            }
-            console.log("print track");
-            for (var i = 0; i < 100; i++) {
-                console.log("track: " + buttonType[i]);
-                console.log("track2: " + buttonPos[i]);
+                epsilon = .2;
             }
             //display status
             document.getElementById("game").innerHTML = "In progress: " + controls.Song;
@@ -12843,9 +12800,9 @@ dat.utils.common);
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_webgl_obj_loader__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_webgl_obj_loader___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_webgl_obj_loader__);
 
@@ -12921,7 +12878,7 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
         __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.normals, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
         __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufPos);
         __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.positions, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
-        console.log(`Created Mesh from OBJ`);
+        //console.log(`Created Mesh from OBJ`);
         this.objString = ""; // hacky clear
     }
 }
@@ -12940,9 +12897,9 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(2);
 
 
 
@@ -13035,9 +12992,9 @@ class City extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(2);
 
 
 
@@ -13082,8 +13039,8 @@ class Square extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /*
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__globals__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__globals__ = __webpack_require__(2);
 
 
 // In this file, `gl` is accessible because it is imported above
@@ -13127,7 +13084,7 @@ class OpenGLRenderer {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_3d_view_controls__ = __webpack_require__(36);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_3d_view_controls___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_3d_view_controls__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix__ = __webpack_require__(1);
 
 
 class Camera {
@@ -16146,8 +16103,8 @@ function getBoundingClientOffset (element) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__globals__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__globals__ = __webpack_require__(2);
 
 
 var activeProgram = null;
@@ -16258,12 +16215,54 @@ class ShaderProgram {
 
 /***/ }),
 /* 68 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(1);
+
+class Button {
+    constructor(letter, time) {
+        // if we want to access these later, we need to bind them to 'this'
+        this.letter = letter;
+        this.time = time;
+        this.position = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0);
+    }
+    getTime() {
+        return this.time;
+    }
+    setTime(time) {
+        this.time = time;
+    }
+    getLetter() {
+        return this.letter;
+    }
+    setLetter(letter) {
+        this.letter = letter;
+    }
+    getPosition() {
+        return this.position;
+    }
+    setPosition(position) {
+        this.position = position;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Button;
+
+// Usage:
+//   var person = new Person("Austin", "555-555-5555");
+//   console.log(person.name)              // Austin
+//   person.setName("Austin Eng")
+//   console.log(person.getName())         // Austin Eng 
+
+
+/***/ }),
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var errorEx = __webpack_require__(69);
-var fallback = __webpack_require__(75);
+var errorEx = __webpack_require__(70);
+var fallback = __webpack_require__(76);
 
 var JSONError = errorEx('JSONError', {
 	fileName: errorEx.append('in %s')
@@ -16299,14 +16298,14 @@ module.exports = function (x, reviver, filename) {
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var util = __webpack_require__(70);
-var isArrayish = __webpack_require__(74);
+var util = __webpack_require__(71);
+var isArrayish = __webpack_require__(75);
 
 var errorEx = function errorEx(name, properties) {
 	if (!name || name.constructor !== String) {
@@ -16439,7 +16438,7 @@ module.exports = errorEx;
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -16967,7 +16966,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(72);
+exports.isBuffer = __webpack_require__(73);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -17011,7 +17010,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(73);
+exports.inherits = __webpack_require__(74);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -17029,10 +17028,10 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9), __webpack_require__(71)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9), __webpack_require__(72)))
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -17222,7 +17221,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -17233,7 +17232,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -17262,7 +17261,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17279,7 +17278,7 @@ module.exports = function isArrayish(obj) {
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -17290,7 +17289,7 @@ module.exports = function isArrayish(obj) {
 
 // RTFM: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
 
-var Uni = __webpack_require__(76)
+var Uni = __webpack_require__(77)
 
 function isHexDigit(x) {
   return (x >= '0' && x <= '9')
@@ -18037,7 +18036,7 @@ module.exports.tokenize = function tokenizeJSON(input, options) {
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports) {
 
 
@@ -18114,49 +18113,49 @@ module.exports.NonAsciiIdentifierPart = /[\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u0
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(0, 100, -20, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
 
 /***/ }),
-/* 78 */
-/***/ (function(module, exports) {
-
-module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Time;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n        vec4 diffuseColor = u_Color;\n        float specularIntensity;\n\n        float angle = dot(fs_LightVec + vec4(cos(u_Time)), fs_Nor);\n        if(angle < 0.5f) {\n            specularIntensity = .1f;\n        } else {\n            vec4 norm = normalize(fs_Nor);\n            vec4 fs_Light = normalize(fs_LightVec);\n            float intensity = pow(dot(fs_Light, norm), 5.f);\n            specularIntensity = max(intensity, 0.f);\n        }\n        \n        // diffuse term for Lambert \n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.4 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = vec3(0.5, 0.3, 0.7) + specularIntensity * 6.;\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color * lightIntensity, 1.);\n}\n"
-
-/***/ }),
 /* 79 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Time; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Pos;\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n    \n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n    fs_Pos = gl_Position;\n}   \n"
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Time;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n        vec4 diffuseColor = u_Color;\n        float specularIntensity;        \n        float ambientTerm = 0.4;\n\n        float angle = dot(fs_LightVec, fs_Nor);\n        if(angle < 0.5f) {\n            specularIntensity = .1f;\n            ambientTerm = 0.25;\n        } else {\n            vec4 norm = normalize(fs_Nor);\n            vec4 fs_Light = normalize(fs_LightVec);\n            float intensity = pow(dot(fs_Light, norm), 5.f);\n            specularIntensity = max(intensity, 0.f);\n            ambientTerm = 0.4;\n        }\n        \n        // diffuse term for Lambert \n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n\n        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = vec3(0.5, 0.5, 0.7) + specularIntensity * 6.;\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color * lightIntensity, 1.);\n}\n"
 
 /***/ }),
 /* 80 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Pressed;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        float in3 = 0.5;\n\n        if(u_Pressed == 0.) {\n            in3 = 0.5;\n        } else {\n            in3 = 1.0;\n        }\n        out_Col = vec4(color2 * lightIntensity, in3);\n}\n\n"
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Time; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Pos;\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n    \n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n    fs_Pos = gl_Position;\n}   \n"
 
 /***/ }),
 /* 81 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Time; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n    vec4 vs_Pos2 = vec4(vs_Pos.x, vs_Pos.y, vs_Pos.z + u_Time, vs_Pos.w);\n\n    vec4 modelposition = u_Model * vs_Pos2;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Pressed;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        float in3 = 0.5;\n\n        if(u_Pressed == 0.) {\n            in3 = 0.5;\n        } else {\n            in3 = 1.0;\n        }\n        out_Col = vec4(color2 * lightIntensity, in3);\n}\n\n"
 
 /***/ }),
 /* 82 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color2 * lightIntensity, diffuseColor.a);\n}\n\n"
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Time; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 10, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n    vec4 vs_Pos2 = vec4(vs_Pos.x, vs_Pos.y, vs_Pos.z, vs_Pos.w);\n\n    vec4 modelposition = u_Model * vs_Pos2;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
 
 /***/ }),
 /* 83 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Pos;\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n    fs_Pos = vs_Pos;\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color2 * lightIntensity, diffuseColor.a);\n}\n\n"
 
 /***/ }),
 /* 84 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Pos;\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n    fs_Pos = vs_Pos;\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+
+/***/ }),
+/* 85 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color2 * lightIntensity, (1. / (-fs_Pos.z)));\n}\n\n"
