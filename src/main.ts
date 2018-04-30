@@ -117,7 +117,7 @@ function play_music() {
     .then(data => {
       const audio_buf = JukeBox.createBufferSource();
       audio_buf.buffer = data;
-      audio_buf.loop = true;
+      audio_buf.loop = false;
       audio_buf.connect(JukeBox.destination);
       audio_buf.start(0);
     });
@@ -220,43 +220,48 @@ function parseJSON() {
   var musicStr = controls.Song;
   var musicPath = './src/resources/music/json/' + musicStr + '.json';
 
-  jsonFile = readTextFile(musicPath);
-  const json = jsonFile;
+  // jsonFile = readTextFile(musicPath);
+  const json = "";
 
-  var midi = parseJson(json);
-  //console.log(midi);
-  var tracks = midi["tracks"];
-  //console.log("midi" + tracks.length);
-
-  if (controls.Difficulty == 'easy') {
-    parseTracksEasy(tracks);
-  } else if (controls.Difficulty == 'hard') {
-    parseTracksHard(tracks);
+  fetch(musicPath)
+  .then(response => response.json())
+  .then(jsonResponse => parseAfterReading(jsonResponse))   
   }
 
-  // fetch('file.json')
-  // .then(response => response.json())
-  // .then(jsonResponse => console.log(jsonResponse))
+function parseAfterReading(json : JSON) {
+  // console.log("d" + JSON.stringify(json));
+    var json2 = JSON.parse(JSON.stringify(json));
+    var tracks = json2["tracks"];
+    var tracks2 = JSON.parse(JSON.stringify(tracks));
+  console.log(tracks2[0]);
+    if (controls.Difficulty == 'easy') {
+      parseTracksEasy(tracks2);
+    } else if (controls.Difficulty == 'hard') {
+      parseTracksHard(tracks2);
+  }
 
+  // console.log("buttons: " + buttons.length);
   // console.log("parse" + buttons.length);
   buttons.sort(function (a: any, b: any) {
     return a.getTime() - b.getTime();
   });
-  // console.log("parse" + buttons.length);
+  console.log("parse" + buttons[0].getLetter());
 }
 
 //easy version
 function parseTracksEasy(tracks: any) {
   //tracks are in an array
   for (let track of tracks) {
-    //console.log("track" + track.length);
+    console.log("track" + track.length);
     //track's notes are in an array
     let notes = [];
     notes = track["notes"];
+    var notes2 = JSON.parse(JSON.stringify(notes));
+    console.log("notes" + notes2[0].get);
     //if the track has notes to be played
-    if (notes.length > 0) {
+    if (notes2.length > 0) {
       var currTime = 0;
-      for (let note of notes) {
+      for (let note of notes2) {
         //name, midi, time, velocity, duration
         //time passed per note
         var time = note["time"];
@@ -265,6 +270,7 @@ function parseTracksEasy(tracks: any) {
         var number = note["midi"];
         var duration = note["duration"];
 
+        // console.log("duration: " + duration);
         //for buttons that happen 0.3
         //connect - 0.35
         //run - 0.25
@@ -368,21 +374,99 @@ function loadTrack() {
   //track 
   track = new Track(vec3.fromValues(0, 0, 0));
   if (controls.Difficulty == "easy") {
+    //loadTrackEasy();
     loadInitialPositionsEasy();
     loadOnly10Easy();
   } else if (controls.Difficulty == "hard") {
+    //loadTrackHard();
     loadInitialPositionsHard();
     loadOnly10Hard();
   }
   track.create();
 }
 
+function loadTrackEasy() {
+  //console.log("buttons: " + buttons.length);
+  //since you have a list of buttons, lets create them all at once
+  //the user will travel forward on the line
+  for (let one of buttons) {
+    var letter = one.getLetter();
+    var time = one.getTime();
+    var spacing = -1;
+    // console.log("parse letters to make into:" + letter);
+
+    let buttonStr = readTextFile('./src/resources/obj/button.obj');
+    let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
+
+    var pos = vec3.fromValues(0,0,0);
+
+    if (letter == 'S') {
+      pos = vec3.fromValues(-7, 0, time * spacing);
+    } else if (letter == 'D') {
+      pos = vec3.fromValues(-4.5, 0, time * spacing);
+    } else if (letter == 'F') {
+      pos = vec3.fromValues(-2, 0, time * spacing);
+    } else if (letter == 'J') {
+      pos = vec3.fromValues(2, 0, time * spacing);
+    } else if (letter == 'K') {
+      pos = vec3.fromValues(4.5, 0, time * spacing);
+    } else if (letter == 'L') {
+      pos = vec3.fromValues(7, 0, time * spacing);
+    }
+    button.translateVertices(pos);
+    one.setPosition(pos);
+
+    track.addMesh(button);
+  }
+}
+
+function loadTrackHard() {
+  // console.log("buttons: " + buttons.length);
+   //since you have a list of buttons, lets create them all at once
+   //the user will travel forward on the line
+   for (let one of buttons) {
+    var letter = one.getLetter();
+    var time = one.getTime();
+    var spacing = -1;
+ 
+     let buttonStr = readTextFile('./src/resources/obj/button.obj');
+     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
+ 
+     //connect = 
+     //bts run = -5
+     var pos = vec3.fromValues(0,0,0);
+ 
+     if(letter == 'A') {
+       pos = vec3.fromValues(-9.5, 0, time * spacing);
+     } else if (letter == 'S') {
+       pos = vec3.fromValues(-7, 0, time * spacing);
+     } else if (letter == 'D') {
+       pos = vec3.fromValues(-4.5, 0, time * spacing);
+     } else if (letter == 'F') {
+       pos = vec3.fromValues(-2, 0, time * spacing);
+     } else if (letter == 'J') {
+       pos = vec3.fromValues(2, 0, time * spacing);
+     } else if (letter == 'K') {
+       pos = vec3.fromValues(4.5, 0, time * spacing);
+     } else if (letter == 'L') {
+       pos = vec3.fromValues(7, 0, time * spacing);
+     } else if (letter == ';') {
+       pos = vec3.fromValues(9.5, 0, time * spacing);
+     }
+ 
+    button.translateVertices(pos);
+    one.setPosition(pos);
+    
+    track.addMesh(button);
+   }
+ }
+
 function loadInitialPositionsEasy() {
   for (let one of buttons) {
     var letter = one.getLetter();
     var time = one.getTime();
     var spacing = -1;
-    //console.log("parse letters to make into:" + letter);
+    console.log("parse letters to make into:" + letter);
 
     let buttonStr = readTextFile('./src/resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
@@ -403,7 +487,7 @@ function loadInitialPositionsEasy() {
     }
     button.translateVertices(pos);
     one.setPosition(pos);
-    // console.log("set positions initally: " + pos);
+    console.log("set positions initally: " + pos);
     // track.addMesh(button);
   }
 }
@@ -424,8 +508,8 @@ function loadOnly10Easy() {
     button.translateVertices(pos);
     buttons[i].setPosition(pos);
 
-    console.log("get time: " + i + " " + currButt.getTime());
-    console.log("set positions: " + i  + " " + pos);
+    // console.log("get time: " + i + " " + currButt.getTime());
+    // console.log("set positions: " + i  + " " + pos);
     
     track.addMesh(button);
   }
@@ -445,29 +529,23 @@ function loadInitialPositionsHard() {
 
     if (letter == 'A') {
       pos = vec3.fromValues(-9.5, 0, time * spacing);
-      button.translateVertices(pos);
     } else if (letter == 'S') {
       pos = vec3.fromValues(-7, 0, time * spacing);
-      button.translateVertices(pos);
     } else if (letter == 'D') {
       pos = vec3.fromValues(-4.5, 0, time * spacing);
-      button.translateVertices(pos);
     } else if (letter == 'F') {
       pos = vec3.fromValues(-2, 0, time * spacing);
-      button.translateVertices(pos);
     } else if (letter == 'J') {
       pos = vec3.fromValues(2, 0, time * spacing);
-      button.translateVertices(pos);
     } else if (letter == 'K') {
       pos = vec3.fromValues(4.5, 0, time * spacing);
-      button.translateVertices(pos);
     } else if (letter == 'L') {
       pos = vec3.fromValues(7, 0, time * spacing);
-      button.translateVertices(pos);
     } else if (letter == ';') {
       pos = vec3.fromValues(9.5, 0, time * spacing);
-      button.translateVertices(pos);
     }
+
+    button.translateVertices(pos);
     one.setPosition(pos);
    // console.log("set positions initally: " + pos);
     // track.addMesh(button);
@@ -626,23 +704,23 @@ function main() {
       renderer.render(camera, track_lambert, [track]);
 
       //update the position of all buttons
-      for (let button of buttons) {
-        var originalPos = button.getPosition();
-        var newPos = vec3.fromValues(originalPos[0], originalPos[1], originalPos[2] + distance);
-        button.setPosition(newPos);
-        console.log("new Positions: " + newPos);
-      }
-
+      // for (let button of buttons) {
+      //   var originalPos = button.getPosition();
+      //   var newPos = vec3.fromValues(originalPos[0], originalPos[1], originalPos[2] + distance);
+      //   button.setPosition(newPos);
+      //   // console.log("new Positions: " + newPos);
+      // }
+      // track.translateVertices(vec3.fromValues(0, 0, distance));
       //reload the track
-      if(controls.Difficulty == 'easy') {
-        loadOnly10Easy();
-      } else {
-        loadOnly10Hard();
-      }
+      // if(controls.Difficulty == 'easy') {
+      //   loadOnly10Easy();
+      // } else {
+      //   loadOnly10Hard();
+      // }
 
       for (var i = 0; i < 5; i++) {
         var curr = buttons[i];
-        console.log("check: " + curr.getLetter() + " " + curr.getPosition());
+        // console.log("check: " + curr.getLetter() + " " + curr.getPosition());
         var position = curr.getPosition();
         if (position[2] >= 0 - epsilon && position[2] <= 0 + epsilon) {
           // console.log("new: " + position[2]);

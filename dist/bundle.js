@@ -218,7 +218,7 @@ function setGL(_gl) {
 function readTextFile(file) {
     var text = "";
     var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", file, true);
+    rawFile.open("GET", file, false);
     rawFile.onreadystatechange = function () {
         if (rawFile.readyState === 4) {
             if (rawFile.status === 200 || rawFile.status == 0) {
@@ -3414,7 +3414,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Camera__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__ = __webpack_require__(67);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__Button__ = __webpack_require__(68);
-throw new Error("Cannot find module \"./web-audio-beat-detector\"");
 
 
 
@@ -3427,15 +3426,15 @@ throw new Error("Cannot find module \"./web-audio-beat-detector\"");
 
 
 
-
-Object(__WEBPACK_IMPORTED_MODULE_11__web_audio_beat_detector__["analyze"])(framework.audioSourceBuffer.buffer).then((bpm) => {
-    // the bpm could be analyzed 
-    framework.songBPM = bpm;
-})
-    .catch((err) => {
-    // something went wrong 
-    console.log("couldn't detect BPM");
-});
+// import { analyze } from './web-audio-beat-detector';
+// analyze(framework.audioSourceBuffer.buffer).then((bpm) => {
+//   // the bpm could be analyzed 
+//   framework.songBPM = bpm;
+// })
+// .catch((err) => {
+//   // something went wrong 
+//   console.log("couldn't detect BPM");
+// });
 const parseJson = __webpack_require__(69);
 let jsonFile; //jsonFile name
 //list of buttons to create
@@ -3505,7 +3504,7 @@ function play_music() {
         .then(data => {
         const audio_buf = JukeBox.createBufferSource();
         audio_buf.buffer = data;
-        audio_buf.loop = true;
+        audio_buf.loop = false;
         audio_buf.connect(JukeBox.destination);
         audio_buf.start(0);
     });
@@ -3587,36 +3586,45 @@ function loadButtonsHard() {
 function parseJSON() {
     var musicStr = controls.Song;
     var musicPath = './src/resources/music/json/' + musicStr + '.json';
-    jsonFile = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])(musicPath);
-    const json = jsonFile;
-    var midi = parseJson(json);
-    //console.log(midi);
-    var tracks = midi["tracks"];
-    //console.log("midi" + tracks.length);
+    // jsonFile = readTextFile(musicPath);
+    const json = "";
+    fetch(musicPath)
+        .then(response => response.json())
+        .then(jsonResponse => parseAfterReading(jsonResponse));
+}
+function parseAfterReading(json) {
+    // console.log("d" + JSON.stringify(json));
+    var json2 = JSON.parse(JSON.stringify(json));
+    var tracks = json2["tracks"];
+    var tracks2 = JSON.parse(JSON.stringify(tracks));
+    console.log(tracks2[0]);
     if (controls.Difficulty == 'easy') {
-        parseTracksEasy(tracks);
+        parseTracksEasy(tracks2);
     }
     else if (controls.Difficulty == 'hard') {
-        parseTracksHard(tracks);
+        parseTracksHard(tracks2);
     }
+    // console.log("buttons: " + buttons.length);
     // console.log("parse" + buttons.length);
     buttons.sort(function (a, b) {
         return a.getTime() - b.getTime();
     });
-    // console.log("parse" + buttons.length);
+    console.log("parse" + buttons[0].getLetter());
 }
 //easy version
 function parseTracksEasy(tracks) {
     //tracks are in an array
     for (let track of tracks) {
-        //console.log("track" + track.length);
+        console.log("track" + track.length);
         //track's notes are in an array
         let notes = [];
         notes = track["notes"];
+        var notes2 = JSON.parse(JSON.stringify(notes));
+        console.log("notes" + notes2[0].get);
         //if the track has notes to be played
-        if (notes.length > 0) {
+        if (notes2.length > 0) {
             var currTime = 0;
-            for (let note of notes) {
+            for (let note of notes2) {
                 //name, midi, time, velocity, duration
                 //time passed per note
                 var time = note["time"];
@@ -3624,6 +3632,7 @@ function parseTracksEasy(tracks) {
                 currTime = time;
                 var number = note["midi"];
                 var duration = note["duration"];
+                // console.log("duration: " + duration);
                 //for buttons that happen 0.3
                 //connect - 0.35
                 //run - 0.25
@@ -3735,21 +3744,26 @@ function loadTrack() {
     //track 
     track = new __WEBPACK_IMPORTED_MODULE_4__geometry_Track__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
     if (controls.Difficulty == "easy") {
+        //loadTrackEasy();
         loadInitialPositionsEasy();
         loadOnly10Easy();
     }
     else if (controls.Difficulty == "hard") {
+        //loadTrackHard();
         loadInitialPositionsHard();
         loadOnly10Hard();
     }
     track.create();
 }
-function loadInitialPositionsEasy() {
+function loadTrackEasy() {
+    //console.log("buttons: " + buttons.length);
+    //since you have a list of buttons, lets create them all at once
+    //the user will travel forward on the line
     for (let one of buttons) {
         var letter = one.getLetter();
         var time = one.getTime();
         var spacing = -1;
-        //console.log("parse letters to make into:" + letter);
+        // console.log("parse letters to make into:" + letter);
         let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
         let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
         var pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0);
@@ -3773,7 +3787,81 @@ function loadInitialPositionsEasy() {
         }
         button.translateVertices(pos);
         one.setPosition(pos);
-        // console.log("set positions initally: " + pos);
+        track.addMesh(button);
+    }
+}
+function loadTrackHard() {
+    // console.log("buttons: " + buttons.length);
+    //since you have a list of buttons, lets create them all at once
+    //the user will travel forward on the line
+    for (let one of buttons) {
+        var letter = one.getLetter();
+        var time = one.getTime();
+        var spacing = -1;
+        let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
+        let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+        //connect = 
+        //bts run = -5
+        var pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0);
+        if (letter == 'A') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-9.5, 0, time * spacing);
+        }
+        else if (letter == 'S') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * spacing);
+        }
+        else if (letter == 'D') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * spacing);
+        }
+        else if (letter == 'F') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * spacing);
+        }
+        else if (letter == 'J') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * spacing);
+        }
+        else if (letter == 'K') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * spacing);
+        }
+        else if (letter == 'L') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * spacing);
+        }
+        else if (letter == ';') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(9.5, 0, time * spacing);
+        }
+        button.translateVertices(pos);
+        one.setPosition(pos);
+        track.addMesh(button);
+    }
+}
+function loadInitialPositionsEasy() {
+    for (let one of buttons) {
+        var letter = one.getLetter();
+        var time = one.getTime();
+        var spacing = -1;
+        console.log("parse letters to make into:" + letter);
+        let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
+        let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+        var pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0);
+        if (letter == 'S') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * spacing);
+        }
+        else if (letter == 'D') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * spacing);
+        }
+        else if (letter == 'F') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * spacing);
+        }
+        else if (letter == 'J') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * spacing);
+        }
+        else if (letter == 'K') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * spacing);
+        }
+        else if (letter == 'L') {
+            pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * spacing);
+        }
+        button.translateVertices(pos);
+        one.setPosition(pos);
+        console.log("set positions initally: " + pos);
         // track.addMesh(button);
     }
 }
@@ -3790,8 +3878,8 @@ function loadOnly10Easy() {
         var pos = currButt.getPosition();
         button.translateVertices(pos);
         buttons[i].setPosition(pos);
-        console.log("get time: " + i + " " + currButt.getTime());
-        console.log("set positions: " + i + " " + pos);
+        // console.log("get time: " + i + " " + currButt.getTime());
+        // console.log("set positions: " + i  + " " + pos);
         track.addMesh(button);
     }
 }
@@ -3806,36 +3894,29 @@ function loadInitialPositionsHard() {
         var pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0);
         if (letter == 'A') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-9.5, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'S') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'D') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-4.5, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'F') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-2, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'J') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(2, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'K') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(4.5, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == 'L') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * spacing);
-            button.translateVertices(pos);
         }
         else if (letter == ';') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(9.5, 0, time * spacing);
-            button.translateVertices(pos);
         }
+        button.translateVertices(pos);
         one.setPosition(pos);
         // console.log("set positions initally: " + pos);
         // track.addMesh(button);
@@ -3968,22 +4049,22 @@ function main() {
             track_lambert.setGeometryColor(base_color);
             renderer.render(camera, track_lambert, [track]);
             //update the position of all buttons
-            for (let button of buttons) {
-                var originalPos = button.getPosition();
-                var newPos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(originalPos[0], originalPos[1], originalPos[2] + distance);
-                button.setPosition(newPos);
-                console.log("new Positions: " + newPos);
-            }
+            // for (let button of buttons) {
+            //   var originalPos = button.getPosition();
+            //   var newPos = vec3.fromValues(originalPos[0], originalPos[1], originalPos[2] + distance);
+            //   button.setPosition(newPos);
+            //   // console.log("new Positions: " + newPos);
+            // }
+            // track.translateVertices(vec3.fromValues(0, 0, distance));
             //reload the track
-            if (controls.Difficulty == 'easy') {
-                loadOnly10Easy();
-            }
-            else {
-                loadOnly10Hard();
-            }
+            // if(controls.Difficulty == 'easy') {
+            //   loadOnly10Easy();
+            // } else {
+            //   loadOnly10Hard();
+            // }
             for (var i = 0; i < 5; i++) {
                 var curr = buttons[i];
-                console.log("check: " + curr.getLetter() + " " + curr.getPosition());
+                // console.log("check: " + curr.getLetter() + " " + curr.getPosition());
                 var position = curr.getPosition();
                 if (position[2] >= 0 - epsilon && position[2] <= 0 + epsilon) {
                     // console.log("new: " + position[2]);
