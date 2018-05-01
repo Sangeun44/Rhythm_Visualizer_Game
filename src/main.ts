@@ -427,7 +427,7 @@ function loadTrackHard() {
   for (let one of buttons) {
     var letter = one.getLetter();
     var time = one.getTime();
-    var spacing = -1;
+    var spacing = -2;
 
     let buttonStr = readTextFile('./src/resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
@@ -697,7 +697,7 @@ function main() {
     }
 
     //user starts game
-    if (startGame && buttons.length > 0) {
+    if (startGame && buttons.length > 100) {
       //render track
       base_color = vec4.fromValues(65 / 255, 105 / 255, 225 / 255, 1);
       track_lambert.setGeometryColor(base_color);
@@ -736,14 +736,14 @@ function main() {
       for (var i = 0; i < 5; i++) {
         var curr = buttons[i];
         var time = curr.getTime();
-        console.log("time Z " + time + " position " + curr.getPosition());
+       // console.log("time Z " + time + " position " + curr.getPosition());
         var checkTime1 = timeSinceStartSec - epsilon;
         var checkTime2 = timeSinceStartSec + epsilon;
         if (time >= checkTime1 && time <= checkTime2) {
           //var position = curr.getPosition();
           //var checkPosZ = position[2];
           //console.log("position Z " + checkPosZ );
-          console.log("check this position mark: " + checkLine1 + " " + checkLine2);
+         // console.log("check this position mark: " + checkLine1 + " " + checkLine2);
           //console.log("button position: " + position + " button time: " + time + " check this time mark: " + checkTime1 + " " + checkTime2);
           // if (checkPosZ >= checkLine1 && checkPosZ <= checkLine2) {
             // console.log("new: " + position[2]);
@@ -1040,35 +1040,36 @@ function keyPressed(event: KeyboardEvent) {
       break;
     case 86:
       if (play == 0) {
+        window.setTimeout(parseJSON(), 100000);
+        //parseJSON();
         //start music
-        play_music();
+        window.setTimeout(play_music(), 5000);
         //parse JSON file
-        parseJSON();
-      }
 
-      if (controls.Difficulty == "easy") {
-        epsilon = .2;
-      }
-      else if (controls.Difficulty == "hard") {
-        epsilon = .2;
-      }
-
-      checkLine1 = 0 - epsilon;
-      checkLine2 = 0 + epsilon;
+        if (controls.Difficulty == "easy") {
+          epsilon = .2;
+        }
+        else if (controls.Difficulty == "hard") {
+          epsilon = .2;
+        }
+  
+        checkLine1 = 0 - epsilon;
+        checkLine2 = 0 + epsilon;
+        
+        var d = Date.now();
+        startTime = d;
+        startGame = true;
 
       //display status
       document.getElementById("game").innerHTML = "In progress: " + controls.Song;
       document.getElementById("health").innerHTML = "Health: " + health;
       document.getElementById("points").innerHTML = "Score: " + points;
-
-      var d = Date.now();
-      startTime = d;
-
-      play++;
+      }
 
       document.getElementById('visualizerInfo').style.visibility = "hidden";
 
-      startGame = true;
+      play++;
+
       break;
   }
 }
