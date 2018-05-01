@@ -3426,7 +3426,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-// import { analyze } from './web-audio-beat-detector';
 // analyze(framework.audioSourceBuffer.buffer).then((bpm) => {
 //   // the bpm could be analyzed 
 //   framework.songBPM = bpm;
@@ -3585,156 +3584,140 @@ function loadButtonsHard() {
 //currntly doing a test midi json
 function parseJSON() {
     var musicStr = controls.Song;
+    if (musicStr == 'Connect-Goofy') {
+        musicStr = "Connect";
+    }
     var musicPath = './src/resources/music/json/' + musicStr + '.json';
     // jsonFile = readTextFile(musicPath);
     const json = "";
     fetch(musicPath)
         .then(response => response.json())
         .then(jsonResponse => parseAfterReading(jsonResponse));
+    //create track mesh
+    loadTrack();
+    console.log("load track create");
 }
 function parseAfterReading(json) {
-    // console.log("d" + JSON.stringify(json));
-    var json2 = JSON.parse(JSON.stringify(json));
-    var tracks = json2["tracks"];
-    var tracks2 = JSON.parse(JSON.stringify(tracks));
-    console.log(tracks2[0]);
     if (controls.Difficulty == 'easy') {
-        parseTracksEasy(tracks2);
+        parseTracksEasy(json);
     }
     else if (controls.Difficulty == 'hard') {
-        parseTracksHard(tracks2);
+        parseTracksHard(json);
     }
     // console.log("buttons: " + buttons.length);
     // console.log("parse" + buttons.length);
     buttons.sort(function (a, b) {
         return a.getTime() - b.getTime();
     });
-    console.log("parse" + buttons[0].getLetter());
 }
 //easy version
-function parseTracksEasy(tracks) {
+function parseTracksEasy(json) {
     //tracks are in an array
-    for (let track of tracks) {
-        console.log("track" + track.length);
+    var json2 = JSON.parse(JSON.stringify(json));
+    var length = parseInt(JSON.stringify(json2.tracks.length));
+    console.log("length: " + length);
+    for (let i = 0; i < length; i++) {
         //track's notes are in an array
-        let notes = [];
-        notes = track["notes"];
-        var notes2 = JSON.parse(JSON.stringify(notes));
-        console.log("notes" + notes2[0].get);
+        var oneTrack = json2.tracks[i];
+        let notes = oneTrack["notes"];
+        var noteLength = parseInt(JSON.stringify(notes.length));
+        console.log("LENGTH OF NOTES: " + noteLength);
         //if the track has notes to be played
-        if (notes2.length > 0) {
+        if (noteLength > 0) {
             var currTime = 0;
-            for (let note of notes2) {
-                //name, midi, time, velocity, duration
-                //time passed per note
-                var time = note["time"];
+            for (let note of notes) {
+                var number = parseFloat(JSON.stringify(note.midi));
+                var time = parseFloat(JSON.stringify(note.time));
                 var deltaTime = time - currTime;
                 currTime = time;
-                var number = note["midi"];
-                var duration = note["duration"];
-                // console.log("duration: " + duration);
-                //for buttons that happen 0.3
+                // console.log("time " + time);
+                // console.log("dtime " + deltaTime);
+                // console.log("midi " + number);
                 //connect - 0.35
                 //run - 0.25
                 //if the time difference between one note and the other is :
                 if (deltaTime > 0.5) {
-                    //cutoffs: 28, 40, 52, 64, 76, 88, 100
+                    var b;
                     if (number > 0 && number < 55) {
-                        //console.log("15 to 40"); 
-                        // console.log("parse S" + " time: " + time);
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("S", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("S", time);
                     }
                     else if (number > 55 && number < 65) {
-                        //console.log("40 to 52");
-                        // console.log("parse D" + " time: " + time);
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("D", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("D", time);
                     }
                     else if (number > 65 && number < 70) {
-                        //console.log("64 to 76");
-                        // console.log("parse F" + " time: " + time);
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("F", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("F", time);
                     }
                     else if (number > 70 && number < 75) {
-                        // console.log("parse J" + " time: " + time);
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("J", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("J", time);
                     }
                     else if (number > 75 && number < 83) {
-                        // console.log("parse K" + " time: " + time);
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("K", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("K", time);
                     }
                     else if (number > 83 && number < 127) {
-                        // console.log("parse L" + " time: " + time);
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("L", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("L", time);
                     }
+                    buttons.push(b);
                 }
             }
         }
     }
 }
 //easy version
-function parseTracksHard(tracks) {
+function parseTracksHard(json) {
     //tracks are in an array
-    for (let track of tracks) {
-        // console.log("track" + track.length);
+    var json2 = JSON.parse(JSON.stringify(json));
+    var length = parseInt(JSON.stringify(json2.tracks.length));
+    console.log("length: " + length);
+    for (let i = 0; i < length; i++) {
         //track's notes are in an array
-        let notes = [];
-        notes = track["notes"];
+        var oneTrack = json2.tracks[i];
+        let notes = oneTrack["notes"];
+        var noteLength = parseInt(JSON.stringify(notes.length));
+        console.log("LENGTH OF NOTES: " + noteLength);
         //if the track has notes to be played
-        if (notes.length > 0) {
+        if (noteLength > 0) {
             var currTime = 0;
             for (let note of notes) {
-                //name, midi, time, velocity, duration
-                //time passed per note
-                var time = note["time"];
+                var number = parseFloat(JSON.stringify(note.midi));
+                var time = parseFloat(JSON.stringify(note.time));
                 var deltaTime = time - currTime;
                 currTime = time;
-                var number = note["midi"];
-                var duration = note["duration"];
+                console.log("time " + time);
+                console.log("dtime " + deltaTime);
+                console.log("midi " + number);
                 //for buttons that happen 0.3
                 //connect - 0.35
                 //run - 0.25
                 var max = 3;
                 var min = -3;
                 var rand = Math.random() * (max - min) + min;
-                if (deltaTime > 0.4) {
+                if (deltaTime > 0.5) {
+                    var b;
                     if (number > 0 + rand && number < 66 + rand) {
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("A", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("A", time);
                     }
                     else if (number > 66 + rand && number < 69 + rand) {
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("S", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("S", time);
                     }
                     else if (number > 69 + rand && number < 73 + rand) {
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("D", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("D", time);
                     }
                     else if (number > 73 + rand && number < 77 + rand) {
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("F", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("F", time);
                     }
                     else if (number > 77 + rand && number < 79 + rand) {
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("J", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("J", time);
                     }
                     else if (number > 79 + rand && number < 82 + rand) {
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("K", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("K", time);
                     }
                     else if (number > 82 + rand && number < 85 + rand) {
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("L", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("L", time);
                     }
                     else if (number > 85 + rand && number < 127) {
-                        var b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */](";", time);
-                        buttons.push(b);
+                        b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */](";", time);
                     }
+                    buttons.push(b);
                 }
             }
         }
@@ -3744,16 +3727,17 @@ function loadTrack() {
     //track 
     track = new __WEBPACK_IMPORTED_MODULE_4__geometry_Track__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
     if (controls.Difficulty == "easy") {
-        //loadTrackEasy();
-        loadInitialPositionsEasy();
-        loadOnly10Easy();
+        loadTrackEasy();
+        //loadInitialPositionsEasy();
+        //loadOnly10Easy();
     }
     else if (controls.Difficulty == "hard") {
-        //loadTrackHard();
-        loadInitialPositionsHard();
-        loadOnly10Hard();
+        loadTrackHard();
+        //loadInitialPositionsHard();
+        //loadOnly10Hard();
     }
     track.create();
+    console.log("length of track pos: " + track.pos.length);
 }
 function loadTrackEasy() {
     //console.log("buttons: " + buttons.length);
@@ -3767,6 +3751,7 @@ function loadTrackEasy() {
         let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
         let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
         var pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0);
+        console.log("button: " + letter);
         if (letter == 'S') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * spacing);
         }
@@ -3785,9 +3770,9 @@ function loadTrackEasy() {
         else if (letter == 'L') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(7, 0, time * spacing);
         }
-        button.translateVertices(pos);
-        one.setPosition(pos);
-        track.addMesh(button);
+        button.translateVertices(pos); //translate button mesh
+        one.setPosition(pos); //translate the button object
+        track.addMesh(button); //add the mesh button to the track
     }
 }
 function loadTrackHard() {
@@ -3971,23 +3956,23 @@ function main() {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     //mario
     const lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(78)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(79)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(77)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(78)),
     ]);
     //key buttons
     const button_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(80)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(81)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(79)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(80)),
     ]);
     //the track buttons
     const track_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(82)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(83)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(81)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(82)),
     ]);
     //transparent
     const plate_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(84)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(85)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(83)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(84)),
     ]);
     //change fov
     //camera.fovy = 1.5;
@@ -4040,14 +4025,15 @@ function main() {
         }
         //user starts game
         if (startGame) {
+            //render track
+            // base_color = vec4.fromValues(65 / 255, 105 / 255, 225 / 255, 1);
+            // track_lambert.setGeometryColor(base_color);
+            // track_lambert.setTime(count);
+            // renderer.render(camera, track_lambert, [track]);
             //calculate the buttons positions as the track moves across
             var rate = 0.05;
             var distance = tickFrame * rate;
-            console.log("tick: " + tickFrame);
-            //render track
-            base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(65 / 255, 105 / 255, 225 / 255, 1);
-            track_lambert.setGeometryColor(base_color);
-            renderer.render(camera, track_lambert, [track]);
+            //console.log("tick: " + tickFrame);
             //update the position of all buttons
             // for (let button of buttons) {
             //   var originalPos = button.getPosition();
@@ -4062,92 +4048,84 @@ function main() {
             // } else {
             //   loadOnly10Hard();
             // }
-            for (var i = 0; i < 5; i++) {
-                var curr = buttons[i];
-                // console.log("check: " + curr.getLetter() + " " + curr.getPosition());
-                var position = curr.getPosition();
-                if (position[2] >= 0 - epsilon && position[2] <= 0 + epsilon) {
-                    // console.log("new: " + position[2]);
-                    // console.log("a button passed z: " + position + " " + letter);
-                    var letter = curr.getLetter();
-                    if (letter == 'A') {
-                        if (downA) {
-                            points++;
-                        }
-                        else {
-                            health--;
-                        }
-                    }
-                    if (letter == 'S') {
-                        if (downS) {
-                            points++;
-                        }
-                        else {
-                            health--;
-                        }
-                    }
-                    if (letter == 'D') {
-                        if (downD) {
-                            points++;
-                        }
-                        else {
-                            health--;
-                        }
-                    }
-                    if (letter == 'F') {
-                        if (downF) {
-                            points++;
-                        }
-                        else {
-                            health--;
-                        }
-                    }
-                    if (letter == 'J') {
-                        if (downJ) {
-                            console.log("point: " + points);
-                            points++;
-                        }
-                        else {
-                            health--;
-                        }
-                    }
-                    if (letter == 'K') {
-                        if (downK) {
-                            console.log("point: " + points);
-                            points++;
-                        }
-                        else {
-                            health--;
-                        }
-                    }
-                    if (letter == 'L') {
-                        if (downL) {
-                            console.log("point: " + points);
-                            points++;
-                        }
-                        else {
-                            health--;
-                        }
-                    }
-                    if (letter == ';') {
-                        if (downP) {
-                            points++;
-                        }
-                        else {
-                            health--;
-                        }
-                    }
-                    document.getElementById("health").innerHTML = "Health: " + health;
-                    document.getElementById("points").innerHTML = "Score: " + points;
-                    if (health <= 0) {
-                        console.log("health IS zero");
-                        document.getElementById("game").innerHTML = "YOU LOSE!";
-                        startGame = false;
-                        JukeBox.close();
-                    }
-                    // buttons.shift();
-                }
-            }
+            // for (var i = 0; i < 5; i++) {
+            //   var curr = buttons[i];
+            //   // console.log("check: " + curr.getLetter() + " " + curr.getPosition());
+            //   var position = curr.getPosition();
+            //   if (position[2] >= 0 - epsilon && position[2] <= 0 + epsilon) {
+            //     // console.log("new: " + position[2]);
+            //     // console.log("a button passed z: " + position + " " + letter);
+            //     var letter = curr.getLetter();
+            //     if (letter == 'A') {
+            //       if (downA) {
+            //         points++;
+            //       } else {
+            //         health--;
+            //       }
+            //     }
+            //     if (letter == 'S') {
+            //       if (downS) {
+            //         points++;
+            //       } else {
+            //         health--;
+            //       }
+            //     }
+            //     if (letter == 'D') {
+            //       if (downD) {
+            //         points++;
+            //       } else {
+            //         health--;
+            //       }
+            //     }
+            //     if (letter == 'F') {
+            //       if (downF) {
+            //         points++;
+            //       } else {
+            //         health--;
+            //       }
+            //     }
+            //     if (letter == 'J') {
+            //       if (downJ) {
+            //         console.log("point: " + points);
+            //         points++;
+            //       } else {
+            //         health--;
+            //       }
+            //     }
+            //     if (letter == 'K') {
+            //       if (downK) {
+            //         console.log("point: " + points);
+            //         points++;
+            //       } else {
+            //         health--;
+            //       }
+            //     }
+            //     if (letter == 'L') {
+            //       if (downL) {
+            //         console.log("point: " + points);
+            //         points++;
+            //       } else {
+            //         health--;
+            //       }
+            //     }
+            //     if (letter == ';') {
+            //       if (downP) {
+            //         points++;
+            //       } else {
+            //         health--;
+            //       }
+            //     }
+            //     document.getElementById("health").innerHTML = "Health: " + health;
+            //     document.getElementById("points").innerHTML = "Score: " + points;
+            //     if (health <= 0) {
+            //       console.log("health IS zero");
+            //       document.getElementById("game").innerHTML = "YOU LOSE!";
+            //       startGame = false;
+            //       JukeBox.close();
+            //     }
+            //     // buttons.shift();
+            //   }
+            // }
             //  //current easy buttons
             if (controls.Difficulty == "easy") {
                 if (downS) {
@@ -4270,8 +4248,8 @@ function main() {
         // Tell the browser to call `tick` again whenever it renders a new frame
         requestAnimationFrame(tick);
         endTick = Date.now();
+        tickFrame = endTick - startTick;
     }
-    tickFrame = endTick - startTick;
     window.addEventListener('resize', function () {
         renderer.setSize(window.innerWidth, window.innerHeight);
         camera.setAspectRatio(window.innerWidth / window.innerHeight);
@@ -4368,9 +4346,6 @@ function keyPressed(event) {
                 play_music();
                 //parse JSON file
                 parseJSON();
-                //create track mesh
-                loadTrack();
-                console.log("load track create");
             }
             if (controls.Difficulty == "easy") {
                 epsilon = .2;
@@ -12971,7 +12946,7 @@ class Mesh extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 /* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-!function(e,t){ true?module.exports=t():"function"==typeof define&&define.amd?define("OBJ",[],t):"object"==typeof exports?exports.OBJ=t():e.OBJ=t()}(this,function(){return function(e){function t(a){if(r[a])return r[a].exports;var i=r[a]={i:a,l:!1,exports:{}};return e[a].call(i.exports,i,i.exports,t),i.l=!0,i.exports}var r={};return t.m=e,t.c=r,t.d=function(exports,e,r){t.o(exports,e)||Object.defineProperty(exports,e,{configurable:!1,enumerable:!0,get:r})},t.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(r,"a",r),r},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p="/",t(t.s=3)}([function(e,exports,t){"use strict";function r(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function a(e){switch(e){case"BYTE":case"UNSIGNED_BYTE":return 1;case"SHORT":case"UNSIGNED_SHORT":return 2;case"FLOAT":return 4}}Object.defineProperty(exports,"__esModule",{value:!0});var i=exports.Layout=function e(){r(this,e);for(var t=arguments.length,a=Array(t),i=0;i<t;i++)a[i]=arguments[i];this.attributes=a;var s=0,l=0,o=!0,u=!1,f=void 0;try{for(var c,p=a[Symbol.iterator]();!(o=(c=p.next()).done);o=!0){var h=c.value;if(this[h.key])throw new n(h);s%h.sizeOfType!=0&&(s+=h.sizeOfType-s%h.sizeOfType),this[h.key]={attribute:h,size:h.size,type:h.type,normalized:h.normalized,offset:s},s+=h.sizeInBytes,l=Math.max(l,h.sizeOfType)}}catch(e){u=!0,f=e}finally{try{!o&&p.return&&p.return()}finally{if(u)throw f}}s%l!=0&&(s+=l-s%l),this.stride=s;var v=!0,m=!1,y=void 0;try{for(var d,M=a[Symbol.iterator]();!(v=(d=M.next()).done);v=!0){this[d.value.key].stride=this.stride}}catch(e){m=!0,y=e}finally{try{!v&&M.return&&M.return()}finally{if(m)throw y}}},n=function e(t){r(this,e),this.message="found duplicate attribute: "+t.key},s=function e(t,i,n){arguments.length>3&&void 0!==arguments[3]&&arguments[3];r(this,e),this.key=t,this.size=i,this.type=n,this.normalized=!1,this.sizeOfType=a(n),this.sizeInBytes=this.sizeOfType*i};i.POSITION=new s("position",3,"FLOAT"),i.NORMAL=new s("normal",3,"FLOAT"),i.TANGENT=new s("tangent",3,"FLOAT"),i.BITANGENT=new s("bitangent",3,"FLOAT"),i.UV=new s("uv",2,"FLOAT"),i.MATERIAL_INDEX=new s("materialIndex",1,"SHORT"),i.MATERIAL_ENABLED=new s("materialEnabled",1,"UNSIGNED_SHORT"),i.AMBIENT=new s("ambient",3,"FLOAT"),i.DIFFUSE=new s("diffuse",3,"FLOAT"),i.SPECULAR=new s("specular",3,"FLOAT"),i.SPECULAR_EXPONENT=new s("specularExponent",3,"FLOAT"),i.EMISSIVE=new s("emissive",3,"FLOAT"),i.TRANSMISSION_FILTER=new s("transmissionFilter",3,"FLOAT"),i.DISSOLVE=new s("dissolve",1,"FLOAT"),i.ILLUMINATION=new s("illumination",1,"UNSIGNED_SHORT"),i.REFRACTION_INDEX=new s("refractionIndex",1,"FLOAT"),i.SHARPNESS=new s("sharpness",1,"FLOAT"),i.MAP_DIFFUSE=new s("mapDiffuse",1,"SHORT"),i.MAP_AMBIENT=new s("mapAmbient",1,"SHORT"),i.MAP_SPECULAR=new s("mapSpecular",1,"SHORT"),i.MAP_SPECULAR_EXPONENT=new s("mapSpecularExponent",1,"SHORT"),i.MAP_DISSOLVE=new s("mapDissolve",1,"SHORT"),i.ANTI_ALIASING=new s("antiAliasing",1,"UNSIGNED_SHORT"),i.MAP_BUMP=new s("mapBump",1,"SHORT"),i.MAP_DISPLACEMENT=new s("mapDisplacement",1,"SHORT"),i.MAP_DECAL=new s("mapDecal",1,"SHORT"),i.MAP_EMISSIVE=new s("mapEmissive",1,"SHORT")},function(e,exports,t){"use strict";function r(e){if(Array.isArray(e)){for(var t=0,r=Array(e.length);t<e.length;t++)r[t]=e[t];return r}return Array.from(e)}function a(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(exports,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var a=t[r];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}return function(t,r,a){return r&&e(t.prototype,r),a&&e(t,a),t}}(),n=t(0),s=function(){function e(t,i){a(this,e),i=i||{},i.materials=i.materials||[];var n=this;n.has_materials=!!i.materials,n.materials={},n.vertices=[],n.vertexNormals=[],n.textures=[],n.indices=[],this.name="";var s=[],l=[],o=[],u={},f=[],c={},p=-1;u.verts=[],u.norms=[],u.textures=[],u.hashindices={},u.indices=[],u.materialIndices=[],u.index=0;for(var h=/^v\s/,v=/^vn\s/,m=/^vt\s/,y=/^f\s/,d=/\s+/,M=/^usemtl/,b=t.split("\n"),I=0;I<b.length;I++){var _=b[I].trim();if(_&&!_.startsWith("#")){var x=_.split(d);if(x.shift(),h.test(_))s.push.apply(s,r(x));else if(v.test(_))l.push.apply(l,r(x));else if(m.test(_))o.push.apply(o,r(x));else if(M.test(_)){var k=x[0];k in c||(f.push(k),c[k]=f.length-1),p=c[k]}else if(y.test(_))for(var A=!1,w=0,F=x.length;w<F;w++){3!==w||A||(w=2,A=!0);var E=x[0]+","+p,S=x[w]+","+p;if(S in u.hashindices)u.indices.push(u.hashindices[S]);else{var T=x[w].split("/"),O=T.length-1;u.verts.push(+s[3*(T[0]-1)+0]),u.verts.push(+s[3*(T[0]-1)+1]),u.verts.push(+s[3*(T[0]-1)+2]),o.length&&(u.textures.push(+o[2*(T[1]-1)+0]),u.textures.push(+o[2*(T[1]-1)+1])),u.norms.push(+l[3*(T[O]-1)+0]),u.norms.push(+l[3*(T[O]-1)+1]),u.norms.push(+l[3*(T[O]-1)+2]),u.materialIndices.push(p),u.hashindices[S]=u.index,u.indices.push(u.index),u.index+=1}3===w&&A&&u.indices.push(u.hashindices[E])}}}n.vertices=u.verts,n.vertexNormals=u.norms,n.textures=u.textures,n.vertexMaterialIndices=u.materialIndices,n.indices=u.indices,n.materialNames=f,n.materialIndices=c,n.materialsByIndex={}}return i(e,[{key:"makeBufferData",value:function(e){var t=this.vertices.length/3,r=new ArrayBuffer(e.stride*t);r.numItems=t;for(var a=new DataView(r),i=0,s=0;i<t;i++){s=i*e.stride;var l=!0,o=!1,u=void 0;try{for(var f,c=e.attributes[Symbol.iterator]();!(l=(f=c.next()).done);l=!0){var p=f.value,h=s+e[p.key].offset;switch(p.key){case n.Layout.POSITION.key:a.setFloat32(h,this.vertices[3*i],!0),a.setFloat32(h+4,this.vertices[3*i+1],!0),a.setFloat32(h+8,this.vertices[3*i+2],!0);break;case n.Layout.UV.key:a.setFloat32(h,this.textures[2*i],!0),a.setFloat32(h+4,this.vertices[2*i+1],!0);break;case n.Layout.NORMAL.key:a.setFloat32(h,this.vertexNormals[3*i],!0),a.setFloat32(h+4,this.vertexNormals[3*i+1],!0),a.setFloat32(h+8,this.vertexNormals[3*i+2],!0);break;case n.Layout.MATERIAL_INDEX.key:a.setInt16(h,this.vertexMaterialIndices[i],!0);break;case n.Layout.AMBIENT.key:var v=this.vertexMaterialIndices[i],m=this.materialsByIndex[v];if(!m)break;a.setFloat32(h,m.ambient[0],!0),a.setFloat32(h+4,m.ambient[1],!0),a.setFloat32(h+8,m.ambient[2],!0);break;case n.Layout.DIFFUSE.key:var y=this.vertexMaterialIndices[i],d=this.materialsByIndex[y];if(!d)break;a.setFloat32(h,d.diffuse[0],!0),a.setFloat32(h+4,d.diffuse[1],!0),a.setFloat32(h+8,d.diffuse[2],!0);break;case n.Layout.SPECULAR.key:var M=this.vertexMaterialIndices[i],b=this.materialsByIndex[M];if(!b)break;a.setFloat32(h,b.specular[0],!0),a.setFloat32(h+4,b.specular[1],!0),a.setFloat32(h+8,b.specular[2],!0);break;case n.Layout.SPECULAR_EXPONENT.key:var I=this.vertexMaterialIndices[i],_=this.materialsByIndex[I];if(!_)break;a.setFloat32(h,_.specularExponent,!0);break;case n.Layout.EMISSIVE.key:var x=this.vertexMaterialIndices[i],k=this.materialsByIndex[x];if(!k)break;a.setFloat32(h,k.emissive[0],!0),a.setFloat32(h+4,k.emissive[1],!0),a.setFloat32(h+8,k.emissive[2],!0);break;case n.Layout.TRANSMISSION_FILTER.key:var A=this.vertexMaterialIndices[i],w=this.materialsByIndex[A];if(!w)break;a.setFloat32(h,w.transmissionFilter[0],!0),a.setFloat32(h+4,w.transmissionFilter[1],!0),a.setFloat32(h+8,w.transmissionFilter[2],!0);break;case n.Layout.DISSOLVE.key:var F=this.vertexMaterialIndices[i],E=this.materialsByIndex[F];if(!E)break;a.setFloat32(h,E.dissolve,!0);break;case n.Layout.ILLUMINATION.key:var S=this.vertexMaterialIndices[i],T=this.materialsByIndex[S];if(!T)break;a.setInt16(h,T.illumination,!0);break;case n.Layout.REFRACTION_INDEX.key:var O=this.vertexMaterialIndices[i],L=this.materialsByIndex[O];if(!L)break;a.setFloat32(h,L.refractionIndex,!0);break;case n.Layout.SHARPNESS.key:var B=this.vertexMaterialIndices[i],N=this.materialsByIndex[B];if(!N)break;a.setFloat32(h,N.sharpness,!0);break;case n.Layout.ANTI_ALIASING.key:var R=this.vertexMaterialIndices[i],P=this.materialsByIndex[R];if(!P)break;a.setInt16(h,P.antiAliasing,!0)}}}catch(e){o=!0,u=e}finally{try{!l&&c.return&&c.return()}finally{if(o)throw u}}}return r}},{key:"makeIndexBufferData",value:function(){var e=new Uint16Array(this.indices);return e.numItems=this.indices.length,e}},{key:"addMaterialLibrary",value:function(e){for(var t in e.materials)if(t in this.materialIndices){var r=e.materials[t],a=this.materialIndices[r.name];this.materialsByIndex[a]=r}}}]),e}();exports.default=s},function(e,exports,t){"use strict";function r(e){return Array.isArray(e)?e:Array.from(e)}function a(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(exports,"__esModule",{value:!0});var i=function(){function e(e,t){for(var r=0;r<t.length;r++){var a=t[r];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}return function(t,r,a){return r&&e(t.prototype,r),a&&e(t,a),t}}(),n=exports.Material=function e(t){a(this,e),this.name=t,this.ambient=[0,0,0],this.diffuse=[0,0,0],this.specular=[0,0,0],this.emissive=[0,0,0],this.transmissionFilter=[0,0,0],this.dissolve=0,this.specularExponent=0,this.transparency=0,this.illumination=0,this.refractionIndex=1,this.sharpness=0,this.mapDiffuse=null,this.mapAmbient=null,this.mapSpecular=null,this.mapSpecularExponent=null,this.mapDissolve=null,this.antiAliasing=!1,this.mapBump=null,this.mapDisplacement=null,this.mapDecal=null,this.mapEmissive=null,this.mapReflections=[]};exports.MaterialLibrary=function(){function e(t){a(this,e),this.data=t,this.currentMaterial=null,this.materials={},this.parse()}return i(e,[{key:"parse_newmtl",value:function(e){var t=e[0];this.currentMaterial=new n(t),this.materials[t]=this.currentMaterial}},{key:"parseColor",value:function(e){if("spectral"!=e[0]&&"xyz"!=e[0]){if(3==e.length)return e.map(parseFloat);var t=parseFloat(e[0]);return[t,t,t]}}},{key:"parse_Ka",value:function(e){this.currentMaterial.ambient=this.parseColor(e)}},{key:"parse_Kd",value:function(e){this.currentMaterial.diffuse=this.parseColor(e)}},{key:"parse_Ks",value:function(e){this.currentMaterial.specular=this.parseColor(e)}},{key:"parse_Ke",value:function(e){this.currentMaterial.emissive=this.parseColor(e)}},{key:"parse_Tf",value:function(e){this.currentMaterial.transmissionFilter=this.parseColor(e)}},{key:"parse_d",value:function(e){this.currentMaterial.dissolve=parseFloat(e.pop())}},{key:"parse_illum",value:function(e){this.currentMaterial.illumination=parseInt(e[0])}},{key:"parse_Ni",value:function(e){this.currentMaterial.refractionIndex=parseFloat(e[0])}},{key:"parse_Ns",value:function(e){this.currentMaterial.specularExponent=parseInt(e[0])}},{key:"parse_sharpness",value:function(e){this.currentMaterial.sharpness=parseInt(e[0])}},{key:"parse_cc",value:function(e,t){t.colorCorrection="on"==e[0]}},{key:"parse_blendu",value:function(e,t){t.horizontalBlending="on"==e[0]}},{key:"parse_blendv",value:function(e,t){t.verticalBlending="on"==e[0]}},{key:"parse_boost",value:function(e,t){t.boostMipMapSharpness=parseFloat(e[0])}},{key:"parse_mm",value:function(e,t){t.modifyTextureMap.brightness=parseFloat(e[0]),t.modifyTextureMap.contrast=parseFloat(e[1])}},{key:"parse_ost",value:function(e,t,r){for(;e.length<3;)e.push(r);t.u=parseFloat(e[0]),t.v=parseFloat(e[1]),t.w=parseFloat(e[2])}},{key:"parse_o",value:function(e,t){this.parse_ost(e,t.offset,0)}},{key:"parse_s",value:function(e,t){this.parse_ost(e,t.scale,1)}},{key:"parse_t",value:function(e,t){this.parse_ost(e,t.turbulence,0)}},{key:"parse_texres",value:function(e,t){t.textureResolution=parseFloat(e[0])}},{key:"parse_clamp",value:function(e,t){t.clamp="on"==e[0]}},{key:"parse_bm",value:function(e,t){t.bumpMultiplier=parseFloat(e[0])}},{key:"parse_imfchan",value:function(e,t){t.imfChan=e[0]}},{key:"parse_type",value:function(e,t){t.reflectionType=e[0]}},{key:"parseOptions",value:function(e){var t={colorCorrection:!1,horizontalBlending:!0,verticalBlending:!0,boostMipMapSharpness:0,modifyTextureMap:{brightness:0,contrast:1},offset:{u:0,v:0,w:0},scale:{u:1,v:1,w:1},turbulence:{u:0,v:0,w:0},clamp:!1,textureResolution:null,bumpMultiplier:1,imfChan:null},r=void 0,a=void 0,i={};for(e.reverse();e.length;){var n=e.pop();n.startsWith("-")?(r=n.substr(1),i[r]=[]):i[r].push(n)}for(r in i)if(i.hasOwnProperty(r)){a=i[r];var s=this["parse_"+r];s&&s.bind(this)(a,t)}return t}},{key:"parseMap",value:function(e){var t=void 0,a=void 0;if(e[0].startsWith("-"))t=e.pop(),a=e;else{var i=r(e);t=i[0],a=i.slice(1)}return a=this.parseOptions(a),a.filename=t,a}},{key:"parse_map_Ka",value:function(e){this.currentMaterial.mapAmbient=this.parseMap(e)}},{key:"parse_map_Kd",value:function(e){this.currentMaterial.mapDiffuse=this.parseMap(e)}},{key:"parse_map_Ks",value:function(e){this.currentMaterial.mapSpecular=this.parseMap(e)}},{key:"parse_map_Ke",value:function(e){this.currentMaterial.mapEmissive=this.parseMap(e)}},{key:"parse_map_Ns",value:function(e){this.currentMaterial.mapSpecularExponent=this.parseMap(e)}},{key:"parse_map_d",value:function(e){this.currentMaterial.mapDissolve=this.parseMap(e)}},{key:"parse_map_aat",value:function(e){this.currentMaterial.antiAliasing="on"==e[0]}},{key:"parse_map_bump",value:function(e){this.currentMaterial.mapBump=this.parseMap(e)}},{key:"parse_bump",value:function(e){this.parse_map_bump(e)}},{key:"parse_disp",value:function(e){this.currentMaterial.mapDisplacement=this.parseMap(e)}},{key:"parse_decal",value:function(e){this.currentMaterial.mapDecal=this.parseMap(e)}},{key:"parse_refl",value:function(e){this.currentMaterial.mapReflections.push(this.parseMap(e))}},{key:"parse",value:function(){var e=this.data.split(/\r?\n/),t=!0,a=!1,i=void 0;try{for(var n,s=e[Symbol.iterator]();!(t=(n=s.next()).done);t=!0){var l=n.value;if((l=l.trim())&&!l.startsWith("#")){var o=l.split(/\s/),u=void 0,f=o,c=r(f);u=c[0],o=c.slice(1);var p=this["parse_"+u];p&&p.bind(this)(o)}}}catch(e){a=!0,i=e}finally{try{!t&&s.return&&s.return()}finally{if(a)throw i}}delete this.data,this.currentMaterial=null}}]),e}()},function(e,exports,t){e.exports=t(4)},function(e,exports,t){"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.deleteMeshBuffers=exports.initMeshBuffers=exports.downloadMeshes=exports.downloadModels=exports.Layout=exports.MaterialLibrary=exports.Material=exports.Mesh=void 0;var r=t(1),a=function(e){return e&&e.__esModule?e:{default:e}}(r),i=t(2),n=t(0),s=t(5);exports.Mesh=a.default,exports.Material=i.Material,exports.MaterialLibrary=i.MaterialLibrary,exports.Layout=n.Layout,exports.downloadModels=s.downloadModels,exports.downloadMeshes=s.downloadMeshes,exports.initMeshBuffers=s.initMeshBuffers,exports.deleteMeshBuffers=s.deleteMeshBuffers},function(e,exports,t){"use strict";function r(e,t){var r=["mapDiffuse","mapAmbient","mapSpecular","mapDissolve","mapBump","mapDisplacement","mapDecal","mapEmissive"];t.endsWith("/")||(t+="/");var a=[];for(var i in e.materials)if(e.materials.hasOwnProperty(i)){i=e.materials[i];var n=!0,s=!1,l=void 0;try{for(var o,u=r[Symbol.iterator]();!(n=(o=u.next()).done);n=!0){var f=o.value;(function(e){var r=i[e];if(!r)return"continue";var n=t+r.filename;a.push(fetch(n).then(function(e){if(!e.ok)throw new Error;return e.blob()}).then(function(e){var t=new Image;t.src=URL.createObjectURL(e),r.texture=t}).catch(function(){}))})(f)}}catch(e){s=!0,l=e}finally{try{!n&&u.return&&u.return()}finally{if(s)throw l}}}return Promise.all(a)}function a(e){var t=[],a=!0,i=!1,n=void 0;try{for(var s,o=e[Symbol.iterator]();!(a=(s=o.next()).done);a=!0){var c=s.value;!function(e){var a=[];if(!e.obj)throw new Error('"obj" attribute of model object not set. The .obj file is required to be set in order to use downloadModels()');var i=e.name;if(!i){var n=e.obj.split("/");i=n[n.length-1].replace(".obj","")}if(a.push(Promise.resolve(i)),a.push(fetch(e.obj).then(function(e){return e.text()}).then(function(e){return new u.default(e)})),e.mtl){var s=e.mtl;"boolean"==typeof s&&(s=e.obj.replace(/\.obj$/,".mtl")),a.push(fetch(s).then(function(e){return e.text()}).then(function(t){var a=new f.MaterialLibrary(t);if(!1!==e.downloadMtlTextures){var i=e.mtlTextureRoot;return i||(i=s.substr(0,s.lastIndexOf("/"))),Promise.all([Promise.resolve(a),r(a,i)])}return Promise.all(Promise.resolve(a))}).then(function(e){return e[0]}))}t.push(Promise.all(a))}(c)}}catch(e){i=!0,n=e}finally{try{!a&&o.return&&o.return()}finally{if(i)throw n}}return Promise.all(t).then(function(e){var t={},r=!0,a=!1,i=void 0;try{for(var n,s=e[Symbol.iterator]();!(r=(n=s.next()).done);r=!0){var o=n.value,u=l(o,3),f=u[0],c=u[1],p=u[2];c.name=f,p&&c.addMaterialLibrary(p),t[f]=c}}catch(e){a=!0,i=e}finally{try{!r&&s.return&&s.return()}finally{if(a)throw i}}return t})}function i(e,t,r){void 0===r&&(r={});var a=[];for(var i in e){(function(t){if(!e.hasOwnProperty(t))return"continue";var r=e[t];a.push(fetch(r).then(function(e){return e.text()}).then(function(e){return[t,new u.default(e)]}))})(i)}Promise.all(a).then(function(e){var a=!0,i=!1,n=void 0;try{for(var s,o=e[Symbol.iterator]();!(a=(s=o.next()).done);a=!0){var u=s.value,f=l(u,2),c=f[0],p=f[1];r[c]=p}}catch(e){i=!0,n=e}finally{try{!a&&o.return&&o.return()}finally{if(i)throw n}}return t(r)})}function n(e,t){t.normalBuffer=c(e,e.ARRAY_BUFFER,t.vertexNormals,3),t.textureBuffer=c(e,e.ARRAY_BUFFER,t.textures,2),t.vertexBuffer=c(e,e.ARRAY_BUFFER,t.vertices,3),t.indexBuffer=c(e,e.ELEMENT_ARRAY_BUFFER,t.indices,1)}function s(e,t){e.deleteBuffer(t.normalBuffer),e.deleteBuffer(t.textureBuffer),e.deleteBuffer(t.vertexBuffer),e.deleteBuffer(t.indexBuffer)}Object.defineProperty(exports,"__esModule",{value:!0});var l=function(){function e(e,t){var r=[],a=!0,i=!1,n=void 0;try{for(var s,l=e[Symbol.iterator]();!(a=(s=l.next()).done)&&(r.push(s.value),!t||r.length!==t);a=!0);}catch(e){i=!0,n=e}finally{try{!a&&l.return&&l.return()}finally{if(i)throw n}}return r}return function(t,r){if(Array.isArray(t))return t;if(Symbol.iterator in Object(t))return e(t,r);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}();exports.downloadModels=a,exports.downloadMeshes=i,exports.initMeshBuffers=n,exports.deleteMeshBuffers=s;var o=t(1),u=function(e){return e&&e.__esModule?e:{default:e}}(o),f=t(2),c=(t(0),function(e,t,r,a){var i=e.createBuffer(),n=t===e.ARRAY_BUFFER?Float32Array:Uint16Array;return e.bindBuffer(t,i),e.bufferData(t,new n(r),e.STATIC_DRAW),i.itemSize=a,i.numItems=r.length/a,i})}])});
+!function(e,t){ true?module.exports=t():"function"==typeof define&&define.amd?define("OBJ",[],t):"object"==typeof exports?exports.OBJ=t():e.OBJ=t()}("undefined"!=typeof self?self:this,function(){return function(e){function t(a){if(r[a])return r[a].exports;var n=r[a]={i:a,l:!1,exports:{}};return e[a].call(n.exports,n,n.exports,t),n.l=!0,n.exports}var r={};return t.m=e,t.c=r,t.d=function(exports,e,r){t.o(exports,e)||Object.defineProperty(exports,e,{configurable:!1,enumerable:!0,get:r})},t.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(r,"a",r),r},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p="/",t(t.s=3)}([function(e,exports,t){"use strict";function r(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function a(e){switch(e){case"BYTE":case"UNSIGNED_BYTE":return 1;case"SHORT":case"UNSIGNED_SHORT":return 2;case"FLOAT":return 4}}Object.defineProperty(exports,"__esModule",{value:!0});var n=exports.Layout=function e(){r(this,e);for(var t=arguments.length,a=Array(t),n=0;n<t;n++)a[n]=arguments[n];this.attributes=a;var s=0,l=0,o=!0,u=!1,c=void 0;try{for(var f,h=a[Symbol.iterator]();!(o=(f=h.next()).done);o=!0){var p=f.value;if(this[p.key])throw new i(p);s%p.sizeOfType!=0&&(s+=p.sizeOfType-s%p.sizeOfType),this[p.key]={attribute:p,size:p.size,type:p.type,normalized:p.normalized,offset:s},s+=p.sizeInBytes,l=Math.max(l,p.sizeOfType)}}catch(e){u=!0,c=e}finally{try{!o&&h.return&&h.return()}finally{if(u)throw c}}s%l!=0&&(s+=l-s%l),this.stride=s;var v=!0,d=!1,y=void 0;try{for(var m,M=a[Symbol.iterator]();!(v=(m=M.next()).done);v=!0){this[m.value.key].stride=this.stride}}catch(e){d=!0,y=e}finally{try{!v&&M.return&&M.return()}finally{if(d)throw y}}},i=function e(t){r(this,e),this.message="found duplicate attribute: "+t.key},s=function e(t,n,i){arguments.length>3&&void 0!==arguments[3]&&arguments[3];r(this,e),this.key=t,this.size=n,this.type=i,this.normalized=!1,this.sizeOfType=a(i),this.sizeInBytes=this.sizeOfType*n};n.POSITION=new s("position",3,"FLOAT"),n.NORMAL=new s("normal",3,"FLOAT"),n.TANGENT=new s("tangent",3,"FLOAT"),n.BITANGENT=new s("bitangent",3,"FLOAT"),n.UV=new s("uv",2,"FLOAT"),n.MATERIAL_INDEX=new s("materialIndex",1,"SHORT"),n.MATERIAL_ENABLED=new s("materialEnabled",1,"UNSIGNED_SHORT"),n.AMBIENT=new s("ambient",3,"FLOAT"),n.DIFFUSE=new s("diffuse",3,"FLOAT"),n.SPECULAR=new s("specular",3,"FLOAT"),n.SPECULAR_EXPONENT=new s("specularExponent",3,"FLOAT"),n.EMISSIVE=new s("emissive",3,"FLOAT"),n.TRANSMISSION_FILTER=new s("transmissionFilter",3,"FLOAT"),n.DISSOLVE=new s("dissolve",1,"FLOAT"),n.ILLUMINATION=new s("illumination",1,"UNSIGNED_SHORT"),n.REFRACTION_INDEX=new s("refractionIndex",1,"FLOAT"),n.SHARPNESS=new s("sharpness",1,"FLOAT"),n.MAP_DIFFUSE=new s("mapDiffuse",1,"SHORT"),n.MAP_AMBIENT=new s("mapAmbient",1,"SHORT"),n.MAP_SPECULAR=new s("mapSpecular",1,"SHORT"),n.MAP_SPECULAR_EXPONENT=new s("mapSpecularExponent",1,"SHORT"),n.MAP_DISSOLVE=new s("mapDissolve",1,"SHORT"),n.ANTI_ALIASING=new s("antiAliasing",1,"UNSIGNED_SHORT"),n.MAP_BUMP=new s("mapBump",1,"SHORT"),n.MAP_DISPLACEMENT=new s("mapDisplacement",1,"SHORT"),n.MAP_DECAL=new s("mapDecal",1,"SHORT"),n.MAP_EMISSIVE=new s("mapEmissive",1,"SHORT")},function(e,exports,t){"use strict";function r(e){if(Array.isArray(e)){for(var t=0,r=Array(e.length);t<e.length;t++)r[t]=e[t];return r}return Array.from(e)}function a(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(exports,"__esModule",{value:!0});var n=function(){function e(e,t){for(var r=0;r<t.length;r++){var a=t[r];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}return function(t,r,a){return r&&e(t.prototype,r),a&&e(t,a),t}}(),i=t(0),s=function(){function e(t,n){a(this,e),n=n||{},n.materials=n.materials||{},n.enableWTextureCoord=!!n.enableWTextureCoord,n.indicesPerMaterial=!!n.indicesPerMaterial;var i=this;i.vertices=[],i.vertexNormals=[],i.textures=[],i.indices=[],i.textureStride=n.enableWTextureCoord?3:2,this.name="";var s=[],l=[],o=[],u={},c=[],f={},h=-1,p=0;u.verts=[],u.norms=[],u.textures=[],u.hashindices={},u.indices=[[]],u.materialIndices=[],u.index=0;for(var v=/^v\s/,d=/^vn\s/,y=/^vt\s/,m=/^f\s/,M=/\s+/,b=/^usemtl/,x=t.split("\n"),I=0;I<x.length;I++){var A=x[I].trim();if(A&&!A.startsWith("#")){var _=A.split(M);if(_.shift(),v.test(A))s.push.apply(s,r(_));else if(d.test(A))l.push.apply(l,r(_));else if(y.test(A)){var k=_;_.length>2&&!n.enableWTextureCoord?k=_.slice(0,2):2===_.length&&n.enableWTextureCoord&&k.push(0),o.push.apply(o,r(k))}else if(b.test(A)){var T=_[0];T in f||(c.push(T),f[T]=c.length-1,n.indicesPerMaterial&&f[T]>0&&u.indices.push([])),h=f[T],n.indicesPerMaterial&&(p=h)}else if(m.test(A))for(var w=!1,F=0,S=_.length;F<S;F++){3!==F||w||(F=2,w=!0);var E=_[0]+","+h,g=_[F]+","+h;if(g in u.hashindices)u.indices[p].push(u.hashindices[g]);else{var O=_[F].split("/"),B=O.length-1;if(u.verts.push(+s[3*(O[0]-1)+0]),u.verts.push(+s[3*(O[0]-1)+1]),u.verts.push(+s[3*(O[0]-1)+2]),o.length){var L=n.enableWTextureCoord?3:2;u.textures.push(+o[(O[1]-1)*L+0]),u.textures.push(+o[(O[1]-1)*L+1]),n.enableWTextureCoord&&u.textures.push(+o[(O[1]-1)*L+2])}u.norms.push(+l[3*(O[B]-1)+0]),u.norms.push(+l[3*(O[B]-1)+1]),u.norms.push(+l[3*(O[B]-1)+2]),u.materialIndices.push(h),u.hashindices[g]=u.index,u.indices[p].push(u.hashindices[g]),u.index+=1}3===F&&w&&u.indices[p].push(u.hashindices[E])}}}i.vertices=u.verts,i.vertexNormals=u.norms,i.textures=u.textures,i.vertexMaterialIndices=u.materialIndices,i.indices=n.indicesPerMaterial?u.indices:u.indices[p],i.materialNames=c,i.materialIndices=f,i.materialsByIndex={},n.calcTangentsAndBitangents&&this.calculateTangentsAndBitangents()}return n(e,[{key:"calculateTangentsAndBitangents",value:function(){var e={};e.tangents=[].concat(r(new Array(this.vertices.length))).map(function(e){return 0}),e.bitangents=[].concat(r(new Array(this.vertices.length))).map(function(e){return 0});var t=void 0;t=Array.isArray(this.indices[0])?[].concat.apply([],this.indices):this.indices;for(var a=this.vertices,n=this.vertexNormals,i=this.textures,s=0;s<t.length;s+=3){var l=t[s+0],o=t[s+1],u=t[s+2],c=a[3*l+0],f=a[3*l+1],h=a[3*l+2],p=i[2*l+0],v=i[2*l+1],d=a[3*o+0],y=a[3*o+1],m=a[3*o+2],M=i[2*o+0],b=i[2*o+1],x=a[3*u+0],I=a[3*u+1],A=a[3*u+2],_=i[2*u+0],k=i[2*u+1],T=d-c,w=y-f,F=m-h,S=x-c,E=I-f,g=A-h,O=M-p,B=b-v,L=_-p,N=k-v,R=O*N-B*L,P=1/(Math.abs(R<1e-4)?1:R),D=(T*N-S*B)*P,C=(w*N-E*B)*P,U=(F*N-g*B)*P,j=(S*O-T*L)*P,z=(E*O-w*L)*P,H=(g*O-F*L)*P,W=n[3*l+0],G=n[3*l+1],V=n[3*l+2],K=n[3*o+0],q=n[3*o+1],X=n[3*o+2],Y=n[3*u+0],J=n[3*u+1],Q=n[3*u+2],Z=D*W+C*G+U*V,ee=D*K+C*q+U*X,te=D*Y+C*J+U*Q,re=D-W*Z,ae=C-G*Z,ne=U-V*Z,ie=D-K*ee,se=C-q*ee,le=U-X*ee,oe=D-Y*te,ue=C-J*te,ce=U-Q*te,fe=Math.sqrt(re*re+ae*ae+ne*ne),he=Math.sqrt(ie*ie+se*se+le*le),pe=Math.sqrt(oe*oe+ue*ue+ce*ce),ve=j*W+z*G+H*V,de=j*K+z*q+H*X,ye=j*Y+z*J+H*Q,me=j-W*ve,Me=z-G*ve,be=H-V*ve,xe=j-K*de,Ie=z-q*de,Ae=H-X*de,_e=j-Y*ye,ke=z-J*ye,Te=H-Q*ye,we=Math.sqrt(me*me+Me*Me+be*be),Fe=Math.sqrt(xe*xe+Ie*Ie+Ae*Ae),Se=Math.sqrt(_e*_e+ke*ke+Te*Te);e.tangents[3*l+0]+=re/fe,e.tangents[3*l+1]+=ae/fe,e.tangents[3*l+2]+=ne/fe,e.tangents[3*o+0]+=ie/he,e.tangents[3*o+1]+=se/he,e.tangents[3*o+2]+=le/he,e.tangents[3*u+0]+=oe/pe,e.tangents[3*u+1]+=ue/pe,e.tangents[3*u+2]+=ce/pe,e.bitangents[3*l+0]+=me/we,e.bitangents[3*l+1]+=Me/we,e.bitangents[3*l+2]+=be/we,e.bitangents[3*o+0]+=xe/Fe,e.bitangents[3*o+1]+=Ie/Fe,e.bitangents[3*o+2]+=Ae/Fe,e.bitangents[3*u+0]+=_e/Se,e.bitangents[3*u+1]+=ke/Se,e.bitangents[3*u+2]+=Te/Se}this.tangents=e.tangents,this.bitangents=e.bitangents}},{key:"makeBufferData",value:function(e){var t=this.vertices.length/3,r=new ArrayBuffer(e.stride*t);r.numItems=t;for(var a=new DataView(r),n=0,s=0;n<t;n++){s=n*e.stride;var l=!0,o=!1,u=void 0;try{for(var c,f=e.attributes[Symbol.iterator]();!(l=(c=f.next()).done);l=!0){var h=c.value,p=s+e[h.key].offset;switch(h.key){case i.Layout.POSITION.key:a.setFloat32(p,this.vertices[3*n],!0),a.setFloat32(p+4,this.vertices[3*n+1],!0),a.setFloat32(p+8,this.vertices[3*n+2],!0);break;case i.Layout.UV.key:a.setFloat32(p,this.textures[2*n],!0),a.setFloat32(p+4,this.vertices[2*n+1],!0);break;case i.Layout.NORMAL.key:a.setFloat32(p,this.vertexNormals[3*n],!0),a.setFloat32(p+4,this.vertexNormals[3*n+1],!0),a.setFloat32(p+8,this.vertexNormals[3*n+2],!0);break;case i.Layout.MATERIAL_INDEX.key:a.setInt16(p,this.vertexMaterialIndices[n],!0);break;case i.Layout.AMBIENT.key:var v=this.vertexMaterialIndices[n],d=this.materialsByIndex[v];if(!d)break;a.setFloat32(p,d.ambient[0],!0),a.setFloat32(p+4,d.ambient[1],!0),a.setFloat32(p+8,d.ambient[2],!0);break;case i.Layout.DIFFUSE.key:var y=this.vertexMaterialIndices[n],m=this.materialsByIndex[y];if(!m)break;a.setFloat32(p,m.diffuse[0],!0),a.setFloat32(p+4,m.diffuse[1],!0),a.setFloat32(p+8,m.diffuse[2],!0);break;case i.Layout.SPECULAR.key:var M=this.vertexMaterialIndices[n],b=this.materialsByIndex[M];if(!b)break;a.setFloat32(p,b.specular[0],!0),a.setFloat32(p+4,b.specular[1],!0),a.setFloat32(p+8,b.specular[2],!0);break;case i.Layout.SPECULAR_EXPONENT.key:var x=this.vertexMaterialIndices[n],I=this.materialsByIndex[x];if(!I)break;a.setFloat32(p,I.specularExponent,!0);break;case i.Layout.EMISSIVE.key:var A=this.vertexMaterialIndices[n],_=this.materialsByIndex[A];if(!_)break;a.setFloat32(p,_.emissive[0],!0),a.setFloat32(p+4,_.emissive[1],!0),a.setFloat32(p+8,_.emissive[2],!0);break;case i.Layout.TRANSMISSION_FILTER.key:var k=this.vertexMaterialIndices[n],T=this.materialsByIndex[k];if(!T)break;a.setFloat32(p,T.transmissionFilter[0],!0),a.setFloat32(p+4,T.transmissionFilter[1],!0),a.setFloat32(p+8,T.transmissionFilter[2],!0);break;case i.Layout.DISSOLVE.key:var w=this.vertexMaterialIndices[n],F=this.materialsByIndex[w];if(!F)break;a.setFloat32(p,F.dissolve,!0);break;case i.Layout.ILLUMINATION.key:var S=this.vertexMaterialIndices[n],E=this.materialsByIndex[S];if(!E)break;a.setInt16(p,E.illumination,!0);break;case i.Layout.REFRACTION_INDEX.key:var g=this.vertexMaterialIndices[n],O=this.materialsByIndex[g];if(!O)break;a.setFloat32(p,O.refractionIndex,!0);break;case i.Layout.SHARPNESS.key:var B=this.vertexMaterialIndices[n],L=this.materialsByIndex[B];if(!L)break;a.setFloat32(p,L.sharpness,!0);break;case i.Layout.ANTI_ALIASING.key:var N=this.vertexMaterialIndices[n],R=this.materialsByIndex[N];if(!R)break;a.setInt16(p,R.antiAliasing,!0)}}}catch(e){o=!0,u=e}finally{try{!l&&f.return&&f.return()}finally{if(o)throw u}}}return r}},{key:"makeIndexBufferData",value:function(){var e=new Uint16Array(this.indices);return e.numItems=this.indices.length,e}},{key:"addMaterialLibrary",value:function(e){for(var t in e.materials)if(t in this.materialIndices){var r=e.materials[t],a=this.materialIndices[r.name];this.materialsByIndex[a]=r}}}]),e}();exports.default=s},function(e,exports,t){"use strict";function r(e){return Array.isArray(e)?e:Array.from(e)}function a(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}Object.defineProperty(exports,"__esModule",{value:!0});var n=function(){function e(e,t){for(var r=0;r<t.length;r++){var a=t[r];a.enumerable=a.enumerable||!1,a.configurable=!0,"value"in a&&(a.writable=!0),Object.defineProperty(e,a.key,a)}}return function(t,r,a){return r&&e(t.prototype,r),a&&e(t,a),t}}(),i=exports.Material=function e(t){a(this,e),this.name=t,this.ambient=[0,0,0],this.diffuse=[0,0,0],this.specular=[0,0,0],this.emissive=[0,0,0],this.transmissionFilter=[0,0,0],this.dissolve=0,this.specularExponent=0,this.transparency=0,this.illumination=0,this.refractionIndex=1,this.sharpness=0,this.mapDiffuse=null,this.mapAmbient=null,this.mapSpecular=null,this.mapSpecularExponent=null,this.mapDissolve=null,this.antiAliasing=!1,this.mapBump=null,this.mapDisplacement=null,this.mapDecal=null,this.mapEmissive=null,this.mapReflections=[]};exports.MaterialLibrary=function(){function e(t){a(this,e),this.data=t,this.currentMaterial=null,this.materials={},this.parse()}return n(e,[{key:"parse_newmtl",value:function(e){var t=e[0];this.currentMaterial=new i(t),this.materials[t]=this.currentMaterial}},{key:"parseColor",value:function(e){if("spectral"!=e[0]&&"xyz"!=e[0]){if(3==e.length)return e.map(parseFloat);var t=parseFloat(e[0]);return[t,t,t]}}},{key:"parse_Ka",value:function(e){this.currentMaterial.ambient=this.parseColor(e)}},{key:"parse_Kd",value:function(e){this.currentMaterial.diffuse=this.parseColor(e)}},{key:"parse_Ks",value:function(e){this.currentMaterial.specular=this.parseColor(e)}},{key:"parse_Ke",value:function(e){this.currentMaterial.emissive=this.parseColor(e)}},{key:"parse_Tf",value:function(e){this.currentMaterial.transmissionFilter=this.parseColor(e)}},{key:"parse_d",value:function(e){this.currentMaterial.dissolve=parseFloat(e.pop())}},{key:"parse_illum",value:function(e){this.currentMaterial.illumination=parseInt(e[0])}},{key:"parse_Ni",value:function(e){this.currentMaterial.refractionIndex=parseFloat(e[0])}},{key:"parse_Ns",value:function(e){this.currentMaterial.specularExponent=parseInt(e[0])}},{key:"parse_sharpness",value:function(e){this.currentMaterial.sharpness=parseInt(e[0])}},{key:"parse_cc",value:function(e,t){t.colorCorrection="on"==e[0]}},{key:"parse_blendu",value:function(e,t){t.horizontalBlending="on"==e[0]}},{key:"parse_blendv",value:function(e,t){t.verticalBlending="on"==e[0]}},{key:"parse_boost",value:function(e,t){t.boostMipMapSharpness=parseFloat(e[0])}},{key:"parse_mm",value:function(e,t){t.modifyTextureMap.brightness=parseFloat(e[0]),t.modifyTextureMap.contrast=parseFloat(e[1])}},{key:"parse_ost",value:function(e,t,r){for(;e.length<3;)e.push(r);t.u=parseFloat(e[0]),t.v=parseFloat(e[1]),t.w=parseFloat(e[2])}},{key:"parse_o",value:function(e,t){this.parse_ost(e,t.offset,0)}},{key:"parse_s",value:function(e,t){this.parse_ost(e,t.scale,1)}},{key:"parse_t",value:function(e,t){this.parse_ost(e,t.turbulence,0)}},{key:"parse_texres",value:function(e,t){t.textureResolution=parseFloat(e[0])}},{key:"parse_clamp",value:function(e,t){t.clamp="on"==e[0]}},{key:"parse_bm",value:function(e,t){t.bumpMultiplier=parseFloat(e[0])}},{key:"parse_imfchan",value:function(e,t){t.imfChan=e[0]}},{key:"parse_type",value:function(e,t){t.reflectionType=e[0]}},{key:"parseOptions",value:function(e){var t={colorCorrection:!1,horizontalBlending:!0,verticalBlending:!0,boostMipMapSharpness:0,modifyTextureMap:{brightness:0,contrast:1},offset:{u:0,v:0,w:0},scale:{u:1,v:1,w:1},turbulence:{u:0,v:0,w:0},clamp:!1,textureResolution:null,bumpMultiplier:1,imfChan:null},r=void 0,a=void 0,n={};for(e.reverse();e.length;){var i=e.pop();i.startsWith("-")?(r=i.substr(1),n[r]=[]):n[r].push(i)}for(r in n)if(n.hasOwnProperty(r)){a=n[r];var s=this["parse_"+r];s&&s.bind(this)(a,t)}return t}},{key:"parseMap",value:function(e){var t=void 0,a=void 0;if(e[0].startsWith("-"))t=e.pop(),a=e;else{var n=r(e);t=n[0],a=n.slice(1)}return a=this.parseOptions(a),a.filename=t,a}},{key:"parse_map_Ka",value:function(e){this.currentMaterial.mapAmbient=this.parseMap(e)}},{key:"parse_map_Kd",value:function(e){this.currentMaterial.mapDiffuse=this.parseMap(e)}},{key:"parse_map_Ks",value:function(e){this.currentMaterial.mapSpecular=this.parseMap(e)}},{key:"parse_map_Ke",value:function(e){this.currentMaterial.mapEmissive=this.parseMap(e)}},{key:"parse_map_Ns",value:function(e){this.currentMaterial.mapSpecularExponent=this.parseMap(e)}},{key:"parse_map_d",value:function(e){this.currentMaterial.mapDissolve=this.parseMap(e)}},{key:"parse_map_aat",value:function(e){this.currentMaterial.antiAliasing="on"==e[0]}},{key:"parse_map_bump",value:function(e){this.currentMaterial.mapBump=this.parseMap(e)}},{key:"parse_bump",value:function(e){this.parse_map_bump(e)}},{key:"parse_disp",value:function(e){this.currentMaterial.mapDisplacement=this.parseMap(e)}},{key:"parse_decal",value:function(e){this.currentMaterial.mapDecal=this.parseMap(e)}},{key:"parse_refl",value:function(e){this.currentMaterial.mapReflections.push(this.parseMap(e))}},{key:"parse",value:function(){var e=this.data.split(/\r?\n/),t=!0,a=!1,n=void 0;try{for(var i,s=e[Symbol.iterator]();!(t=(i=s.next()).done);t=!0){var l=i.value;if((l=l.trim())&&!l.startsWith("#")){var o=l.split(/\s/),u=void 0,c=o,f=r(c);u=f[0],o=f.slice(1);var h=this["parse_"+u];h&&h.bind(this)(o)}}}catch(e){a=!0,n=e}finally{try{!t&&s.return&&s.return()}finally{if(a)throw n}}delete this.data,this.currentMaterial=null}}]),e}()},function(e,exports,t){e.exports=t(4)},function(e,exports,t){"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.version=exports.deleteMeshBuffers=exports.initMeshBuffers=exports.downloadMeshes=exports.downloadModels=exports.Layout=exports.MaterialLibrary=exports.Material=exports.Mesh=void 0;var r=t(1),a=function(e){return e&&e.__esModule?e:{default:e}}(r),n=t(2),i=t(0),s=t(5);exports.Mesh=a.default,exports.Material=n.Material,exports.MaterialLibrary=n.MaterialLibrary,exports.Layout=i.Layout,exports.downloadModels=s.downloadModels,exports.downloadMeshes=s.downloadMeshes,exports.initMeshBuffers=s.initMeshBuffers,exports.deleteMeshBuffers=s.deleteMeshBuffers,exports.version="1.1.3"},function(e,exports,t){"use strict";function r(e,t){var r=["mapDiffuse","mapAmbient","mapSpecular","mapDissolve","mapBump","mapDisplacement","mapDecal","mapEmissive"];t.endsWith("/")||(t+="/");var a=[];for(var n in e.materials)if(e.materials.hasOwnProperty(n)){n=e.materials[n];var i=!0,s=!1,l=void 0;try{for(var o,u=r[Symbol.iterator]();!(i=(o=u.next()).done);i=!0){var c=o.value;(function(e){var r=n[e];if(!r)return"continue";var i=t+r.filename;a.push(fetch(i).then(function(e){if(!e.ok)throw new Error;return e.blob()}).then(function(e){var t=new Image;return t.src=URL.createObjectURL(e),r.texture=t,new Promise(function(e){return t.onload=e})}).catch(function(){}))})(c)}}catch(e){s=!0,l=e}finally{try{!i&&u.return&&u.return()}finally{if(s)throw l}}}return Promise.all(a)}function a(e){var t=[],a=!0,n=!1,i=void 0;try{for(var s,o=e[Symbol.iterator]();!(a=(s=o.next()).done);a=!0){var f=s.value;!function(e){var a=[];if(!e.obj)throw new Error('"obj" attribute of model object not set. The .obj file is required to be set in order to use downloadModels()');var n={};n.indicesPerMaterial=!!e.indicesPerMaterial,n.calcTangentsAndBitangents=!!e.calcTangentsAndBitangents;var i=e.name;if(!i){var s=e.obj.split("/");i=s[s.length-1].replace(".obj","")}if(a.push(Promise.resolve(i)),a.push(fetch(e.obj).then(function(e){return e.text()}).then(function(e){return new u.default(e,n)})),e.mtl){var l=e.mtl;"boolean"==typeof l&&(l=e.obj.replace(/\.obj$/,".mtl")),a.push(fetch(l).then(function(e){return e.text()}).then(function(t){var a=new c.MaterialLibrary(t);if(!1!==e.downloadMtlTextures){var n=e.mtlTextureRoot;return n||(n=l.substr(0,l.lastIndexOf("/"))),Promise.all([Promise.resolve(a),r(a,n)])}return Promise.all(Promise.resolve(a))}).then(function(e){return e[0]}))}t.push(Promise.all(a))}(f)}}catch(e){n=!0,i=e}finally{try{!a&&o.return&&o.return()}finally{if(n)throw i}}return Promise.all(t).then(function(e){var t={},r=!0,a=!1,n=void 0;try{for(var i,s=e[Symbol.iterator]();!(r=(i=s.next()).done);r=!0){var o=i.value,u=l(o,3),c=u[0],f=u[1],h=u[2];f.name=c,h&&f.addMaterialLibrary(h),t[c]=f}}catch(e){a=!0,n=e}finally{try{!r&&s.return&&s.return()}finally{if(a)throw n}}return t})}function n(e,t,r){void 0===r&&(r={});var a=[];for(var n in e){(function(t){if(!e.hasOwnProperty(t))return"continue";var r=e[t];a.push(fetch(r).then(function(e){return e.text()}).then(function(e){return[t,new u.default(e)]}))})(n)}Promise.all(a).then(function(e){var a=!0,n=!1,i=void 0;try{for(var s,o=e[Symbol.iterator]();!(a=(s=o.next()).done);a=!0){var u=s.value,c=l(u,2),f=c[0],h=c[1];r[f]=h}}catch(e){n=!0,i=e}finally{try{!a&&o.return&&o.return()}finally{if(n)throw i}}return t(r)})}function i(e,t){t.normalBuffer=f(e,e.ARRAY_BUFFER,t.vertexNormals,3),t.textureBuffer=f(e,e.ARRAY_BUFFER,t.textures,t.textureStride),t.vertexBuffer=f(e,e.ARRAY_BUFFER,t.vertices,3),t.indexBuffer=f(e,e.ELEMENT_ARRAY_BUFFER,t.indices,1)}function s(e,t){e.deleteBuffer(t.normalBuffer),e.deleteBuffer(t.textureBuffer),e.deleteBuffer(t.vertexBuffer),e.deleteBuffer(t.indexBuffer)}Object.defineProperty(exports,"__esModule",{value:!0});var l=function(){function e(e,t){var r=[],a=!0,n=!1,i=void 0;try{for(var s,l=e[Symbol.iterator]();!(a=(s=l.next()).done)&&(r.push(s.value),!t||r.length!==t);a=!0);}catch(e){n=!0,i=e}finally{try{!a&&l.return&&l.return()}finally{if(n)throw i}}return r}return function(t,r){if(Array.isArray(t))return t;if(Symbol.iterator in Object(t))return e(t,r);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}();exports.downloadModels=a,exports.downloadMeshes=n,exports.initMeshBuffers=i,exports.deleteMeshBuffers=s;var o=t(1),u=function(e){return e&&e.__esModule?e:{default:e}}(o),c=t(2),f=(t(0),function(e,t,r,a){var n=e.createBuffer(),i=t===e.ARRAY_BUFFER?Float32Array:Uint16Array;return e.bindBuffer(t,n),e.bufferData(t,new i(r),e.STATIC_DRAW),n.itemSize=a,n.numItems=r.length/a,n})}])});
 
 /***/ }),
 /* 32 */
@@ -16342,14 +16317,14 @@ class Button {
 
 "use strict";
 
-var errorEx = __webpack_require__(70);
-var fallback = __webpack_require__(76);
+const errorEx = __webpack_require__(70);
+const fallback = __webpack_require__(76);
 
-var JSONError = errorEx('JSONError', {
+const JSONError = errorEx('JSONError', {
 	fileName: errorEx.append('in %s')
 });
 
-module.exports = function (x, reviver, filename) {
+module.exports = (input, reviver, filename) => {
 	if (typeof reviver === 'string') {
 		filename = reviver;
 		reviver = null;
@@ -16357,18 +16332,16 @@ module.exports = function (x, reviver, filename) {
 
 	try {
 		try {
-			return JSON.parse(x, reviver);
+			return JSON.parse(input, reviver);
 		} catch (err) {
-			fallback.parse(x, {
-				mode: 'json',
-				reviver: reviver
-			});
+			fallback(input, reviver);
 
 			throw err;
 		}
 	} catch (err) {
-		var jsonErr = new JSONError(err);
+		err.message = err.message.replace(/\n/g, '');
 
+		const jsonErr = new JSONError(err);
 		if (filename) {
 			jsonErr.fileName = filename;
 		}
@@ -17362,881 +17335,91 @@ module.exports = function isArrayish(obj) {
 /* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/*
- * Author: Alex Kocharin <alex@kocharin.ru>
- * GIT: https://github.com/rlidwka/jju
- * License: WTFPL, grab your copy here: http://www.wtfpl.net/txt/copying/
- */
+"use strict";
 
-// RTFM: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
 
-var Uni = __webpack_require__(77)
-
-function isHexDigit(x) {
-  return (x >= '0' && x <= '9')
-      || (x >= 'A' && x <= 'F')
-      || (x >= 'a' && x <= 'f')
-}
-
-function isOctDigit(x) {
-  return x >= '0' && x <= '7'
-}
-
-function isDecDigit(x) {
-  return x >= '0' && x <= '9'
-}
-
-var unescapeMap = {
-  '\'': '\'',
-  '"' : '"',
-  '\\': '\\',
-  'b' : '\b',
-  'f' : '\f',
-  'n' : '\n',
-  'r' : '\r',
-  't' : '\t',
-  'v' : '\v',
-  '/' : '/',
-}
-
-function formatError(input, msg, position, lineno, column, json5) {
-  var result = msg + ' at ' + (lineno + 1) + ':' + (column + 1)
-    , tmppos = position - column - 1
-    , srcline = ''
-    , underline = ''
-
-  var isLineTerminator = json5 ? Uni.isLineTerminator : Uni.isLineTerminatorJSON
-
-  // output no more than 70 characters before the wrong ones
-  if (tmppos < position - 70) {
-    tmppos = position - 70
-  }
-
-  while (1) {
-    var chr = input[++tmppos]
-
-    if (isLineTerminator(chr) || tmppos === input.length) {
-      if (position >= tmppos) {
-        // ending line error, so show it after the last char
-        underline += '^'
-      }
-      break
-    }
-    srcline += chr
-
-    if (position === tmppos) {
-      underline += '^'
-    } else if (position > tmppos) {
-      underline += input[tmppos] === '\t' ? '\t' : ' '
-    }
-
-    // output no more than 78 characters on the string
-    if (srcline.length > 78) break
-  }
-
-  return result + '\n' + srcline + '\n' + underline
-}
-
-function parse(input, options) {
-  // parse as a standard JSON mode
-  var json5 = !(options.mode === 'json' || options.legacy)
-  var isLineTerminator = json5 ? Uni.isLineTerminator : Uni.isLineTerminatorJSON
-  var isWhiteSpace = json5 ? Uni.isWhiteSpace : Uni.isWhiteSpaceJSON
-
-  var length = input.length
-    , lineno = 0
-    , linestart = 0
-    , position = 0
-    , stack = []
-
-  var tokenStart = function() {}
-  var tokenEnd = function(v) {return v}
-
-  /* tokenize({
-       raw: '...',
-       type: 'whitespace'|'comment'|'key'|'literal'|'separator'|'newline',
-       value: 'number'|'string'|'whatever',
-       path: [...],
-     })
-  */
-  if (options._tokenize) {
-    ;(function() {
-      var start = null
-      tokenStart = function() {
-        if (start !== null) throw Error('internal error, token overlap')
-        start = position
-      }
-
-      tokenEnd = function(v, type) {
-        if (start != position) {
-          var hash = {
-            raw: input.substr(start, position-start),
-            type: type,
-            stack: stack.slice(0),
-          }
-          if (v !== undefined) hash.value = v
-          options._tokenize.call(null, hash)
-        }
-        start = null
-        return v
-      }
-    })()
-  }
-
-  function fail(msg) {
-    var column = position - linestart
-
-    if (!msg) {
-      if (position < length) {
-        var token = '\'' +
-          JSON
-            .stringify(input[position])
-            .replace(/^"|"$/g, '')
-            .replace(/'/g, "\\'")
-            .replace(/\\"/g, '"')
-          + '\''
-
-        if (!msg) msg = 'Unexpected token ' + token
-      } else {
-        if (!msg) msg = 'Unexpected end of input'
-      }
-    }
-
-    var error = SyntaxError(formatError(input, msg, position, lineno, column, json5))
-    error.row = lineno + 1
-    error.column = column + 1
-    throw error
-  }
-
-  function newline(chr) {
-    // account for <cr><lf>
-    if (chr === '\r' && input[position] === '\n') position++
-    linestart = position
-    lineno++
-  }
-
-  function parseGeneric() {
-    var result
-
-    while (position < length) {
-      tokenStart()
-      var chr = input[position++]
-
-      if (chr === '"' || (chr === '\'' && json5)) {
-        return tokenEnd(parseString(chr), 'literal')
-
-      } else if (chr === '{') {
-        tokenEnd(undefined, 'separator')
-        return parseObject()
-
-      } else if (chr === '[') {
-        tokenEnd(undefined, 'separator')
-        return parseArray()
-
-      } else if (chr === '-'
-             ||  chr === '.'
-             ||  isDecDigit(chr)
-                 //           + number       Infinity          NaN
-             ||  (json5 && (chr === '+' || chr === 'I' || chr === 'N'))
-      ) {
-        return tokenEnd(parseNumber(), 'literal')
-
-      } else if (chr === 'n') {
-        parseKeyword('null')
-        return tokenEnd(null, 'literal')
-
-      } else if (chr === 't') {
-        parseKeyword('true')
-        return tokenEnd(true, 'literal')
-
-      } else if (chr === 'f') {
-        parseKeyword('false')
-        return tokenEnd(false, 'literal')
-
-      } else {
-        position--
-        return tokenEnd(undefined)
-      }
-    }
-  }
-
-  function parseKey() {
-    var result
-
-    while (position < length) {
-      tokenStart()
-      var chr = input[position++]
-
-      if (chr === '"' || (chr === '\'' && json5)) {
-        return tokenEnd(parseString(chr), 'key')
-
-      } else if (chr === '{') {
-        tokenEnd(undefined, 'separator')
-        return parseObject()
-
-      } else if (chr === '[') {
-        tokenEnd(undefined, 'separator')
-        return parseArray()
-
-      } else if (chr === '.'
-             ||  isDecDigit(chr)
-      ) {
-        return tokenEnd(parseNumber(true), 'key')
-
-      } else if (json5
-             &&  Uni.isIdentifierStart(chr) || (chr === '\\' && input[position] === 'u')) {
-        // unicode char or a unicode sequence
-        var rollback = position - 1
-        var result = parseIdentifier()
-
-        if (result === undefined) {
-          position = rollback
-          return tokenEnd(undefined)
-        } else {
-          return tokenEnd(result, 'key')
-        }
-
-      } else {
-        position--
-        return tokenEnd(undefined)
-      }
-    }
-  }
-
-  function skipWhiteSpace() {
-    tokenStart()
-    while (position < length) {
-      var chr = input[position++]
-
-      if (isLineTerminator(chr)) {
-        position--
-        tokenEnd(undefined, 'whitespace')
-        tokenStart()
-        position++
-        newline(chr)
-        tokenEnd(undefined, 'newline')
-        tokenStart()
-
-      } else if (isWhiteSpace(chr)) {
-        // nothing
-
-      } else if (chr === '/'
-             && json5
-             && (input[position] === '/' || input[position] === '*')
-      ) {
-        position--
-        tokenEnd(undefined, 'whitespace')
-        tokenStart()
-        position++
-        skipComment(input[position++] === '*')
-        tokenEnd(undefined, 'comment')
-        tokenStart()
-
-      } else {
-        position--
-        break
-      }
-    }
-    return tokenEnd(undefined, 'whitespace')
-  }
-
-  function skipComment(multi) {
-    while (position < length) {
-      var chr = input[position++]
-
-      if (isLineTerminator(chr)) {
-        // LineTerminator is an end of singleline comment
-        if (!multi) {
-          // let parent function deal with newline
-          position--
-          return
-        }
-
-        newline(chr)
-
-      } else if (chr === '*' && multi) {
-        // end of multiline comment
-        if (input[position] === '/') {
-          position++
-          return
-        }
-
-      } else {
-        // nothing
-      }
-    }
-
-    if (multi) {
-      fail('Unclosed multiline comment')
-    }
-  }
-
-  function parseKeyword(keyword) {
-    // keyword[0] is not checked because it should've checked earlier
-    var _pos = position
-    var len = keyword.length
-    for (var i=1; i<len; i++) {
-      if (position >= length || keyword[i] != input[position]) {
-        position = _pos-1
-        fail()
-      }
-      position++
-    }
-  }
-
-  function parseObject() {
-    var result = options.null_prototype ? Object.create(null) : {}
-      , empty_object = {}
-      , is_non_empty = false
-
-    while (position < length) {
-      skipWhiteSpace()
-      var item1 = parseKey()
-      skipWhiteSpace()
-      tokenStart()
-      var chr = input[position++]
-      tokenEnd(undefined, 'separator')
-
-      if (chr === '}' && item1 === undefined) {
-        if (!json5 && is_non_empty) {
-          position--
-          fail('Trailing comma in object')
-        }
-        return result
-
-      } else if (chr === ':' && item1 !== undefined) {
-        skipWhiteSpace()
-        stack.push(item1)
-        var item2 = parseGeneric()
-        stack.pop()
-
-        if (item2 === undefined) fail('No value found for key ' + item1)
-        if (typeof(item1) !== 'string') {
-          if (!json5 || typeof(item1) !== 'number') {
-            fail('Wrong key type: ' + item1)
-          }
-        }
-
-        if ((item1 in empty_object || empty_object[item1] != null) && options.reserved_keys !== 'replace') {
-          if (options.reserved_keys === 'throw') {
-            fail('Reserved key: ' + item1)
-          } else {
-            // silently ignore it
-          }
-        } else {
-          if (typeof(options.reviver) === 'function') {
-            item2 = options.reviver.call(null, item1, item2)
-          }
-
-          if (item2 !== undefined) {
-            is_non_empty = true
-            Object.defineProperty(result, item1, {
-              value: item2,
-              enumerable: true,
-              configurable: true,
-              writable: true,
-            })
-          }
-        }
-
-        skipWhiteSpace()
-
-        tokenStart()
-        var chr = input[position++]
-        tokenEnd(undefined, 'separator')
-
-        if (chr === ',') {
-          continue
-
-        } else if (chr === '}') {
-          return result
-
-        } else {
-          fail()
-        }
-
-      } else {
-        position--
-        fail()
-      }
-    }
-
-    fail()
-  }
-
-  function parseArray() {
-    var result = []
-
-    while (position < length) {
-      skipWhiteSpace()
-      stack.push(result.length)
-      var item = parseGeneric()
-      stack.pop()
-      skipWhiteSpace()
-      tokenStart()
-      var chr = input[position++]
-      tokenEnd(undefined, 'separator')
-
-      if (item !== undefined) {
-        if (typeof(options.reviver) === 'function') {
-          item = options.reviver.call(null, String(result.length), item)
-        }
-        if (item === undefined) {
-          result.length++
-          item = true // hack for check below, not included into result
-        } else {
-          result.push(item)
-        }
-      }
-
-      if (chr === ',') {
-        if (item === undefined) {
-          fail('Elisions are not supported')
-        }
-
-      } else if (chr === ']') {
-        if (!json5 && item === undefined && result.length) {
-          position--
-          fail('Trailing comma in array')
-        }
-        return result
-
-      } else {
-        position--
-        fail()
-      }
-    }
-  }
-
-  function parseNumber() {
-    // rewind because we don't know first char
-    position--
-
-    var start = position
-      , chr = input[position++]
-      , t
-
-    var to_num = function(is_octal) {
-      var str = input.substr(start, position - start)
-
-      if (is_octal) {
-        var result = parseInt(str.replace(/^0o?/, ''), 8)
-      } else {
-        var result = Number(str)
-      }
-
-      if (Number.isNaN(result)) {
-        position--
-        fail('Bad numeric literal - "' + input.substr(start, position - start + 1) + '"')
-      } else if (!json5 && !str.match(/^-?(0|[1-9][0-9]*)(\.[0-9]+)?(e[+-]?[0-9]+)?$/i)) {
-        // additional restrictions imposed by json
-        position--
-        fail('Non-json numeric literal - "' + input.substr(start, position - start + 1) + '"')
-      } else {
-        return result
-      }
-    }
-
-    // ex: -5982475.249875e+29384
-    //     ^ skipping this
-    if (chr === '-' || (chr === '+' && json5)) chr = input[position++]
-
-    if (chr === 'N' && json5) {
-      parseKeyword('NaN')
-      return NaN
-    }
-
-    if (chr === 'I' && json5) {
-      parseKeyword('Infinity')
-
-      // returning +inf or -inf
-      return to_num()
-    }
-
-    if (chr >= '1' && chr <= '9') {
-      // ex: -5982475.249875e+29384
-      //        ^^^ skipping these
-      while (position < length && isDecDigit(input[position])) position++
-      chr = input[position++]
-    }
-
-    // special case for leading zero: 0.123456
-    if (chr === '0') {
-      chr = input[position++]
-
-      //             new syntax, "0o777"           old syntax, "0777"
-      var is_octal = chr === 'o' || chr === 'O' || isOctDigit(chr)
-      var is_hex = chr === 'x' || chr === 'X'
-
-      if (json5 && (is_octal || is_hex)) {
-        while (position < length
-           &&  (is_hex ? isHexDigit : isOctDigit)( input[position] )
-        ) position++
-
-        var sign = 1
-        if (input[start] === '-') {
-          sign = -1
-          start++
-        } else if (input[start] === '+') {
-          start++
-        }
-
-        return sign * to_num(is_octal)
-      }
-    }
-
-    if (chr === '.') {
-      // ex: -5982475.249875e+29384
-      //                ^^^ skipping these
-      while (position < length && isDecDigit(input[position])) position++
-      chr = input[position++]
-    }
-
-    if (chr === 'e' || chr === 'E') {
-      chr = input[position++]
-      if (chr === '-' || chr === '+') position++
-      // ex: -5982475.249875e+29384
-      //                       ^^^ skipping these
-      while (position < length && isDecDigit(input[position])) position++
-      chr = input[position++]
-    }
-
-    // we have char in the buffer, so count for it
-    position--
-    return to_num()
-  }
-
-  function parseIdentifier() {
-    // rewind because we don't know first char
-    position--
-
-    var result = ''
-
-    while (position < length) {
-      var chr = input[position++]
-
-      if (chr === '\\'
-      &&  input[position] === 'u'
-      &&  isHexDigit(input[position+1])
-      &&  isHexDigit(input[position+2])
-      &&  isHexDigit(input[position+3])
-      &&  isHexDigit(input[position+4])
-      ) {
-        // UnicodeEscapeSequence
-        chr = String.fromCharCode(parseInt(input.substr(position+1, 4), 16))
-        position += 5
-      }
-
-      if (result.length) {
-        // identifier started
-        if (Uni.isIdentifierPart(chr)) {
-          result += chr
-        } else {
-          position--
-          return result
-        }
-
-      } else {
-        if (Uni.isIdentifierStart(chr)) {
-          result += chr
-        } else {
-          return undefined
-        }
-      }
-    }
-
-    fail()
-  }
-
-  function parseString(endChar) {
-    // 7.8.4 of ES262 spec
-    var result = ''
-
-    while (position < length) {
-      var chr = input[position++]
-
-      if (chr === endChar) {
-        return result
-
-      } else if (chr === '\\') {
-        if (position >= length) fail()
-        chr = input[position++]
-
-        if (unescapeMap[chr] && (json5 || (chr != 'v' && chr != "'"))) {
-          result += unescapeMap[chr]
-
-        } else if (json5 && isLineTerminator(chr)) {
-          // line continuation
-          newline(chr)
-
-        } else if (chr === 'u' || (chr === 'x' && json5)) {
-          // unicode/character escape sequence
-          var off = chr === 'u' ? 4 : 2
-
-          // validation for \uXXXX
-          for (var i=0; i<off; i++) {
-            if (position >= length) fail()
-            if (!isHexDigit(input[position])) fail('Bad escape sequence')
-            position++
-          }
-
-          result += String.fromCharCode(parseInt(input.substr(position-off, off), 16))
-        } else if (json5 && isOctDigit(chr)) {
-          if (chr < '4' && isOctDigit(input[position]) && isOctDigit(input[position+1])) {
-            // three-digit octal
-            var digits = 3
-          } else if (isOctDigit(input[position])) {
-            // two-digit octal
-            var digits = 2
-          } else {
-            var digits = 1
-          }
-          position += digits - 1
-          result += String.fromCharCode(parseInt(input.substr(position-digits, digits), 8))
-          /*if (!isOctDigit(input[position])) {
-            // \0 is allowed still
-            result += '\0'
-          } else {
-            fail('Octal literals are not supported')
-          }*/
-
-        } else if (json5) {
-          // \X -> x
-          result += chr
-
-        } else {
-          position--
-          fail()
-        }
-
-      } else if (isLineTerminator(chr)) {
-        fail()
-
-      } else {
-        if (!json5 && chr.charCodeAt(0) < 32) {
-          position--
-          fail('Unexpected control character')
-        }
-
-        // SourceCharacter but not one of " or \ or LineTerminator
-        result += chr
-      }
-    }
-
-    fail()
-  }
-
-  skipWhiteSpace()
-  var return_value = parseGeneric()
-  if (return_value !== undefined || position < length) {
-    skipWhiteSpace()
-
-    if (position >= length) {
-      if (typeof(options.reviver) === 'function') {
-        return_value = options.reviver.call(null, '', return_value)
-      }
-      return return_value
-    } else {
-      fail()
-    }
-
-  } else {
-    if (position) {
-      fail('No data, only a whitespace')
-    } else {
-      fail('No data, empty input')
-    }
-  }
-}
-
-/*
- * parse(text, options)
- * or
- * parse(text, reviver)
- *
- * where:
- * text - string
- * options - object
- * reviver - function
- */
-module.exports.parse = function parseJSON(input, options) {
-  // support legacy functions
-  if (typeof(options) === 'function') {
-    options = {
-      reviver: options
-    }
-  }
-
-  if (input === undefined) {
-    // parse(stringify(x)) should be equal x
-    // with JSON functions it is not 'cause of undefined
-    // so we're fixing it
-    return undefined
-  }
-
-  // JSON.parse compat
-  if (typeof(input) !== 'string') input = String(input)
-  if (options == null) options = {}
-  if (options.reserved_keys == null) options.reserved_keys = 'ignore'
-
-  if (options.reserved_keys === 'throw' || options.reserved_keys === 'ignore') {
-    if (options.null_prototype == null) {
-      options.null_prototype = true
-    }
-  }
-
+module.exports = parseJson
+function parseJson (txt, reviver, context) {
+  context = context || 20
   try {
-    return parse(input, options)
-  } catch(err) {
-    // jju is a recursive parser, so JSON.parse("{{{{{{{") could blow up the stack
-    //
-    // this catch is used to skip all those internal calls
-    if (err instanceof SyntaxError && err.row != null && err.column != null) {
-      var old_err = err
-      err = SyntaxError(old_err.message)
-      err.column = old_err.column
-      err.row = old_err.row
+    return JSON.parse(txt, reviver)
+  } catch (e) {
+    if (typeof txt !== 'string') {
+      const isEmptyArray = Array.isArray(txt) && txt.length === 0
+      const errorMessage = 'Cannot parse ' +
+      (isEmptyArray ? 'an empty array' : String(txt))
+      throw new TypeError(errorMessage)
     }
-    throw err
+    const syntaxErr = e.message.match(/^Unexpected token.*position\s+(\d+)/i)
+    const errIdx = syntaxErr
+    ? +syntaxErr[1]
+    : e.message.match(/^Unexpected end of JSON.*/i)
+    ? txt.length - 1
+    : null
+    if (errIdx != null) {
+      const start = errIdx <= context
+      ? 0
+      : errIdx - context
+      const end = errIdx + context >= txt.length
+      ? txt.length
+      : errIdx + context
+      e.message += ` while parsing near '${
+        start === 0 ? '' : '...'
+      }${txt.slice(start, end)}${
+        end === txt.length ? '' : '...'
+      }'`
+    } else {
+      e.message += ` while parsing '${txt.slice(0, context * 2)}'`
+    }
+    throw e
   }
 }
-
-module.exports.tokenize = function tokenizeJSON(input, options) {
-  if (options == null) options = {}
-
-  options._tokenize = function(smth) {
-    if (options._addstack) smth.stack.unshift.apply(smth.stack, options._addstack)
-    tokens.push(smth)
-  }
-
-  var tokens = []
-  tokens.data = module.exports.parse(input, options)
-  return tokens
-}
-
 
 
 /***/ }),
 /* 77 */
 /***/ (function(module, exports) {
 
-
-// This is autogenerated with esprima tools, see:
-// https://github.com/ariya/esprima/blob/master/esprima.js
-//
-// PS: oh God, I hate Unicode
-
-// ECMAScript 5.1/Unicode v6.3.0 NonAsciiIdentifierStart:
-
-var Uni = module.exports
-
-module.exports.isWhiteSpace = function isWhiteSpace(x) {
-  // section 7.2, table 2
-  return x === '\u0020'
-      || x === '\u00A0'
-      || x === '\uFEFF' // <-- this is not a Unicode WS, only a JS one
-      || (x >= '\u0009' && x <= '\u000D') // 9 A B C D
-
-      // + whitespace characters from unicode, category Zs
-      || x === '\u1680'
-      || x === '\u180E'
-      || (x >= '\u2000' && x <= '\u200A') // 0 1 2 3 4 5 6 7 8 9 A
-      || x === '\u2028'
-      || x === '\u2029'
-      || x === '\u202F'
-      || x === '\u205F'
-      || x === '\u3000'
-}
-
-module.exports.isWhiteSpaceJSON = function isWhiteSpaceJSON(x) {
-  return x === '\u0020'
-      || x === '\u0009'
-      || x === '\u000A'
-      || x === '\u000D'
-}
-
-module.exports.isLineTerminator = function isLineTerminator(x) {
-  // ok, here is the part when JSON is wrong
-  // section 7.3, table 3
-  return x === '\u000A'
-      || x === '\u000D'
-      || x === '\u2028'
-      || x === '\u2029'
-}
-
-module.exports.isLineTerminatorJSON = function isLineTerminatorJSON(x) {
-  return x === '\u000A'
-      || x === '\u000D'
-}
-
-module.exports.isIdentifierStart = function isIdentifierStart(x) {
-  return x === '$'
-      || x === '_'
-      || (x >= 'A' && x <= 'Z')
-      || (x >= 'a' && x <= 'z')
-      || (x >= '\u0080' && Uni.NonAsciiIdentifierStart.test(x))
-}
-
-module.exports.isIdentifierPart = function isIdentifierPart(x) {
-  return x === '$'
-      || x === '_'
-      || (x >= 'A' && x <= 'Z')
-      || (x >= 'a' && x <= 'z')
-      || (x >= '0' && x <= '9') // <-- addition to Start
-      || (x >= '\u0080' && Uni.NonAsciiIdentifierPart.test(x))
-}
-
-module.exports.NonAsciiIdentifierStart = /[\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376\u0377\u037A-\u037D\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0620-\u064A\u066E\u066F\u0671-\u06D3\u06D5\u06E5\u06E6\u06EE\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u08A0\u08A2-\u08AC\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097F\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC\u09DD\u09DF-\u09E1\u09F0\u09F1\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0\u0AE1\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B35-\u0B39\u0B3D\u0B5C\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C33\u0C35-\u0C39\u0C3D\u0C58\u0C59\u0C60\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0\u0CE1\u0CF1\u0CF2\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D60\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32\u0E33\u0E40-\u0E46\u0E81\u0E82\u0E84\u0E87\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA\u0EAB\u0EAD-\u0EB0\u0EB2\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F4\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16EE-\u16F0\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191C\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19C1-\u19C7\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF1\u1CF5\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2160-\u2188\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FCC\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A\uA62B\uA640-\uA66E\uA67F-\uA697\uA6A0-\uA6EF\uA717-\uA71F\uA722-\uA788\uA78B-\uA78E\uA790-\uA793\uA7A0-\uA7AA\uA7F8-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA80-\uAAAF\uAAB1\uAAB5\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uABC0-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]/
-
-// ECMAScript 5.1/Unicode v6.3.0 NonAsciiIdentifierPart:
-
-module.exports.NonAsciiIdentifierPart = /[\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0300-\u0374\u0376\u0377\u037A-\u037D\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u0483-\u0487\u048A-\u0527\u0531-\u0556\u0559\u0561-\u0587\u0591-\u05BD\u05BF\u05C1\u05C2\u05C4\u05C5\u05C7\u05D0-\u05EA\u05F0-\u05F2\u0610-\u061A\u0620-\u0669\u066E-\u06D3\u06D5-\u06DC\u06DF-\u06E8\u06EA-\u06FC\u06FF\u0710-\u074A\u074D-\u07B1\u07C0-\u07F5\u07FA\u0800-\u082D\u0840-\u085B\u08A0\u08A2-\u08AC\u08E4-\u08FE\u0900-\u0963\u0966-\u096F\u0971-\u0977\u0979-\u097F\u0981-\u0983\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BC-\u09C4\u09C7\u09C8\u09CB-\u09CE\u09D7\u09DC\u09DD\u09DF-\u09E3\u09E6-\u09F1\u0A01-\u0A03\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A3C\u0A3E-\u0A42\u0A47\u0A48\u0A4B-\u0A4D\u0A51\u0A59-\u0A5C\u0A5E\u0A66-\u0A75\u0A81-\u0A83\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABC-\u0AC5\u0AC7-\u0AC9\u0ACB-\u0ACD\u0AD0\u0AE0-\u0AE3\u0AE6-\u0AEF\u0B01-\u0B03\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B35-\u0B39\u0B3C-\u0B44\u0B47\u0B48\u0B4B-\u0B4D\u0B56\u0B57\u0B5C\u0B5D\u0B5F-\u0B63\u0B66-\u0B6F\u0B71\u0B82\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BBE-\u0BC2\u0BC6-\u0BC8\u0BCA-\u0BCD\u0BD0\u0BD7\u0BE6-\u0BEF\u0C01-\u0C03\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C33\u0C35-\u0C39\u0C3D-\u0C44\u0C46-\u0C48\u0C4A-\u0C4D\u0C55\u0C56\u0C58\u0C59\u0C60-\u0C63\u0C66-\u0C6F\u0C82\u0C83\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBC-\u0CC4\u0CC6-\u0CC8\u0CCA-\u0CCD\u0CD5\u0CD6\u0CDE\u0CE0-\u0CE3\u0CE6-\u0CEF\u0CF1\u0CF2\u0D02\u0D03\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D-\u0D44\u0D46-\u0D48\u0D4A-\u0D4E\u0D57\u0D60-\u0D63\u0D66-\u0D6F\u0D7A-\u0D7F\u0D82\u0D83\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0DCA\u0DCF-\u0DD4\u0DD6\u0DD8-\u0DDF\u0DF2\u0DF3\u0E01-\u0E3A\u0E40-\u0E4E\u0E50-\u0E59\u0E81\u0E82\u0E84\u0E87\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA\u0EAB\u0EAD-\u0EB9\u0EBB-\u0EBD\u0EC0-\u0EC4\u0EC6\u0EC8-\u0ECD\u0ED0-\u0ED9\u0EDC-\u0EDF\u0F00\u0F18\u0F19\u0F20-\u0F29\u0F35\u0F37\u0F39\u0F3E-\u0F47\u0F49-\u0F6C\u0F71-\u0F84\u0F86-\u0F97\u0F99-\u0FBC\u0FC6\u1000-\u1049\u1050-\u109D\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u135D-\u135F\u1380-\u138F\u13A0-\u13F4\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16EE-\u16F0\u1700-\u170C\u170E-\u1714\u1720-\u1734\u1740-\u1753\u1760-\u176C\u176E-\u1770\u1772\u1773\u1780-\u17D3\u17D7\u17DC\u17DD\u17E0-\u17E9\u180B-\u180D\u1810-\u1819\u1820-\u1877\u1880-\u18AA\u18B0-\u18F5\u1900-\u191C\u1920-\u192B\u1930-\u193B\u1946-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u19D0-\u19D9\u1A00-\u1A1B\u1A20-\u1A5E\u1A60-\u1A7C\u1A7F-\u1A89\u1A90-\u1A99\u1AA7\u1B00-\u1B4B\u1B50-\u1B59\u1B6B-\u1B73\u1B80-\u1BF3\u1C00-\u1C37\u1C40-\u1C49\u1C4D-\u1C7D\u1CD0-\u1CD2\u1CD4-\u1CF6\u1D00-\u1DE6\u1DFC-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u200C\u200D\u203F\u2040\u2054\u2071\u207F\u2090-\u209C\u20D0-\u20DC\u20E1\u20E5-\u20F0\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2160-\u2188\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D7F-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2DE0-\u2DFF\u2E2F\u3005-\u3007\u3021-\u302F\u3031-\u3035\u3038-\u303C\u3041-\u3096\u3099\u309A\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FCC\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA62B\uA640-\uA66F\uA674-\uA67D\uA67F-\uA697\uA69F-\uA6F1\uA717-\uA71F\uA722-\uA788\uA78B-\uA78E\uA790-\uA793\uA7A0-\uA7AA\uA7F8-\uA827\uA840-\uA873\uA880-\uA8C4\uA8D0-\uA8D9\uA8E0-\uA8F7\uA8FB\uA900-\uA92D\uA930-\uA953\uA960-\uA97C\uA980-\uA9C0\uA9CF-\uA9D9\uAA00-\uAA36\uAA40-\uAA4D\uAA50-\uAA59\uAA60-\uAA76\uAA7A\uAA7B\uAA80-\uAAC2\uAADB-\uAADD\uAAE0-\uAAEF\uAAF2-\uAAF6\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uABC0-\uABEA\uABEC\uABED\uABF0-\uABF9\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE00-\uFE0F\uFE20-\uFE26\uFE33\uFE34\uFE4D-\uFE4F\uFE70-\uFE74\uFE76-\uFEFC\uFF10-\uFF19\uFF21-\uFF3A\uFF3F\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]/
-
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(0, 100, -20, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
 
 /***/ }),
 /* 78 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(0, 100, -20, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Time;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n        vec4 diffuseColor = u_Color;\n        float specularIntensity;        \n        float ambientTerm = 0.4;\n\n        float angle = dot(fs_LightVec, fs_Nor);\n        if(angle < 0.5f) {\n            specularIntensity = .1f;\n            ambientTerm = 0.25;\n        } else {\n            vec4 norm = normalize(fs_Nor);\n            vec4 fs_Light = normalize(fs_LightVec);\n            float intensity = pow(dot(fs_Light, norm), 5.f);\n            specularIntensity = max(intensity, 0.f);\n            ambientTerm = 0.4;\n        }\n        \n        // diffuse term for Lambert \n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n\n        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = vec3(0.5, 0.5, 0.7) + specularIntensity * 6.;\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color * lightIntensity, 1.);\n}\n"
 
 /***/ }),
 /* 79 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Time;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n        vec4 diffuseColor = u_Color;\n        float specularIntensity;        \n        float ambientTerm = 0.4;\n\n        float angle = dot(fs_LightVec, fs_Nor);\n        if(angle < 0.5f) {\n            specularIntensity = .1f;\n            ambientTerm = 0.25;\n        } else {\n            vec4 norm = normalize(fs_Nor);\n            vec4 fs_Light = normalize(fs_LightVec);\n            float intensity = pow(dot(fs_Light, norm), 5.f);\n            specularIntensity = max(intensity, 0.f);\n            ambientTerm = 0.4;\n        }\n        \n        // diffuse term for Lambert \n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n\n        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = vec3(0.5, 0.5, 0.7) + specularIntensity * 6.;\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color * lightIntensity, 1.);\n}\n"
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Time; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Pos;\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n    \n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n    fs_Pos = gl_Position;\n}   \n"
 
 /***/ }),
 /* 80 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Time; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Pos;\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n    \n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n    fs_Pos = gl_Position;\n}   \n"
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Pressed;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        float in3 = 0.5;\n\n        if(u_Pressed == 0.) {\n            in3 = 0.5;\n        } else {\n            in3 = 1.0;\n        }\n        out_Col = vec4(color2 * lightIntensity, in3);\n}\n\n"
 
 /***/ }),
 /* 81 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Pressed;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        float in3 = 0.5;\n\n        if(u_Pressed == 0.) {\n            in3 = 0.5;\n        } else {\n            in3 = 1.0;\n        }\n        out_Col = vec4(color2 * lightIntensity, in3);\n}\n\n"
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Time; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 10, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n    vec4 vs_Pos2 = vec4(vs_Pos.x, vs_Pos.y, vs_Pos.z + u_Time, vs_Pos.w);\n\n    vec4 modelposition = u_Model * vs_Pos2;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
 
 /***/ }),
 /* 82 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Time; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(10, 10, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n    vec4 vs_Pos2 = vec4(vs_Pos.x, vs_Pos.y, vs_Pos.z, vs_Pos.w);\n\n    vec4 modelposition = u_Model * vs_Pos2;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color2 * lightIntensity, diffuseColor.a);\n}\n\n"
 
 /***/ }),
 /* 83 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color2 * lightIntensity, diffuseColor.a);\n}\n\n"
-
-/***/ }),
-/* 84 */
-/***/ (function(module, exports) {
-
 module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Pos;\nconst vec4 lightPos = vec4(10, 100, 0, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n    fs_Pos = vs_Pos;\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
 
 /***/ }),
-/* 85 */
+/* 84 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color2 * lightIntensity, (1. / (-fs_Pos.z)));\n}\n\n"

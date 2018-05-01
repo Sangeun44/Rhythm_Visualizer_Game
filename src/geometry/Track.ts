@@ -50,13 +50,14 @@ translateVertices(pos : vec3) {
       var yCom = this.pos[i+1];
       var zCom = this.pos[i+2];
       
-      var vert = vec3.fromValues(xCom + pos[0], yCom + pos[1], zCom+ pos[2]);
+      var vert = vec3.fromValues(xCom + pos[0], yCom + pos[1], zCom + pos[2]);
 
       this.pos[i] = vert[0];
       this.pos[i+1] = vert[1];
       this.pos[i+2] = vert[2];
       this.pos[i+3] = 1;
   }
+  console.log("translated vertices");
 }
 
   addMesh(mesh: Mesh) {
