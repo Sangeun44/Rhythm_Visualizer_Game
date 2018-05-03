@@ -38,6 +38,7 @@ let jsonFile: string; //jsonFile name
 
 //list of buttons to create
 let buttons = Array<Button>();
+let buttonNum = 0;
 
 let points = 0;
 let health = 100;
@@ -67,36 +68,39 @@ let count: number = 0.0;
 let marioString: string; //objString name
 let mario: Mesh;
 
-let buttonAstr: string;
+let buttonStr: string;
+let buttonTipStr: string;
+
 let buttonA: Mesh;
+let buttonATip: Mesh;
 let downA: boolean;
 
-let buttonFstr: string;
 let buttonF: Mesh;
+let buttonFTip: Mesh;
 let downF: boolean;
 
-let buttonSstr: string;
 let buttonS: Mesh;
+let buttonSTip: Mesh;
 let downS: boolean;
 
-let buttonDstr: string;
 let buttonD: Mesh;
+let buttonDTip: Mesh;
 let downD: boolean;
 
-let buttonJstr: string;
 let buttonJ: Mesh;
+let buttonJTip: Mesh;
 let downJ: boolean;
 
-let buttonKstr: string;
 let buttonK: Mesh;
+let buttonKTip: Mesh;
 let downK: boolean;
 
-let buttonLstr: string;
 let buttonL: Mesh;
+let buttonLTip: Mesh;
 let downL: boolean;
 
-let buttonPstr: string;
 let buttonP: Mesh;
+let buttonPTip: Mesh;
 let downP: boolean;
 
 //music 
@@ -130,6 +134,7 @@ function play_music() {
 }
 
 function loadScene() {
+  console.log("load scene");
   //Mario 
   marioString = readTextFile('./src/resources/obj/wahoo.obj');
   mario = new Mesh(marioString, vec3.fromValues(0, 0, 0));
@@ -141,79 +146,144 @@ function loadScene() {
 }
 
 function loadButtonsEasy() {
-  buttonSstr = readTextFile('./src/resources/obj/button.obj');
-  buttonS = new Mesh(buttonSstr, vec3.fromValues(0, 0, 0));
+  console.log("load buttons easy");
+  buttonStr = readTextFile('./src/resources/obj/button.obj');
+  buttonTipStr = readTextFile('./src/resources/obj/tip.obj');
+
+  //S
+  buttonS = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonS.translateVertices(vec3.fromValues(-7, 0, 0));
   buttonS.create();
 
-  buttonDstr = readTextFile('./src/resources/obj/button.obj');
-  buttonD = new Mesh(buttonDstr, vec3.fromValues(0, 0, 0));
+  buttonSTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonSTip.translateVertices(vec3.fromValues(-7, 1, 0));
+  buttonSTip.create();
+
+  //D
+  buttonD = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonD.translateVertices(vec3.fromValues(-4.5, 0, 0));
   buttonD.create();
 
-  buttonFstr = readTextFile('./src/resources/obj/button.obj');
-  buttonF = new Mesh(buttonFstr, vec3.fromValues(0, 0, 0));
+  buttonDTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonDTip.translateVertices(vec3.fromValues(-4.5, 1, 0));
+  buttonDTip.create();
+
+  //F
+  buttonF = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonF.translateVertices(vec3.fromValues(-2, 0, 0));
   buttonF.create();
 
-  buttonJstr = readTextFile('./src/resources/obj/button.obj');
-  buttonJ = new Mesh(buttonJstr, vec3.fromValues(0, 0, 0));
+  buttonFTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonFTip.translateVertices(vec3.fromValues(-2, 1, 0));
+  buttonFTip.create();
+
+  //J
+  buttonJ = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonJ.translateVertices(vec3.fromValues(2, 0, 0));
   buttonJ.create();
 
-  buttonKstr = readTextFile('./src/resources/obj/button.obj');
-  buttonK = new Mesh(buttonKstr, vec3.fromValues(0, 0, 0));
+  buttonJTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonJTip.translateVertices(vec3.fromValues(2, 1, 0));
+  buttonJTip.create();
+
+  //K
+  buttonK = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonK.translateVertices(vec3.fromValues(4.5, 0, 0));
   buttonK.create();
 
-  buttonLstr = readTextFile('./src/resources/obj/button.obj');
-  buttonL = new Mesh(buttonLstr, vec3.fromValues(0, 0, 0));
+  buttonKTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonKTip.translateVertices(vec3.fromValues(4.5, 1, 0));
+  buttonKTip.create();
+
+  //L
+  buttonL = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonL.translateVertices(vec3.fromValues(7, 0, 0));
   buttonL.create();
+
+  buttonLTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonLTip.translateVertices(vec3.fromValues(7, 1, 0));
+  buttonLTip.create();
 
   keyBoard.push(buttonS, buttonD, buttonF, buttonJ, buttonK, buttonL);
 }
 
 function loadButtonsHard() {
-  buttonAstr = readTextFile('./src/resources/obj/button.obj');
-  buttonA = new Mesh(buttonAstr, vec3.fromValues(0, 0, 0));
+  console.log("load buttons hard");
+
+  buttonStr = readTextFile('./src/resources/obj/button.obj');
+  buttonTipStr = readTextFile('./src/resources/obj/tip.obj');
+  
+  //A
+  buttonA = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonA.translateVertices(vec3.fromValues(-9.5, 0, 0));
   buttonA.create();
 
-  buttonSstr = readTextFile('./src/resources/obj/button.obj');
-  buttonS = new Mesh(buttonSstr, vec3.fromValues(0, 0, 0));
+  buttonATip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonATip.translateVertices(vec3.fromValues(-9.5, 1, 0));
+  buttonATip.create();
+
+  //S
+  buttonS = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonS.translateVertices(vec3.fromValues(-7, 0, 0));
   buttonS.create();
 
-  buttonDstr = readTextFile('./src/resources/obj/button.obj');
-  buttonD = new Mesh(buttonDstr, vec3.fromValues(0, 0, 0));
+  buttonSTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonSTip.translateVertices(vec3.fromValues(-7, 1, 0));
+  buttonSTip.create();
+
+  //D
+  buttonD = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonD.translateVertices(vec3.fromValues(-4.5, 0, 0));
   buttonD.create();
 
-  buttonFstr = readTextFile('./src/resources/obj/button.obj');
-  buttonF = new Mesh(buttonFstr, vec3.fromValues(0, 0, 0));
+  buttonDTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonDTip.translateVertices(vec3.fromValues(-4.5, 1, 0));
+  buttonDTip.create();
+
+  //F
+  buttonF = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonF.translateVertices(vec3.fromValues(-2, 0, 0));
   buttonF.create();
 
-  buttonJstr = readTextFile('./src/resources/obj/button.obj');
-  buttonJ = new Mesh(buttonJstr, vec3.fromValues(0, 0, 0));
+  buttonFTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonFTip.translateVertices(vec3.fromValues(-2, 1, 0));
+  buttonFTip.create();
+
+  //J
+  buttonJ = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonJ.translateVertices(vec3.fromValues(2, 0, 0));
   buttonJ.create();
 
-  buttonKstr = readTextFile('./src/resources/obj/button.obj');
-  buttonK = new Mesh(buttonKstr, vec3.fromValues(0, 0, 0));
+  buttonJTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonJTip.translateVertices(vec3.fromValues(2, 1, 0));
+  buttonJTip.create();
+
+  //K
+  buttonK = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonK.translateVertices(vec3.fromValues(4.5, 0, 0));
   buttonK.create();
 
-  buttonLstr = readTextFile('./src/resources/obj/button.obj');
-  buttonL = new Mesh(buttonLstr, vec3.fromValues(0, 0, 0));
+  buttonKTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonKTip.translateVertices(vec3.fromValues(4.5, 1, 0));
+  buttonKTip.create();
+
+  //L
+  buttonL = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonL.translateVertices(vec3.fromValues(7, 0, 0));
   buttonL.create();
 
-  buttonPstr = readTextFile('./src/resources/obj/button.obj');
-  buttonP = new Mesh(buttonPstr, vec3.fromValues(0, 0, 0));
+  buttonLTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonLTip.translateVertices(vec3.fromValues(7, 1, 0));
+  buttonLTip.create();
+
+  //;
+  buttonP = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonP.translateVertices(vec3.fromValues(9.5, 0, 0));
   buttonP.create();
+
+  buttonPTip = new Mesh(buttonTipStr, vec3.fromValues(0, 0, 0));
+  buttonPTip.translateVertices(vec3.fromValues(9.5, 1, 0));
+  buttonPTip.create();
 
   keyBoard.push(buttonA, buttonS, buttonD, buttonF, buttonJ, buttonK, buttonL, buttonP);
 }
@@ -221,21 +291,26 @@ function loadButtonsHard() {
 //read the JSON file determined by the user
 //currntly doing a test midi json
 async function parseJSON() {
+  console.log("parse the json file");
+
   var musicStr = controls.Song;
   if (musicStr == 'Connect-Goofy') {
     musicStr = "Connect";
   }
   const musicPath = './src/resources/music/json/' + musicStr + '.json';
+  const jsonFileStr = readTextFile(musicPath);
+  const jsonFile = JSON.parse(jsonFileStr);
+  parseAfterReading(jsonFile);
+  // try {
+  //   const fetchResult = fetch(musicPath);
+  //   const response = await fetchResult;
+  //   const jsonData = await response.json();
+  //   parseAfterReading(jsonData);
+  // } catch (e) {
+  //   throw Error(e);
+  // }
 
-  try {
-    const fetchResult = fetch(musicPath);
-    const response = await fetchResult;
-    const jsonData = await response.json();
-    parseAfterReading(jsonData);
-  } catch (e) {
-    throw Error(e);
-  }
-
+  loadTrack();
   // fetch(musicPath)
   // .then(response => response.json())
   // .then(jsonResponse => parseAfterReading(jsonResponse));
@@ -243,8 +318,10 @@ async function parseJSON() {
 
 function parseAfterReading(json: JSON) {
   if (controls.Difficulty == 'easy') {
+    console.log("parse the easy json")
     parseTracksEasy(json);
   } else if (controls.Difficulty == 'hard') {
+    console.log("parse the hard json")
     parseTracksHard(json);
   }
 
@@ -253,24 +330,23 @@ function parseAfterReading(json: JSON) {
   buttons.sort(function (a: any, b: any) {
     return a.getTime() - b.getTime();
   });
+  console.log("sorted the buttons");
 
-  //create track mesh
-  loadTrack();
-  console.log("load track create");
 }
 
 //easy version
 function parseTracksEasy(json: JSON) {
+  console.log("parse easy into track");
   //tracks are in an array
   var json2 = JSON.parse(JSON.stringify(json));
   var length = parseInt(JSON.stringify(json2.tracks.length));
-  console.log("length: " + length);
+  // console.log("length: " + length);
   for (let i = 0; i < length; i++) {
     //track's notes are in an array
     var oneTrack = json2.tracks[i];
     let notes = oneTrack["notes"];
     var noteLength = parseInt(JSON.stringify(notes.length));
-    console.log("LENGTH OF NOTES: " + noteLength);
+    // console.log("LENGTH OF NOTES: " + noteLength);
     //if the track has notes to be played
     if (noteLength > 0) {
       var currTime = 0;
@@ -279,10 +355,9 @@ function parseTracksEasy(json: JSON) {
         var time = parseFloat(JSON.stringify(note.time));
         var deltaTime = time - currTime;
         currTime = time;
-
-        // console.log("time " + time);
-        // console.log("dtime " + deltaTime);
-        // console.log("midi " + number);
+        console.log("time " + time);
+        console.log("dtime " + deltaTime);
+        console.log("midi " + number);
 
         //connect - 0.35
         //run - 0.25
@@ -311,16 +386,16 @@ function parseTracksEasy(json: JSON) {
 
 //hard version
 function parseTracksHard(json: JSON) {
+  console.log("parse hard into track");
   //tracks are in an array
   var json2 = JSON.parse(JSON.stringify(json));
   var length = parseInt(JSON.stringify(json2.tracks.length));
-  console.log("length: " + length);
   for (let i = 0; i < length; i++) {
     //track's notes are in an array
     var oneTrack = json2.tracks[i];
     let notes = oneTrack["notes"];
     var noteLength = parseInt(JSON.stringify(notes.length));
-    console.log("LENGTH OF NOTES: " + noteLength);
+    //console.log("LENGTH OF NOTES: " + noteLength);
     //if the track has notes to be played
     if (noteLength > 0) {
       var currTime = 0;
@@ -364,14 +439,16 @@ function parseTracksHard(json: JSON) {
       }
     }
   }
+  // loadTrackEasy();
 }
 
 function loadTrack() {
+  console.log("load track");
   //track 
   track = new Track(vec3.fromValues(0, 0, 0));
   if (controls.Difficulty == "easy") {
-    loadTrackEasy();
     //loadInitialPositionsEasy();
+    loadTrackEasy();
     //loadOnly10Easy();
   } else if (controls.Difficulty == "hard") {
     loadTrackHard();
@@ -383,13 +460,19 @@ function loadTrack() {
 }
 
 function loadTrackEasy() {
+  console.log("load easy track");
   //console.log("buttons: " + buttons.length);
   //since you have a list of buttons, lets create them all at once
   //the user will travel forward on the line
+  console.log("j" + buttons.length);
+  var c = 0;
   for (let one of buttons) {
+    c++;
     var letter = one.getLetter();
+    console.log("letter " + letter);
     var time = one.getTime();
-    var spacing = -2;
+    console.log("time " + time);
+    var spacing = -5;
     // console.log("parse letters to make into:" + letter);
 
     let buttonStr = readTextFile('./src/resources/obj/button.obj');
@@ -397,7 +480,7 @@ function loadTrackEasy() {
 
     var pos = vec3.fromValues(0, 0, 0);
 
-    console.log("button: " + letter);
+    console.log(c + " button: " + letter);
 
     if (letter == 'S') {
       pos = vec3.fromValues(-7, 0, time * spacing);
@@ -415,19 +498,20 @@ function loadTrackEasy() {
 
     button.translateVertices(pos); //translate button mesh
     one.setPosition(pos); //translate the button object
-
+    buttonNum++;
     track.addMesh(button); //add the mesh button to the track
   }
 }
 
 function loadTrackHard() {
+  console.log("load hard track");
   // console.log("buttons: " + buttons.length);
   //since you have a list of buttons, lets create them all at once
   //the user will travel forward on the line
   for (let one of buttons) {
     var letter = one.getLetter();
     var time = one.getTime();
-    var spacing = -2;
+    var spacing = -5;
 
     let buttonStr = readTextFile('./src/resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
@@ -456,7 +540,7 @@ function loadTrackHard() {
 
     button.translateVertices(pos);
     one.setPosition(pos);
-
+    buttonNum++;
     track.addMesh(button);
   }
 }
@@ -589,7 +673,7 @@ function main() {
   // Add controls to the gui
   const gui = new DAT.GUI();
   gui.add(controls, 'Difficulty', ['easy', 'hard']);
-  gui.add(controls, 'Song', ['Run', 'Connect', 'Connect-Goofy', 'Cheerup', 'Megalovania']);
+  gui.add(controls, 'Song', ['Last Surprise','Run', 'Running in the 90s', 'Resonance','Heartache','Again', 'Cheerup', 'Megalovania']);
   gui.add(controls, 'Load Scene');
 
   // get canvas and webgl context
@@ -617,6 +701,12 @@ function main() {
   const lambert = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
+  ]);
+  
+  //
+  const tip_lambert = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/tip-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/tip-frag.glsl')),
   ]);
 
   //key buttons
@@ -656,7 +746,7 @@ function main() {
       loaded = true;
     } else if (!startGame && controls.Difficulty == "hard") {
       //load 
-      // console.log("load hard mesh buttons");
+      //console.log("load hard mesh buttons");
       loadButtonsHard();
       loaded = true;
     }
@@ -687,6 +777,10 @@ function main() {
     base_color = vec4.fromValues(255 / 255, 160 / 255, 200 / 255, 1);
     button_lambert.setGeometryColor(base_color);
 
+    //tips
+    base_color = vec4.fromValues(255 / 255, 160 / 255, 200 / 255, 1);
+    tip_lambert.setGeometryColor(base_color);
+
     //user has not started game
     if (!startGame && controls.Difficulty == "easy") {
       button_lambert.setGeometryColor(base_color);
@@ -697,7 +791,9 @@ function main() {
     }
 
     //user starts game
-    if (startGame && buttons.length > 100) {
+    console.log(buttonNum);
+    if (startGame) {
+    //if (startGame && buttons.length > 50) {
       //render track
       base_color = vec4.fromValues(65 / 255, 105 / 255, 225 / 255, 1);
       track_lambert.setGeometryColor(base_color);
@@ -705,7 +801,7 @@ function main() {
 
       //calculate the buttons positions as the track moves across
       //with time since start
-      var rate = 2.0;
+      var rate = 5.0;
       var time = timeSinceStartSec;
       var distance = time * rate;
 
@@ -718,10 +814,11 @@ function main() {
       //update the position of all buttons
       // for (let button of buttons) {
       //   var originalPos = button.getPosition();
-      //   var newPos = vec3.fromValues(originalPos[0], originalPos[1], originalPos[2] + distance2);
+      //   var newPos = vec3.fromValues(originalPos[0], originalPos[1], originalPos[2] + distance);
       //   button.setPosition(newPos);
       //   //console.log("new Positions: " + newPos);
       // }
+      
       track_lambert.setTime(distance);
       //translate the track
       //track.translateVertices(vec3.fromValues(0, 0, 1));
@@ -750,15 +847,22 @@ function main() {
             // console.log("a button passed z: " + position + " " + letter);
             var letter = curr.getLetter(); 
             //console.log("letter that passed: " + letter + " pos: " + position + " time: " + time);
+            base_color = vec4.fromValues(260 / 255, 260 / 255, 260 / 255, 1);
             if (letter == 'A') {
               if (downA) {
                 points++;
+                tip_lambert.setGeometryColor(base_color);
+                renderer.render(camera, tip_lambert, [buttonATip]);
+                renderer.render(camera, tip_lambert,[buttonA]);
               } else {
                 health--;
               }
             }
             if (letter == 'S') {
               if (downS) {
+                tip_lambert.setGeometryColor(base_color);
+                renderer.render(camera, tip_lambert, [buttonSTip]);
+                renderer.render(camera, tip_lambert,[buttonS]);
                 points++;
               } else {
                 health--;
@@ -766,6 +870,9 @@ function main() {
             }
             if (letter == 'D') {
               if (downD) {
+                tip_lambert.setGeometryColor(base_color);
+                renderer.render(camera, tip_lambert, [buttonDTip]);
+                renderer.render(camera, tip_lambert,[buttonD]);
                 points++;
               } else {
                 health--;
@@ -773,6 +880,9 @@ function main() {
             }
             if (letter == 'F') {
               if (downF) {
+                tip_lambert.setGeometryColor(base_color);
+                renderer.render(camera, tip_lambert, [buttonFTip]);
+                renderer.render(camera, tip_lambert,[buttonF]);
                 points++;
               } else {
                 health--;
@@ -780,6 +890,7 @@ function main() {
             }
             if (letter == 'J') {
               if (downJ) {
+                renderer.render(camera, tip_lambert, [buttonJTip]);
                 points++;
               } else {
                 health--;
@@ -787,6 +898,7 @@ function main() {
             }
             if (letter == 'K') {
               if (downK) {
+                renderer.render(camera, tip_lambert, [buttonKTip]);
                 points++;
               } else {
                 health--;
@@ -794,6 +906,7 @@ function main() {
             }
             if (letter == 'L') {
               if (downL) {
+                renderer.render(camera, tip_lambert, [buttonLTip]);
                 points++;
               } else {
                 health--;
@@ -817,6 +930,8 @@ function main() {
               JukeBox.close();
             }
             buttons.shift();
+            var b = new Button("fake", 0);
+            buttons.push(b);
           }
       //  }
       }
@@ -939,7 +1054,6 @@ function main() {
     tickFrame = endTick - startTick;
     // Tell the browser to call `tick` again whenever it renders a new frame
     requestAnimationFrame(tick);
-
   }
 
   window.addEventListener('resize', function () {
@@ -1040,12 +1154,12 @@ function keyPressed(event: KeyboardEvent) {
       break;
     case 86:
       if (play == 0) {
-        window.setTimeout(parseJSON(), 100000);
-        //parseJSON();
-        //start music
-        window.setTimeout(play_music(), 5000);
-        //parse JSON file
-
+        //window.setTimeout(parseJSON(), 100000);
+        parseJSON();
+       // play_music();
+        //loadTrack();
+        window.setTimeout(play_music(), 100000);
+        // window.setTimeout(loadTrack(), 10000);
         if (controls.Difficulty == "easy") {
           epsilon = .2;
         }
@@ -1053,8 +1167,8 @@ function keyPressed(event: KeyboardEvent) {
           epsilon = .2;
         }
   
-        checkLine1 = 0 - epsilon;
-        checkLine2 = 0 + epsilon;
+        // checkLine1 = 0 - epsilon;
+        // checkLine2 = 0 + epsilon;
         
         var d = Date.now();
         startTime = d;
