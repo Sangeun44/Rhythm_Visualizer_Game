@@ -30,6 +30,7 @@
     "midi-player-js": "^2.0.3",
     "midifile": "^1.0.4",
     "midiplayer": "^1.0.0",
+    "p5": "^0.6.1",
     "parse-json": "^4.0.0",
     "quaternion": "^2.0.0",
     "read-file": "^0.2.0",

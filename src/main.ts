@@ -17,7 +17,6 @@ import Camera from './Camera';
 import ShaderProgram, { Shader } from './rendering/gl/ShaderProgram';
 
 import Button from './Button';
-
 import { analyze } from 'web-audio-beat-detector';
 
 // analyze(framework.audioSourceBuffer.buffer).then((bpm) => {
@@ -30,8 +29,8 @@ import { analyze } from 'web-audio-beat-detector';
 // });
 
 //global dead line
-let checkLine1 : number;
-let checkLine2 : number;
+let checkLine1: number;
+let checkLine2: number;
 
 const parseJson = require('parse-json');
 let jsonFile: string; //jsonFile name
@@ -55,6 +54,8 @@ let gameDiff: string;
 let startGame = false;
 let loaded = false;
 let parse = false;
+let bpm = 0;
+let tempo = 0;
 
 let play = 0;
 //shapes
@@ -67,6 +68,14 @@ let count: number = 0.0;
 //objects
 let marioString: string; //objString name
 let mario: Mesh;
+
+let longboi1: Mesh;
+let longboi2: Mesh;
+let longboi3: Mesh;
+let longboi4: Mesh;
+let longboi5: Mesh;
+let longboi6: Mesh;
+let longboi7: Mesh;
 
 let buttonStr: string;
 let buttonTipStr: string;
@@ -105,20 +114,28 @@ let downP: boolean;
 
 //music 
 var JukeBox: AudioContext;
+var source, sourceJS;
+var analyser: AnalyserNode;
+var bufferLength: number;
+var buffer;
+var array: Uint8Array;
+var heightsArray: Uint8Array;
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
   Difficulty: "easy",
-  Song: "Run",
+  Song: "Shooting Stars",
   'Load Scene': loadScene // A function pointer, essentially
 };
 
 function play_music() {
   JukeBox = new AudioContext();
+
   var musicStr = controls.Song;
   var musicPath = './src/resources/music/mp3/' + musicStr + '.mp3';
 
+  var mu = 0;
   fetch(musicPath)
     .then(r => r.arrayBuffer())
     .then(b => JukeBox.decodeAudioData(b))
@@ -128,11 +145,79 @@ function play_music() {
       audio_buf.loop = false;
       audio_buf.connect(JukeBox.destination);
       audio_buf.start(0);
+      mu++;
     });
-
+    console.log(mu);
   console.log(`Music On!` + musicStr);
+
+  fetch(musicPath)
+    .then(r => r.arrayBuffer())
+    .then(b => JukeBox.decodeAudioData(b))
+    .then(data => {
+      //audio context
+      sourceJS = JukeBox.createScriptProcessor(2048, 1, 1);
+      sourceJS.connect(JukeBox.destination);
+      
+      analyser = JukeBox.createAnalyser();
+      analyser.smoothingTimeConstant = 0.5;
+      analyser.fftSize = 256;
+
+      source = JukeBox.createBufferSource();
+      source.buffer = data;
+
+      source.connect(analyser);
+      analyser.connect(sourceJS);
+      analyser.connect(JukeBox.destination);
+      source.connect(JukeBox.destination);
+
+      array = new Uint8Array(analyser.frequencyBinCount);
+      bufferLength = analyser.frequencyBinCount;
+      var dataArray = new Uint8Array(bufferLength);
+
+      analyser.getByteFrequencyData(array);
+      //source.start(0);
+      
+      var canvas = document.getElementById("canvas");
+      function render() {
+        requestAnimationFrame(render);
+        analyser.getByteFrequencyData(dataArray);
+        heightsArray = dataArray;
+        console.log("length: " + heightsArray.length);
+      }
+    });
 }
 
+function loadVisuals() {
+  console.log("load visualization");
+  var longboiStr = readTextFile('./src/resources/obj/longboi.obj');
+  longboi1 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
+  longboi1.translateVertices(vec3.fromValues(0, -5, -25));
+  longboi1.create();
+
+  longboi4 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
+  longboi4.translateVertices(vec3.fromValues(-10, -5, -25));
+  longboi4.create();
+
+  longboi6 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
+  longboi6.translateVertices(vec3.fromValues(-5, -5, -25));
+  longboi6.create();
+
+  longboi2 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
+  longboi2.translateVertices(vec3.fromValues(15, -5, -25));
+  longboi2.create();
+
+  longboi5 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
+  longboi5.translateVertices(vec3.fromValues(10, -5, -25));
+  longboi5.create();
+
+  longboi7 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
+  longboi7.translateVertices(vec3.fromValues(5, -5, -25));
+  longboi7.create();
+
+  longboi3 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
+  longboi3.translateVertices(vec3.fromValues(-15, -5, -25));
+  longboi3.create();
+}
 function loadScene() {
   console.log("load scene");
   //Mario 
@@ -212,7 +297,7 @@ function loadButtonsHard() {
 
   buttonStr = readTextFile('./src/resources/obj/button.obj');
   buttonTipStr = readTextFile('./src/resources/obj/tip.obj');
-  
+
   //A
   buttonA = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
   buttonA.translateVertices(vec3.fromValues(-9.5, 0, 0));
@@ -309,7 +394,10 @@ async function parseJSON() {
   // } catch (e) {
   //   throw Error(e);
   // }
-
+  const header = jsonFile.header;
+  const bpm3 = header.bpm;
+  bpm = parseFloat(JSON.stringify(bpm3));
+  // console.log("bpm" + bpm);
   loadTrack();
   // fetch(musicPath)
   // .then(response => response.json())
@@ -355,14 +443,14 @@ function parseTracksEasy(json: JSON) {
         var time = parseFloat(JSON.stringify(note.time));
         var deltaTime = time - currTime;
         currTime = time;
-        console.log("time " + time);
-        console.log("dtime " + deltaTime);
-        console.log("midi " + number);
+        // console.log("time " + time);
+        // console.log("dtime " + deltaTime);
+        // console.log("midi " + number);
 
         //connect - 0.35
         //run - 0.25
         //if the time difference between one note and the other is :
-        if (deltaTime > 0.5) {
+        if (deltaTime > 0.7) {
           var b;
           if (number > 0 && number < 55) {
             b = new Button("S", time);
@@ -405,9 +493,9 @@ function parseTracksHard(json: JSON) {
         var deltaTime = time - currTime;
         currTime = time;
 
-        console.log("time " + time);
-        console.log("dtime " + deltaTime);
-        console.log("midi " + number);
+        // console.log("time " + time);
+        // console.log("dtime " + deltaTime);
+        // console.log("midi " + number);
 
         //for buttons that happen 0.3
         //connect - 0.35
@@ -415,7 +503,7 @@ function parseTracksHard(json: JSON) {
         var max = 3;
         var min = -3;
         var rand = Math.random() * (max - min) + min;
-        if (deltaTime > 0.5) {
+        if (deltaTime > 0.7) {
           var b;
           if (number > 0 + rand && number < 66 + rand) {
             b = new Button("A", time);
@@ -456,7 +544,7 @@ function loadTrack() {
     //loadOnly10Hard();
   }
   track.create();
-  console.log("length of track pos: " + track.pos.length);
+  // console.log("length of track pos: " + track.pos.length);
 }
 
 function loadTrackEasy() {
@@ -464,15 +552,15 @@ function loadTrackEasy() {
   //console.log("buttons: " + buttons.length);
   //since you have a list of buttons, lets create them all at once
   //the user will travel forward on the line
-  console.log("j" + buttons.length);
+  // console.log("j" + buttons.length);
   var c = 0;
   for (let one of buttons) {
     c++;
     var letter = one.getLetter();
-    console.log("letter " + letter);
+    // console.log("letter " + letter);
     var time = one.getTime();
-    console.log("time " + time);
-    var spacing = -5;
+    // console.log("time " + time);
+    var spacing = -7;
     // console.log("parse letters to make into:" + letter);
 
     let buttonStr = readTextFile('./src/resources/obj/button.obj');
@@ -480,7 +568,7 @@ function loadTrackEasy() {
 
     var pos = vec3.fromValues(0, 0, 0);
 
-    console.log(c + " button: " + letter);
+    // console.log(c + " button: " + letter);
 
     if (letter == 'S') {
       pos = vec3.fromValues(-7, 0, time * spacing);
@@ -511,7 +599,7 @@ function loadTrackHard() {
   for (let one of buttons) {
     var letter = one.getLetter();
     var time = one.getTime();
-    var spacing = -5;
+    var spacing = -7;
 
     let buttonStr = readTextFile('./src/resources/obj/button.obj');
     let button = new Mesh(buttonStr, vec3.fromValues(0, 0, 0));
@@ -673,7 +761,7 @@ function main() {
   // Add controls to the gui
   const gui = new DAT.GUI();
   gui.add(controls, 'Difficulty', ['easy', 'hard']);
-  gui.add(controls, 'Song', ['Last Surprise','Run', 'Running in the 90s', 'Resonance','Heartache','Again', 'Cheerup', 'Megalovania']);
+  gui.add(controls, 'Song', ['Shooting Stars', 'Merry Go Round of Life', 'Last Surprise', 'Run', 'Running in the 90s', 'Resonance', 'Heartache', 'Again', 'Cheerup', 'Megalovania']);
   gui.add(controls, 'Load Scene');
 
   // get canvas and webgl context
@@ -688,6 +776,7 @@ function main() {
 
   // Initial call to load scene
   loadScene();
+  loadVisuals();
 
   const camera = new Camera(vec3.fromValues(0, 5, 15), vec3.fromValues(0, 0, 0));
   const renderer = new OpenGLRenderer(canvas);
@@ -702,7 +791,7 @@ function main() {
     new Shader(gl.VERTEX_SHADER, require('./shaders/lambert-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/lambert-frag.glsl')),
   ]);
-  
+
   //
   const tip_lambert = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/tip-vert.glsl')),
@@ -727,11 +816,22 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/plate-frag.glsl')),
   ]);
 
+  const long_lambert = new ShaderProgram([
+    new Shader(gl.VERTEX_SHADER, require('./shaders/longboi-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/longboi-frag.glsl')),
+  ]);
+
   //change fov
   //camera.fovy = 1.5;
 
+  var musicStr = controls.Song;
+  var musicPath = './src/resources/music/mp3/' + musicStr + '.mp3';
+  count = 0;
+  long_lambert.setPressed(0); //for long boi, u_pressed is the bpm
+
   // This function will be called every frame
   function tick() {
+    long_lambert.setTime(count);
     startTick = Date.now();
 
     var timeRightNow = Date.now();
@@ -768,6 +868,9 @@ function main() {
     lambert.setGeometryColor(base_color);
     renderer.render(camera, lambert, [mario]);
 
+    //long boi
+    long_lambert.setGeometryColor(base_color);
+    renderer.render(camera, long_lambert, [longboi1, longboi2, longboi3, longboi4, longboi5, longboi6, longboi7]);
     //plate
     base_color = vec4.fromValues(150 / 255, 240 / 255, 255 / 255, 1);
     plate_lambert.setGeometryColor(base_color);
@@ -790,10 +893,41 @@ function main() {
       renderer.render(camera, button_lambert, [buttonA, buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL, buttonP]);
     }
 
+    // function render(input: string, timepressed: number) {
+    //   base_color = vec4.fromValues(255 / 255, 255 / 255, 225 / 255, 1);
+    //   while (timepressed - timeSinceStartSec < 0.02) {
+    //     renderer.render(camera, tip_lambert, [buttonS]);
+    //     if (input == 'A') {
+    //       renderer.render(camera, tip_lambert, [buttonA]);
+    //     } else if (input == 'S') {
+    //       renderer.render(camera, tip_lambert, [buttonS]);
+    //     } else if (input == 'D') {
+    //       renderer.render(camera, tip_lambert, [buttonD]);
+    //     } else if (input == 'F') {
+    //       renderer.render(camera, tip_lambert, [buttonF]);
+    //     } else if (input == 'J') {
+    //       renderer.render(camera, tip_lambert, [buttonJ]);
+
+    //     } else if (input == 'K') {
+    //       renderer.render(camera, tip_lambert, [buttonK]);
+
+    //     } else if (input == 'L') {
+    //       renderer.render(camera, tip_lambert, [buttonL]);
+
+    //     } else if (input == ';') {
+    //       renderer.render(camera, tip_lambert, [buttonP]);
+
+    //     }
+    //   }
+    // }
     //user starts game
     console.log(buttonNum);
     if (startGame) {
-    //if (startGame && buttons.length > 50) {
+      count++;
+      var d = bpm % tickFrame;
+      long_lambert.setPressed(d);
+      console.log("d" + d);
+      //if (startGame && buttons.length > 50) {
       //render track
       base_color = vec4.fromValues(65 / 255, 105 / 255, 225 / 255, 1);
       track_lambert.setGeometryColor(base_color);
@@ -801,7 +935,8 @@ function main() {
 
       //calculate the buttons positions as the track moves across
       //with time since start
-      var rate = 5.0;
+      var rate = 7.0;
+      //rate += 0.0000001;
       var time = timeSinceStartSec;
       var distance = time * rate;
 
@@ -818,7 +953,7 @@ function main() {
       //   button.setPosition(newPos);
       //   //console.log("new Positions: " + newPos);
       // }
-      
+
       track_lambert.setTime(distance);
       //translate the track
       //track.translateVertices(vec3.fromValues(0, 0, 1));
@@ -830,110 +965,120 @@ function main() {
       //   loadOnly10Hard();
       // }
 
-      for (var i = 0; i < 5; i++) {
+      for (var i = 0; i < 2; i++) {
         var curr = buttons[i];
         var time = curr.getTime();
-       // console.log("time Z " + time + " position " + curr.getPosition());
+        // console.log("time Z " + time + " position " + curr.getPosition());
         var checkTime1 = timeSinceStartSec - epsilon;
         var checkTime2 = timeSinceStartSec + epsilon;
         if (time >= checkTime1 && time <= checkTime2) {
           //var position = curr.getPosition();
           //var checkPosZ = position[2];
           //console.log("position Z " + checkPosZ );
-         // console.log("check this position mark: " + checkLine1 + " " + checkLine2);
+          // console.log("check this position mark: " + checkLine1 + " " + checkLine2);
           //console.log("button position: " + position + " button time: " + time + " check this time mark: " + checkTime1 + " " + checkTime2);
           // if (checkPosZ >= checkLine1 && checkPosZ <= checkLine2) {
-            // console.log("new: " + position[2]);
-            // console.log("a button passed z: " + position + " " + letter);
-            var letter = curr.getLetter(); 
-            //console.log("letter that passed: " + letter + " pos: " + position + " time: " + time);
-            base_color = vec4.fromValues(260 / 255, 260 / 255, 260 / 255, 1);
-            if (letter == 'A') {
-              if (downA) {
-                points++;
-                tip_lambert.setGeometryColor(base_color);
-                renderer.render(camera, tip_lambert, [buttonATip]);
-                renderer.render(camera, tip_lambert,[buttonA]);
-              } else {
-                health--;
-              }
-            }
-            if (letter == 'S') {
-              if (downS) {
-                tip_lambert.setGeometryColor(base_color);
-                renderer.render(camera, tip_lambert, [buttonSTip]);
-                renderer.render(camera, tip_lambert,[buttonS]);
-                points++;
-              } else {
-                health--;
-              }
-            }
-            if (letter == 'D') {
-              if (downD) {
-                tip_lambert.setGeometryColor(base_color);
-                renderer.render(camera, tip_lambert, [buttonDTip]);
-                renderer.render(camera, tip_lambert,[buttonD]);
-                points++;
-              } else {
-                health--;
-              }
-            }
-            if (letter == 'F') {
-              if (downF) {
-                tip_lambert.setGeometryColor(base_color);
-                renderer.render(camera, tip_lambert, [buttonFTip]);
-                renderer.render(camera, tip_lambert,[buttonF]);
-                points++;
-              } else {
-                health--;
-              }
-            }
-            if (letter == 'J') {
-              if (downJ) {
-                renderer.render(camera, tip_lambert, [buttonJTip]);
-                points++;
-              } else {
-                health--;
-              }
-            }
-            if (letter == 'K') {
-              if (downK) {
-                renderer.render(camera, tip_lambert, [buttonKTip]);
-                points++;
-              } else {
-                health--;
-              }
-            }
-            if (letter == 'L') {
-              if (downL) {
-                renderer.render(camera, tip_lambert, [buttonLTip]);
-                points++;
-              } else {
-                health--;
-              }
-            }
-            if (letter == ';') {
-              if (downP) {
-                points++;
-              } else {
-                health--;
-              }
-            }
+          // console.log("new: " + position[2]);
+          // console.log("a button passed z: " + position + " " + letter);
+          var letter = curr.getLetter();
+          //console.log("letter that passed: " + letter + " pos: " + position + " time: " + time);
+          base_color = vec4.fromValues(260 / 255, 260 / 255, 260 / 255, 1);
+          tip_lambert.setGeometryColor(base_color);
 
-            document.getElementById("health").innerHTML = "Health: " + health;
-            document.getElementById("points").innerHTML = "Score: " + points;
-
-            if (health <= 0) {
-              console.log("health IS zero");
-              document.getElementById("game").innerHTML = "YOU LOSE!";
-              startGame = false;
-              JukeBox.close();
+          if (letter == 'A') {
+            if (downA) {
+              points++;
+              renderer.render(camera, tip_lambert, [buttonATip]);
+              renderer.render(camera, tip_lambert, [buttonA]);
+            } else {
+              health--;
             }
-            buttons.shift();
-            var b = new Button("fake", 0);
-            buttons.push(b);
           }
-      //  }
+          if (letter == 'S') {
+            if (downS) {
+              // render('S', timeSinceStartSec);
+              renderer.render(camera, tip_lambert, [buttonSTip]);
+              renderer.render(camera, tip_lambert, [buttonS]);
+              points++;
+            } else {
+              health--;
+            }
+          }
+          if (letter == 'D') {
+            if (downD) {
+              // render('D', timeSinceStartSec);
+              renderer.render(camera, tip_lambert, [buttonDTip]);
+              renderer.render(camera, tip_lambert, [buttonD]);
+              points++;
+            } else {
+              health--;
+            }
+          }
+          if (letter == 'F') {
+            if (downF) {
+              // render('F', timeSinceStartSec);
+              renderer.render(camera, tip_lambert, [buttonFTip]);
+              renderer.render(camera, tip_lambert, [buttonF]);
+              points++;
+            } else {
+              health--;
+            }
+          }
+          if (letter == 'J') {
+            if (downJ) {
+              renderer.render(camera, tip_lambert, [buttonJTip]);
+              renderer.render(camera, tip_lambert, [buttonJ]);
+
+              points++;
+            } else {
+              health--;
+            }
+          }
+          if (letter == 'K') {
+            if (downK) {
+              renderer.render(camera, tip_lambert, [buttonKTip]);
+              renderer.render(camera, tip_lambert, [buttonK]);
+              points++;
+            } else {
+              health--;
+            }
+          }
+          if (letter == 'L') {
+            if (downL) {
+              renderer.render(camera, tip_lambert, [buttonLTip]);
+              renderer.render(camera, tip_lambert, [buttonL]);
+              points++;
+            } else {
+              health--;
+            }
+          }
+          if (letter == ';') {
+            if (downP) {
+              renderer.render(camera, tip_lambert, [buttonPTip]);
+              renderer.render(camera, tip_lambert, [buttonP]);
+              points++;
+            } else {
+              health--;
+            }
+          }
+
+          document.getElementById("health").innerHTML = "Health: " + health;
+          document.getElementById("points").innerHTML = "Score: " + points;
+
+          if (health <= 0) {
+            console.log("health IS zero");
+            document.getElementById("game").innerHTML = "YOU LOSE!";
+            startGame = false;
+            JukeBox.close();
+          }
+          buttons.shift();
+          var b = new Button("fake", 0);
+          buttons.push(b);
+        }
+        //  }
+        if (buttons[0].getLetter() == 'fake') {
+          document.getElementById("game").innerHTML = "YOU WIN!";
+        }
       }
 
       //  //current easy buttons
@@ -941,6 +1086,7 @@ function main() {
         if (downS) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonS]);
+          renderer.render(camera, tip_lambert, [buttonSTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonS]);
@@ -948,6 +1094,7 @@ function main() {
         if (downD) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonD]);
+          renderer.render(camera, tip_lambert, [buttonDTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonD]);
@@ -956,6 +1103,7 @@ function main() {
         if (downF) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonF]);
+          renderer.render(camera, tip_lambert, [buttonFTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonF]);
@@ -964,6 +1112,7 @@ function main() {
         if (downJ) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonJ]);
+          renderer.render(camera, tip_lambert, [buttonJTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonJ]);
@@ -972,6 +1121,7 @@ function main() {
         if (downK) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonK]);
+          renderer.render(camera, tip_lambert, [buttonKTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonK]);
@@ -980,6 +1130,7 @@ function main() {
         if (downL) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonL]);
+          renderer.render(camera, tip_lambert, [buttonLTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonL]);
@@ -988,6 +1139,7 @@ function main() {
         if (downA) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonA]);
+          renderer.render(camera, tip_lambert, [buttonATip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonA]);
@@ -995,6 +1147,7 @@ function main() {
         if (downS) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonS]);
+          renderer.render(camera, tip_lambert, [buttonSTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonS]);
@@ -1002,6 +1155,7 @@ function main() {
         if (downD) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonD]);
+          renderer.render(camera, tip_lambert, [buttonDTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonD]);
@@ -1010,6 +1164,7 @@ function main() {
         if (downF) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonF]);
+          renderer.render(camera, tip_lambert, [buttonFTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonF]);
@@ -1018,6 +1173,7 @@ function main() {
         if (downJ) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonJ]);
+          renderer.render(camera, tip_lambert, [buttonJTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonJ]);
@@ -1026,6 +1182,7 @@ function main() {
         if (downK) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonK]);
+          renderer.render(camera, tip_lambert, [buttonKTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonK]);
@@ -1034,6 +1191,7 @@ function main() {
         if (downL) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonL]);
+          renderer.render(camera, tip_lambert, [buttonLTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonL]);
@@ -1042,6 +1200,7 @@ function main() {
         if (downP) {
           button_lambert.setPressed(1);
           renderer.render(camera, button_lambert, [buttonP]);
+          renderer.render(camera, tip_lambert, [buttonPTip]);
         } else {
           button_lambert.setPressed(0);
           renderer.render(camera, button_lambert, [buttonP]);
@@ -1156,7 +1315,7 @@ function keyPressed(event: KeyboardEvent) {
       if (play == 0) {
         //window.setTimeout(parseJSON(), 100000);
         parseJSON();
-       // play_music();
+        // play_music();
         //loadTrack();
         window.setTimeout(play_music(), 100000);
         // window.setTimeout(loadTrack(), 10000);
@@ -1166,18 +1325,18 @@ function keyPressed(event: KeyboardEvent) {
         else if (controls.Difficulty == "hard") {
           epsilon = .2;
         }
-  
+
         // checkLine1 = 0 - epsilon;
         // checkLine2 = 0 + epsilon;
-        
+
         var d = Date.now();
         startTime = d;
         startGame = true;
 
-      //display status
-      document.getElementById("game").innerHTML = "In progress: " + controls.Song;
-      document.getElementById("health").innerHTML = "Health: " + health;
-      document.getElementById("points").innerHTML = "Score: " + points;
+        //display status
+        document.getElementById("game").innerHTML = "In progress: " + controls.Song;
+        document.getElementById("health").innerHTML = "Health: " + health;
+        document.getElementById("points").innerHTML = "Score: " + points;
       }
 
       document.getElementById('visualizerInfo').style.visibility = "hidden";

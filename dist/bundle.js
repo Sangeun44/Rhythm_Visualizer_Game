@@ -220,15 +220,19 @@ function readTextFile(file) {
     var text = "";
     var rawFile = new XMLHttpRequest();
     rawFile.open("GET", file, false);
+    var isFinished = false;
     rawFile.onreadystatechange = function () {
         if (rawFile.readyState === 4) {
             if (rawFile.status === 200 || rawFile.status == 0) {
                 var allText = rawFile.responseText;
                 text = allText;
             }
+            isFinished = true;
         }
     };
     rawFile.send(null);
+    while (!isFinished)
+        ;
     return text;
 }
 
@@ -3464,6 +3468,8 @@ let gameDiff;
 let startGame = false;
 let loaded = false;
 let parse = false;
+let bpm = 0;
+let tempo = 0;
 let play = 0;
 //shapes
 let cube;
@@ -3473,6 +3479,9 @@ let count = 0.0;
 //objects
 let marioString; //objString name
 let mario;
+let longboi1;
+let longboi2;
+let longboi3;
 let buttonStr;
 let buttonTipStr;
 let buttonA;
@@ -3505,13 +3514,14 @@ var JukeBox;
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
     Difficulty: "easy",
-    Song: "Run",
+    Song: "Shooting Stars",
     'Load Scene': loadScene // A function pointer, essentially
 };
 function play_music() {
     JukeBox = new AudioContext();
     var musicStr = controls.Song;
     var musicPath = './src/resources/music/mp3/' + musicStr + '.mp3';
+    // var audioBuffer = JukeBox.createBufferSource();
     fetch(musicPath)
         .then(r => r.arrayBuffer())
         .then(b => JukeBox.decodeAudioData(b))
@@ -3523,6 +3533,19 @@ function play_music() {
         audio_buf.start(0);
     });
     console.log(`Music On!` + musicStr);
+}
+function loadVisuals() {
+    console.log("load visualization");
+    var longboiStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/longboi.obj');
+    longboi1 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](longboiStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    longboi1.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, -5, -20));
+    longboi1.create();
+    longboi2 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](longboiStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    longboi2.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(20, -5, -20));
+    longboi2.create();
+    longboi3 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](longboiStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    longboi3.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-20, -5, -20));
+    longboi3.create();
 }
 function loadScene() {
     console.log("load scene");
@@ -3665,6 +3688,10 @@ function parseJSON() {
         // } catch (e) {
         //   throw Error(e);
         // }
+        const header = jsonFile.header;
+        const bpm3 = header.bpm;
+        bpm = parseFloat(JSON.stringify(bpm3));
+        // console.log("bpm" + bpm);
         loadTrack();
         // fetch(musicPath)
         // .then(response => response.json())
@@ -3708,13 +3735,13 @@ function parseTracksEasy(json) {
                 var time = parseFloat(JSON.stringify(note.time));
                 var deltaTime = time - currTime;
                 currTime = time;
-                console.log("time " + time);
-                console.log("dtime " + deltaTime);
-                console.log("midi " + number);
+                // console.log("time " + time);
+                // console.log("dtime " + deltaTime);
+                // console.log("midi " + number);
                 //connect - 0.35
                 //run - 0.25
                 //if the time difference between one note and the other is :
-                if (deltaTime > 0.5) {
+                if (deltaTime > 0.7) {
                     var b;
                     if (number > 0 && number < 55) {
                         b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("S", time);
@@ -3760,16 +3787,16 @@ function parseTracksHard(json) {
                 var time = parseFloat(JSON.stringify(note.time));
                 var deltaTime = time - currTime;
                 currTime = time;
-                console.log("time " + time);
-                console.log("dtime " + deltaTime);
-                console.log("midi " + number);
+                // console.log("time " + time);
+                // console.log("dtime " + deltaTime);
+                // console.log("midi " + number);
                 //for buttons that happen 0.3
                 //connect - 0.35
                 //run - 0.25
                 var max = 3;
                 var min = -3;
                 var rand = Math.random() * (max - min) + min;
-                if (deltaTime > 0.5) {
+                if (deltaTime > 0.7) {
                     var b;
                     if (number > 0 + rand && number < 66 + rand) {
                         b = new __WEBPACK_IMPORTED_MODULE_10__Button__["a" /* default */]("A", time);
@@ -3832,7 +3859,7 @@ function loadTrackEasy() {
         console.log("letter " + letter);
         var time = one.getTime();
         console.log("time " + time);
-        var spacing = -4;
+        var spacing = -7;
         // console.log("parse letters to make into:" + letter);
         let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
         let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
@@ -3870,7 +3897,7 @@ function loadTrackHard() {
     for (let one of buttons) {
         var letter = one.getLetter();
         var time = one.getTime();
-        var spacing = -2;
+        var spacing = -7;
         let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
         let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
         //connect = 
@@ -4025,7 +4052,7 @@ function main() {
     // Add controls to the gui
     const gui = new __WEBPACK_IMPORTED_MODULE_2_dat_gui__["GUI"]();
     gui.add(controls, 'Difficulty', ['easy', 'hard']);
-    gui.add(controls, 'Song', ['Run', 'Connect', 'Connect-Goofy', 'Cheerup', 'Megalovania']);
+    gui.add(controls, 'Song', ['Shooting Stars', 'Bring Me to Life', 'Marry Go Round of Life', 'Last Surprise', 'Run', 'Running in the 90s', 'Resonance', 'Heartache', 'Again', 'Cheerup', 'Megalovania']);
     gui.add(controls, 'Load Scene');
     // get canvas and webgl context
     const canvas = document.getElementById('canvas');
@@ -4038,6 +4065,7 @@ function main() {
     Object(__WEBPACK_IMPORTED_MODULE_6__globals__["c" /* setGL */])(gl);
     // Initial call to load scene
     loadScene();
+    loadVisuals();
     const camera = new __WEBPACK_IMPORTED_MODULE_8__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 5, 15), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_7__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
     renderer.setClearColor(0.4, 0.3, 0.9, 1);
@@ -4068,6 +4096,10 @@ function main() {
     const plate_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
         new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(85)),
         new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(86)),
+    ]);
+    const long_lambert = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(87)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(88)),
     ]);
     //change fov
     //camera.fovy = 1.5;
@@ -4102,6 +4134,9 @@ function main() {
         //mario
         lambert.setGeometryColor(base_color);
         renderer.render(camera, lambert, [mario]);
+        //long boi
+        long_lambert.setGeometryColor(base_color);
+        renderer.render(camera, long_lambert, [longboi1, longboi2, longboi3]);
         //plate
         base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(150 / 255, 240 / 255, 255 / 255, 1);
         plate_lambert.setGeometryColor(base_color);
@@ -4121,16 +4156,41 @@ function main() {
             button_lambert.setGeometryColor(base_color);
             renderer.render(camera, button_lambert, [buttonA, buttonS, buttonD, buttonF, buttonK, buttonJ, buttonL, buttonP]);
         }
+        // function render(input: string, timepressed: number) {
+        //   base_color = vec4.fromValues(255 / 255, 255 / 255, 225 / 255, 1);
+        //   while (timepressed - timeSinceStartSec < 0.02) {
+        //     renderer.render(camera, tip_lambert, [buttonS]);
+        //     if (input == 'A') {
+        //       renderer.render(camera, tip_lambert, [buttonA]);
+        //     } else if (input == 'S') {
+        //       renderer.render(camera, tip_lambert, [buttonS]);
+        //     } else if (input == 'D') {
+        //       renderer.render(camera, tip_lambert, [buttonD]);
+        //     } else if (input == 'F') {
+        //       renderer.render(camera, tip_lambert, [buttonF]);
+        //     } else if (input == 'J') {
+        //       renderer.render(camera, tip_lambert, [buttonJ]);
+        //     } else if (input == 'K') {
+        //       renderer.render(camera, tip_lambert, [buttonK]);
+        //     } else if (input == 'L') {
+        //       renderer.render(camera, tip_lambert, [buttonL]);
+        //     } else if (input == ';') {
+        //       renderer.render(camera, tip_lambert, [buttonP]);
+        //     }
+        //   }
+        // }
         //user starts game
         console.log(buttonNum);
-        if (startGame && buttons.length > 50) {
+        if (startGame) {
+            //if (startGame && buttons.length > 50) {
             //render track
             base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(65 / 255, 105 / 255, 225 / 255, 1);
             track_lambert.setGeometryColor(base_color);
             renderer.render(camera, track_lambert, [track]);
             //calculate the buttons positions as the track moves across
             //with time since start
-            var rate = 4.0;
+            var rate = 7.0;
+            //rate += 0.0000001;
             var time = timeSinceStartSec;
             var distance = time * rate;
             //calculate distance with dT
@@ -4154,7 +4214,7 @@ function main() {
             // } else {
             //   loadOnly10Hard();
             // }
-            for (var i = 0; i < 5; i++) {
+            for (var i = 0; i < 3; i++) {
                 var curr = buttons[i];
                 var time = curr.getTime();
                 // console.log("time Z " + time + " position " + curr.getPosition());
@@ -4172,10 +4232,10 @@ function main() {
                     var letter = curr.getLetter();
                     //console.log("letter that passed: " + letter + " pos: " + position + " time: " + time);
                     base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(260 / 255, 260 / 255, 260 / 255, 1);
+                    tip_lambert.setGeometryColor(base_color);
                     if (letter == 'A') {
                         if (downA) {
                             points++;
-                            tip_lambert.setGeometryColor(base_color);
                             renderer.render(camera, tip_lambert, [buttonATip]);
                             renderer.render(camera, tip_lambert, [buttonA]);
                         }
@@ -4185,7 +4245,7 @@ function main() {
                     }
                     if (letter == 'S') {
                         if (downS) {
-                            tip_lambert.setGeometryColor(base_color);
+                            // render('S', timeSinceStartSec);
                             renderer.render(camera, tip_lambert, [buttonSTip]);
                             renderer.render(camera, tip_lambert, [buttonS]);
                             points++;
@@ -4196,7 +4256,7 @@ function main() {
                     }
                     if (letter == 'D') {
                         if (downD) {
-                            tip_lambert.setGeometryColor(base_color);
+                            // render('D', timeSinceStartSec);
                             renderer.render(camera, tip_lambert, [buttonDTip]);
                             renderer.render(camera, tip_lambert, [buttonD]);
                             points++;
@@ -4207,7 +4267,7 @@ function main() {
                     }
                     if (letter == 'F') {
                         if (downF) {
-                            tip_lambert.setGeometryColor(base_color);
+                            // render('F', timeSinceStartSec);
                             renderer.render(camera, tip_lambert, [buttonFTip]);
                             renderer.render(camera, tip_lambert, [buttonF]);
                             points++;
@@ -4219,6 +4279,7 @@ function main() {
                     if (letter == 'J') {
                         if (downJ) {
                             renderer.render(camera, tip_lambert, [buttonJTip]);
+                            renderer.render(camera, tip_lambert, [buttonJ]);
                             points++;
                         }
                         else {
@@ -4228,6 +4289,7 @@ function main() {
                     if (letter == 'K') {
                         if (downK) {
                             renderer.render(camera, tip_lambert, [buttonKTip]);
+                            renderer.render(camera, tip_lambert, [buttonK]);
                             points++;
                         }
                         else {
@@ -4237,6 +4299,7 @@ function main() {
                     if (letter == 'L') {
                         if (downL) {
                             renderer.render(camera, tip_lambert, [buttonLTip]);
+                            renderer.render(camera, tip_lambert, [buttonL]);
                             points++;
                         }
                         else {
@@ -4245,6 +4308,8 @@ function main() {
                     }
                     if (letter == ';') {
                         if (downP) {
+                            renderer.render(camera, tip_lambert, [buttonPTip]);
+                            renderer.render(camera, tip_lambert, [buttonP]);
                             points++;
                         }
                         else {
@@ -4264,12 +4329,16 @@ function main() {
                     buttons.push(b);
                 }
                 //  }
+                if (buttons[0].getLetter() == 'fake') {
+                    document.getElementById("game").innerHTML = "YOU WIN!";
+                }
             }
             //  //current easy buttons
             if (controls.Difficulty == "easy") {
                 if (downS) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonS]);
+                    renderer.render(camera, tip_lambert, [buttonSTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4278,6 +4347,7 @@ function main() {
                 if (downD) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonD]);
+                    renderer.render(camera, tip_lambert, [buttonDTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4286,6 +4356,7 @@ function main() {
                 if (downF) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonF]);
+                    renderer.render(camera, tip_lambert, [buttonFTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4294,6 +4365,7 @@ function main() {
                 if (downJ) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonJ]);
+                    renderer.render(camera, tip_lambert, [buttonJTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4302,6 +4374,7 @@ function main() {
                 if (downK) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonK]);
+                    renderer.render(camera, tip_lambert, [buttonKTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4310,6 +4383,7 @@ function main() {
                 if (downL) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonL]);
+                    renderer.render(camera, tip_lambert, [buttonLTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4320,6 +4394,7 @@ function main() {
                 if (downA) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonA]);
+                    renderer.render(camera, tip_lambert, [buttonATip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4328,6 +4403,7 @@ function main() {
                 if (downS) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonS]);
+                    renderer.render(camera, tip_lambert, [buttonSTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4336,6 +4412,7 @@ function main() {
                 if (downD) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonD]);
+                    renderer.render(camera, tip_lambert, [buttonDTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4344,6 +4421,7 @@ function main() {
                 if (downF) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonF]);
+                    renderer.render(camera, tip_lambert, [buttonFTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4352,6 +4430,7 @@ function main() {
                 if (downJ) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonJ]);
+                    renderer.render(camera, tip_lambert, [buttonJTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4360,6 +4439,7 @@ function main() {
                 if (downK) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonK]);
+                    renderer.render(camera, tip_lambert, [buttonKTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4368,6 +4448,7 @@ function main() {
                 if (downL) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonL]);
+                    renderer.render(camera, tip_lambert, [buttonLTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4376,6 +4457,7 @@ function main() {
                 if (downP) {
                     button_lambert.setPressed(1);
                     renderer.render(camera, button_lambert, [buttonP]);
+                    renderer.render(camera, tip_lambert, [buttonPTip]);
                 }
                 else {
                     button_lambert.setPressed(0);
@@ -4488,13 +4570,13 @@ function keyPressed(event) {
                 window.setTimeout(play_music(), 100000);
                 // window.setTimeout(loadTrack(), 10000);
                 if (controls.Difficulty == "easy") {
-                    epsilon = .3;
+                    epsilon = .2;
                 }
                 else if (controls.Difficulty == "hard") {
-                    epsilon = .3;
+                    epsilon = .2;
                 }
-                checkLine1 = 0 - epsilon;
-                checkLine2 = 0 + epsilon;
+                // checkLine1 = 0 - epsilon;
+                // checkLine2 = 0 + epsilon;
                 var d = Date.now();
                 startTime = d;
                 startGame = true;
@@ -17579,6 +17661,18 @@ module.exports = "#version 300 es\n\n//This is a vertex shader. While it is call
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        vec4 avg = (fs_LightVec + vec4(u_Eye.xyz, 0.f)) / 2.f;\n        float specularIntensity;\n\n        if(dot(fs_LightVec, fs_Nor) < 0.f) {\n            specularIntensity = 0.5f;\n        } else {\n            specularIntensity = max(pow(dot(normalize(avg), normalize(fs_Nor)), 9.f), 0.f);\n        }\n        \n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.4;\n\n        float lightIntensity = diffuseTerm * 0.6 + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color2 * lightIntensity, (1. / (-fs_Pos.z)));\n}\n\n"
+
+/***/ }),
+/* 87 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(0, 100, -20, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+
+/***/ }),
+/* 88 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Time;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n        vec4 diffuseColor = u_Color;\n        float specularIntensity;        \n        float ambientTerm = 0.4;\n\n        float angle = dot(fs_LightVec, fs_Nor);\n        if(angle < 0.5f) {\n            specularIntensity = .1f;\n            ambientTerm = 0.25;\n        } else {\n            vec4 norm = normalize(fs_Nor);\n            vec4 fs_Light = normalize(fs_LightVec);\n            float intensity = pow(dot(fs_Light, norm), 5.f);\n            specularIntensity = max(intensity, 0.f);\n            ambientTerm = 0.4;\n        }\n        \n        // diffuse term for Lambert \n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n\n        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = vec3(0.5, 0.5, 0.7) + specularIntensity * 6.;\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color * lightIntensity, 1.);\n}\n"
 
 /***/ })
 /******/ ]);

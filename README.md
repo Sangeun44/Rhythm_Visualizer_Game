@@ -69,6 +69,9 @@ The background moves according to the music.
 
 It might be a bit distracting
 
+I created a Mesh with a lot of tessellation and after getting the bpm and the amplitude of the song, it morphs the mesh accordingly. 
+Using a noise function the tessellated polygons were deformed.
+
 ## OBJ loading
 [webgl-obj-loader](https://www.npmjs.com/package/webgl-obj-loader)
 
@@ -79,7 +82,8 @@ It might be a bit distracting
 Grace Xu Final Music Visualizer:  https://github.com/gracexu94/FinalProject
 * Web Audio API
 * Tone.js
-* Node.js
+* Node.js 
+* P5.js
 * web-audio-beat-detector
 
 Audio Vis : https://github.com/willianjusten/awesome-audio-visualization
