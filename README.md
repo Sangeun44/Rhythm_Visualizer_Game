@@ -32,7 +32,7 @@ demo link: https://sangeun44.github.io/Rhythm_Visualizer_Game/
 # WRITE UP
 * Pennkey: eunsang
 * Name: Sang Lee
-* demo:
+* demo: https://sangeun44.github.io/Rhythm_Visualizer_Game/
 
 # Summary 
 This project is an experiment to recreat BTS Super Star by Dalcomm Soft and takes inspiration from Guitar Hero.
