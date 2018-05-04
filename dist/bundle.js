@@ -3482,6 +3482,10 @@ let mario;
 let longboi1;
 let longboi2;
 let longboi3;
+let longboi4;
+let longboi5;
+let longboi6;
+let longboi7;
 let buttonStr;
 let buttonTipStr;
 let buttonA;
@@ -3510,6 +3514,12 @@ let buttonPTip;
 let downP;
 //music 
 var JukeBox;
+var source, sourceJS;
+var analyser;
+var bufferLength;
+var buffer;
+var array;
+var heightsArray;
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
@@ -3521,7 +3531,7 @@ function play_music() {
     JukeBox = new AudioContext();
     var musicStr = controls.Song;
     var musicPath = './src/resources/music/mp3/' + musicStr + '.mp3';
-    // var audioBuffer = JukeBox.createBufferSource();
+    var mu = 0;
     fetch(musicPath)
         .then(r => r.arrayBuffer())
         .then(b => JukeBox.decodeAudioData(b))
@@ -3531,20 +3541,63 @@ function play_music() {
         audio_buf.loop = false;
         audio_buf.connect(JukeBox.destination);
         audio_buf.start(0);
+        mu++;
     });
+    console.log(mu);
     console.log(`Music On!` + musicStr);
+    fetch(musicPath)
+        .then(r => r.arrayBuffer())
+        .then(b => JukeBox.decodeAudioData(b))
+        .then(data => {
+        //audio context
+        sourceJS = JukeBox.createScriptProcessor(2048, 1, 1);
+        sourceJS.connect(JukeBox.destination);
+        analyser = JukeBox.createAnalyser();
+        analyser.smoothingTimeConstant = 0.5;
+        analyser.fftSize = 256;
+        source = JukeBox.createBufferSource();
+        source.buffer = data;
+        source.connect(analyser);
+        analyser.connect(sourceJS);
+        analyser.connect(JukeBox.destination);
+        source.connect(JukeBox.destination);
+        array = new Uint8Array(analyser.frequencyBinCount);
+        bufferLength = analyser.frequencyBinCount;
+        var dataArray = new Uint8Array(bufferLength);
+        analyser.getByteFrequencyData(array);
+        //source.start(0);
+        var canvas = document.getElementById("canvas");
+        function render() {
+            requestAnimationFrame(render);
+            analyser.getByteFrequencyData(dataArray);
+            heightsArray = dataArray;
+            console.log("length: " + heightsArray.length);
+        }
+    });
 }
 function loadVisuals() {
     console.log("load visualization");
     var longboiStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/longboi.obj');
     longboi1 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](longboiStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
-    longboi1.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, -5, -20));
+    longboi1.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, -5, -25));
     longboi1.create();
+    longboi4 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](longboiStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    longboi4.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-10, -5, -25));
+    longboi4.create();
+    longboi6 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](longboiStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    longboi6.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-5, -5, -25));
+    longboi6.create();
     longboi2 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](longboiStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
-    longboi2.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(20, -5, -20));
+    longboi2.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(15, -5, -25));
     longboi2.create();
+    longboi5 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](longboiStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    longboi5.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(10, -5, -25));
+    longboi5.create();
+    longboi7 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](longboiStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
+    longboi7.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(5, -5, -25));
+    longboi7.create();
     longboi3 = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](longboiStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
-    longboi3.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-20, -5, -20));
+    longboi3.translateVertices(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-15, -5, -25));
     longboi3.create();
 }
 function loadScene() {
@@ -3844,27 +3897,27 @@ function loadTrack() {
         //loadOnly10Hard();
     }
     track.create();
-    console.log("length of track pos: " + track.pos.length);
+    // console.log("length of track pos: " + track.pos.length);
 }
 function loadTrackEasy() {
     console.log("load easy track");
     //console.log("buttons: " + buttons.length);
     //since you have a list of buttons, lets create them all at once
     //the user will travel forward on the line
-    console.log("j" + buttons.length);
+    // console.log("j" + buttons.length);
     var c = 0;
     for (let one of buttons) {
         c++;
         var letter = one.getLetter();
-        console.log("letter " + letter);
+        // console.log("letter " + letter);
         var time = one.getTime();
-        console.log("time " + time);
+        // console.log("time " + time);
         var spacing = -7;
         // console.log("parse letters to make into:" + letter);
         let buttonStr = Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* readTextFile */])('./src/resources/obj/button.obj');
         let button = new __WEBPACK_IMPORTED_MODULE_3__geometry_Mesh__["a" /* default */](buttonStr, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0));
         var pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(0, 0, 0);
-        console.log(c + " button: " + letter);
+        // console.log(c + " button: " + letter);
         if (letter == 'S') {
             pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec3 */].fromValues(-7, 0, time * spacing);
         }
@@ -4052,7 +4105,7 @@ function main() {
     // Add controls to the gui
     const gui = new __WEBPACK_IMPORTED_MODULE_2_dat_gui__["GUI"]();
     gui.add(controls, 'Difficulty', ['easy', 'hard']);
-    gui.add(controls, 'Song', ['Shooting Stars', 'Bring Me to Life', 'Marry Go Round of Life', 'Last Surprise', 'Run', 'Running in the 90s', 'Resonance', 'Heartache', 'Again', 'Cheerup', 'Megalovania']);
+    gui.add(controls, 'Song', ['Shooting Stars', 'Merry Go Round of Life', 'Last Surprise', 'Run', 'Running in the 90s', 'Resonance', 'Heartache', 'Again', 'Cheerup', 'Megalovania']);
     gui.add(controls, 'Load Scene');
     // get canvas and webgl context
     const canvas = document.getElementById('canvas');
@@ -4103,8 +4156,13 @@ function main() {
     ]);
     //change fov
     //camera.fovy = 1.5;
+    var musicStr = controls.Song;
+    var musicPath = './src/resources/music/mp3/' + musicStr + '.mp3';
+    count = 0;
+    long_lambert.setPressed(0); //for long boi, u_pressed is the bpm
     // This function will be called every frame
     function tick() {
+        long_lambert.setTime(count);
         startTick = Date.now();
         var timeRightNow = Date.now();
         var timeSinceStart = timeRightNow - startTime;
@@ -4136,7 +4194,7 @@ function main() {
         renderer.render(camera, lambert, [mario]);
         //long boi
         long_lambert.setGeometryColor(base_color);
-        renderer.render(camera, long_lambert, [longboi1, longboi2, longboi3]);
+        renderer.render(camera, long_lambert, [longboi1, longboi2, longboi3, longboi4, longboi5, longboi6, longboi7]);
         //plate
         base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(150 / 255, 240 / 255, 255 / 255, 1);
         plate_lambert.setGeometryColor(base_color);
@@ -4182,6 +4240,10 @@ function main() {
         //user starts game
         console.log(buttonNum);
         if (startGame) {
+            count++;
+            var d = bpm % tickFrame;
+            long_lambert.setPressed(d);
+            console.log("d" + d);
             //if (startGame && buttons.length > 50) {
             //render track
             base_color = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec4 */].fromValues(65 / 255, 105 / 255, 225 / 255, 1);
@@ -4214,7 +4276,7 @@ function main() {
             // } else {
             //   loadOnly10Hard();
             // }
-            for (var i = 0; i < 3; i++) {
+            for (var i = 0; i < 2; i++) {
                 var curr = buttons[i];
                 var time = curr.getTime();
                 // console.log("time Z " + time + " position " + curr.getPosition());
@@ -17666,13 +17728,13 @@ module.exports = "#version 300 es\n\n// This is a fragment shader. If you've ope
 /* 87 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\n\nconst vec4 lightPos = vec4(0, 100, -20, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n\n    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n\n    gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n                                             // used to render the final positions of the geometry's vertices\n}\n"
+module.exports = "#version 300 es\n\n//This is a vertex shader. While it is called a \"shader\" due to outdated conventions, this file\n//is used to apply matrix transformations to the arrays of vertex data passed to it.\n//Since this code is run on your GPU, each vertex is transformed simultaneously.\n//If it were run on your CPU, each vertex would have to be processed in a FOR loop, one at a time.\n//This simultaneous transformation allows your program to run much faster, especially when rendering\n//geometry with millions of vertices.\n\nuniform mat4 u_Model;       // The matrix that defines the transformation of the\n                            // object we're rendering. In this assignment,\n                            // this will be the result of traversing your scene graph.\n\nuniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.\n                            // This allows us to transform the object's normals properly\n                            // if the object has been non-uniformly scaled.\n\nuniform float u_Pressed; \n\nuniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.\n                            // We've written a static matrix for you to use for HW2,\n                            // but in HW3 you'll have to generate one yourself\n\nin vec4 vs_Pos;             // The array of vertex positions passed to the shader\n\nin vec4 vs_Nor;             // The array of vertex normals passed to the shader\n\nin vec4 vs_Col;             // The array of vertex colors passed to the shader.\n\nout vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.\nout vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Col;            // The color of each vertex. This is implicitly passed to the fragment shader.\nout vec4 fs_Pos;\n\nconst vec4 lightPos = vec4(0, 100, -20, 1); //The position of our virtual light, which is used to compute the shading of\n                                        //the geometry in the fragment shader.\n\n//\tClassic Perlin 3D Noise \n//\tby Stefan Gustavson\n//\nvec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}\nvec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}\nvec3 fade(vec3 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}\n\nfloat cnoise(vec3 P){\n  vec3 Pi0 = floor(P); // Integer part for indexing\n  vec3 Pi1 = Pi0 + vec3(1.0); // Integer part + 1\n  Pi0 = mod(Pi0, 289.0);\n  Pi1 = mod(Pi1, 289.0);\n  vec3 Pf0 = fract(P); // Fractional part for interpolation\n  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0\n  vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);\n  vec4 iy = vec4(Pi0.yy, Pi1.yy);\n  vec4 iz0 = Pi0.zzzz;\n  vec4 iz1 = Pi1.zzzz;\n\n  vec4 ixy = permute(permute(ix) + iy);\n  vec4 ixy0 = permute(ixy + iz0);\n  vec4 ixy1 = permute(ixy + iz1);\n\n  vec4 gx0 = ixy0 / 7.0;\n  vec4 gy0 = fract(floor(gx0) / 7.0) - 0.5;\n  gx0 = fract(gx0);\n  vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);\n  vec4 sz0 = step(gz0, vec4(0.0));\n  gx0 -= sz0 * (step(0.0, gx0) - 0.5);\n  gy0 -= sz0 * (step(0.0, gy0) - 0.5);\n\n  vec4 gx1 = ixy1 / 7.0;\n  vec4 gy1 = fract(floor(gx1) / 7.0) - 0.5;\n  gx1 = fract(gx1);\n  vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);\n  vec4 sz1 = step(gz1, vec4(0.0));\n  gx1 -= sz1 * (step(0.0, gx1) - 0.5);\n  gy1 -= sz1 * (step(0.0, gy1) - 0.5);\n\n  vec3 g000 = vec3(gx0.x,gy0.x,gz0.x);\n  vec3 g100 = vec3(gx0.y,gy0.y,gz0.y);\n  vec3 g010 = vec3(gx0.z,gy0.z,gz0.z);\n  vec3 g110 = vec3(gx0.w,gy0.w,gz0.w);\n  vec3 g001 = vec3(gx1.x,gy1.x,gz1.x);\n  vec3 g101 = vec3(gx1.y,gy1.y,gz1.y);\n  vec3 g011 = vec3(gx1.z,gy1.z,gz1.z);\n  vec3 g111 = vec3(gx1.w,gy1.w,gz1.w);\n\n  vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));\n  g000 *= norm0.x;\n  g010 *= norm0.y;\n  g100 *= norm0.z;\n  g110 *= norm0.w;\n  vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));\n  g001 *= norm1.x;\n  g011 *= norm1.y;\n  g101 *= norm1.z;\n  g111 *= norm1.w;\n\n  float n000 = dot(g000, Pf0);\n  float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));\n  float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));\n  float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));\n  float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));\n  float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));\n  float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));\n  float n111 = dot(g111, Pf1);\n\n  vec3 fade_xyz = fade(Pf0);\n  vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);\n  vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);\n  float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x); \n  return 2.2 * n_xyz;\n}\n\nvoid main()\n{\n    fs_Col = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation\n\n    mat3 invTranspose = mat3(u_ModelInvTr);\n    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);          // Pass the vertex normals to the fragment shader for interpolation.\n                                                            // Transform the geometry's normals by the inverse transpose of the\n                                                            // model matrix. This is necessary to ensure the normals remain\n                                                            // perpendicular to the surface after the surface is transformed by\n                                                            // the model matrix.\n\n    float noise = cnoise(vec3(vs_Pos.x, vs_Pos.y, vs_Pos.z));\n\n    vec4 modelposition = u_ViewProj * u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below\n\n    fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies\n    \n        // gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is\n    \n                                     // used to render the final positions of the geometry's vertices\n    if(u_Pressed < 0.) {\n        gl_Position = modelposition;// gl_Position is a built-in variable of OpenGL which is\n    } else {\n        vec4 addon = vec4(u_Pressed * 1.2 * noise);\n        if(vs_Pos.x > 0.) {\n            gl_Position = modelposition - addon;\n        } else {\n            gl_Position = modelposition + addon;\n        }\n    }\n}\n"
 
 /***/ }),
 /* 88 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform vec3 u_Eye;\nuniform float u_Time;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n//\tSimplex 3D Noise \n//\tby Ian McEwan, Ashima Arts\n//\n\nvoid main()\n{\n        vec4 diffuseColor = u_Color;\n        float specularIntensity;        \n        float ambientTerm = 0.4;\n\n        float angle = dot(fs_LightVec, fs_Nor);\n        if(angle < 0.5f) {\n            specularIntensity = .1f;\n            ambientTerm = 0.25;\n        } else {\n            vec4 norm = normalize(fs_Nor);\n            vec4 fs_Light = normalize(fs_LightVec);\n            float intensity = pow(dot(fs_Light, norm), 5.f);\n            specularIntensity = max(intensity, 0.f);\n            ambientTerm = 0.4;\n        }\n        \n        // diffuse term for Lambert \n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n\n        // Avoid negative lighting values\n        diffuseTerm = min(diffuseTerm, 1.0);\n        diffuseTerm = max(diffuseTerm, 0.0);\n\n        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n\n        // Compute final shaded color\n        vec3 color = vec3(0.5, 0.5, 0.7) + specularIntensity * 6.;\n        vec3 color2 = diffuseColor.xyz;\n\n        out_Col = vec4(color * lightIntensity, 1.);\n}\n"
+module.exports = "#version 300 es\n\n// This is a fragment shader. If you've opened this file first, please\n// open and read lambert.vert.glsl before reading on.\n// Unlike the vertex shader, the fragment shader actually does compute\n// the shading of geometry. For every pixel in your program's output\n// screen, the fragment shader is run for every bit of geometry that\n// particular pixel overlaps. By implicitly interpolating the position\n// data passed into the fragment shader by the vertex shader, the fragment shader\n// can compute what color to apply to its pixel based on things like vertex\n// position, light position, and vertex color.\nprecision highp float;\n\nuniform vec4 u_Color; // The color with which to render this instance of geometry.\nuniform float u_Time;\n\n// These are the interpolated values out of the rasterizer, so you can't know\n// their specific values without knowing the vertices that contributed to them\nin vec4 fs_Nor;\nin vec4 fs_LightVec;\nin vec4 fs_Col;\nin vec4 fs_Pos;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\n\nfloat random (in vec2 st) {\n    return fract(sin(dot(st.xy,\n                         vec2(12.9898,78.233)))*\n        43758.5453123);\n}\n\nfloat snoise (in vec2 st) {\n    vec2 i = floor(st);\n    vec2 f = fract(st);\n\n    // Four corners in 2D of a tile\n    float a = random(i);\n    float b = random(i + vec2(1.0, 0.0));\n    float c = random(i + vec2(0.0, 1.0));\n    float d = random(i + vec2(1.0, 1.0));\n\n    vec2 u = f * f * (3.0 - 2.0 * f);\n\n    return mix(a, b, u.x) +\n            (c - a)* u.y * (1.0 - u.x) +\n            (d - b) * u.x * u.y;\n}\n\nfloat fbm (in vec2 st) {\n    // Initial values\n    float value = 0.0;\n    float amplitude = .5;\n    float frequency = 0.;\n\n    // Loop of octaves\n    for (int i = 0; i < 8; i++) {\n        value += amplitude * abs(snoise(st));\n        st *= 2.;\n        amplitude *= .5;\n    }\n    return value;\n}\n\nvoid main()\n{\n    // Material base color (before shading)\n        vec4 diffuseColor = u_Color;\n        // Calculate the diffuse term for Lambert shading\n        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));\n        // Avoid negative lighting values\n        // diffuseTerm = clamp(diffuseTerm, 0, 1);\n\n        float ambientTerm = 0.8;\n\n        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier\n                                                            //to simulate ambient lighting. This ensures that faces that are not\n                                                            //lit by our point light are not completely black.\n        float fbm = fbm(vec2(fs_Pos.x, fs_Pos.y));\n        if(fs_Pos.x / 1000. > fbm) {\n            out_Col = vec4(diffuseColor.rgb * lightIntensity, 1.);\n        }\n\n        vec3 a = vec3(0.9 * cos(u_Time * .001), 0.5, 0.5);\n        vec3 b = vec3(0.9, 0.5 * cos(u_Time * .001), 0.5);\n        vec3 c = vec3(1.0, 1.0, 1.0);\n        vec3 d = vec3(0.0, 0.33*cos(u_Time * .001), 0.67);\n        vec4 color = vec4(a + b  * cos(u_Time * 0.001 * 2.f * 3.14159 * (c * diffuseTerm + d)), 1);\n\n        out_Col = vec4(color.rgb * lightIntensity, 1.);\n\n        // Compute final shaded color\n\n\n\n}\n"
 
 /***/ })
 /******/ ]);
