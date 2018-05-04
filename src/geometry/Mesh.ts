@@ -54,6 +54,26 @@ class Mesh extends Drawable {
         this.posTemp[i+3] = 1;
     }
 }
+scaleVertices(scale: vec3) {
+  var newPositions = new Array<number>();
+  for(var i = 0; i < this.posTemp.length; i = i + 4) {
+      //input vertex x, y, z
+      var xCom = this.posTemp[i];
+      var yCom = this.posTemp[i+1];
+      var zCom = this.posTemp[i+2];
+      
+      //console.log("original: " + positions[i], positions[i+1], positions[i+2]);
+      //apply rotation in x, y, z direction to the vertex
+      var vert = vec3.fromValues(xCom * scale[0], yCom * scale[1], zCom * scale[2]);
+
+      this.posTemp[i] = vert[0];
+      this.posTemp[i+1] = vert[1];
+      this.posTemp[i+2] = vert[2];
+      this.posTemp[i+3] = 1;
+      //console.log("rotateed Pos: " + newPositions[i], newPositions[i+1], newPositions[i+2]);
+  }
+  return newPositions;
+}
 
    setInd = function(ind : Array<number>) {
     this.idxTemp = Uint32Array.from(ind);

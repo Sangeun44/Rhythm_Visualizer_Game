@@ -191,32 +191,36 @@ function loadVisuals() {
   console.log("load visualization");
   var longboiStr = readTextFile('./src/resources/obj/longboi.obj');
   longboi1 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
-  longboi1.translateVertices(vec3.fromValues(0, -5, -25));
+  longboi1.translateVertices(vec3.fromValues(0, 0, -35));
   longboi1.create();
 
-  longboi4 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
-  longboi4.translateVertices(vec3.fromValues(-10, -5, -25));
-  longboi4.create();
-
-  longboi6 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
-  longboi6.translateVertices(vec3.fromValues(-5, -5, -25));
-  longboi6.create();
-
   longboi2 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
-  longboi2.translateVertices(vec3.fromValues(15, -5, -25));
+  longboi2.scaleVertices(vec3.fromValues(1.5,1.5,1.5));
+  longboi2.translateVertices(vec3.fromValues(0, 0, -35));
   longboi2.create();
 
+  longboi3 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
+  longboi3.scaleVertices(vec3.fromValues(2,2,2));
+  longboi3.translateVertices(vec3.fromValues(0, 0, -35));
+  longboi3.create();
+
+  longboi4 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
+  longboi4.translateVertices(vec3.fromValues(-10, -10, -35));
+  longboi4.create();
+
   longboi5 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
-  longboi5.translateVertices(vec3.fromValues(10, -5, -25));
+  longboi5.translateVertices(vec3.fromValues(10, -10, -35));
   longboi5.create();
 
+  longboi6 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
+  longboi6.translateVertices(vec3.fromValues(-5, -5, -35));
+  longboi6.create();
+
   longboi7 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
-  longboi7.translateVertices(vec3.fromValues(5, -5, -25));
+  longboi7.translateVertices(vec3.fromValues(5, -5,-35));
   longboi7.create();
 
-  longboi3 = new Mesh(longboiStr, vec3.fromValues(0, 0, 0));
-  longboi3.translateVertices(vec3.fromValues(-15, -5, -25));
-  longboi3.create();
+
 }
 function loadScene() {
   console.log("load scene");

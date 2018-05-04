@@ -130,14 +130,7 @@ void main()
         // gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is
     
                                      // used to render the final positions of the geometry's vertices
-    if(u_Pressed < 0.) {
-        gl_Position = modelposition;// gl_Position is a built-in variable of OpenGL which is
-    } else {
-        vec4 addon = vec4(u_Pressed * 1.2 * noise);
-        if(vs_Pos.x > 0.) {
-            gl_Position = modelposition - addon;
-        } else {
-            gl_Position = modelposition + addon;
-        }
-    }
+          vec4 addon = vec4(u_Pressed * 0.8 * noise);
+        gl_Position = modelposition + addon;
+
 }
