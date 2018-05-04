@@ -24,6 +24,7 @@ Mario is in the background like a monument, the metal shader is referenced from 
 demo link: https://sangeun44.github.io/Rhythm_Visualizer_Game/
 
 ![](1st.png)
+![](hi.png)
 
 # Final Procedural Project  
 # Music Visualizer - BTS Super Star/Guitar Hero 
