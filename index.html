@@ -15,7 +15,6 @@
       
   </head>
   <body>
-
       <label id= "game"
       style="position:fixed; 
       text-align: center; 
@@ -23,33 +22,31 @@
       margin:200px;
       margin-top:400px;
       font: 300 20px Arial, Gadget, sans-serif;">
-  
-    </label>
-
-    <label id= "health"
-    style="position:fixed; 
-    text-align: center; 
-    color:white; 
-    margin:200px;
-    margin-top:500px;
-    font: 300 20px Arial, Gadget, sans-serif;">
-
-  </label>
-
-  <label id= "points"
-  style="position:fixed; 
-  text-align: center; 
-  color:white; 
-  margin:200px;
-  margin-top:450px;
-  font: 300 20px Arial, Gadget, sans-serif;">
-  
-   </label>
-    <label id="visualizerInfo" 
+      </label>
+      
+      <label id= "health"
       style="position:fixed; 
       text-align: center; 
       color:white; 
       margin:200px;
+      margin-top:500px;
+      font: 300 20px Arial, Gadget, sans-serif;">
+      </label>
+
+      <label id= "points"
+      style="position:fixed; 
+      text-align: center; 
+      color:white; 
+      margin:200px;
+      margin-top:450px;
+      font: 300 20px Arial, Gadget, sans-serif;">
+      </label>
+    
+      <label id="visualizerInfo" 
+      style="position:fixed; 
+      text-align: center; 
+      color:white; 
+      margin:500px;
       margin-top:500px;
       font: 300 20px Arial, Gadget, sans-serif;">
       CHOOSE A SONG<br>
@@ -59,8 +56,12 @@
       PRESS 'V' TO START
     </label>
 
-   <!-- <script src="bundle.js"></script> -->
-    <canvas id="canvas"></canvas>
+    <div id="content">
+      <input type="file" id="thefile" accept="audio/*" />
+      <canvas id="canvas"></canvas>
+      <audio id="audio" controls></audio>
+    </div>
+
   <script type="text/javascript" src="dist/bundle.js"></script>
   </body>
 

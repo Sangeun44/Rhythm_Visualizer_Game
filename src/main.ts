@@ -7,6 +7,7 @@ import Mesh from './geometry/Mesh';
 import Track from './geometry/Track';
 import Icosphere from './geometry/Icosphere';
 import Square from './geometry/Square';
+import Background from './geometry/Background';
 import Cube from './geometry/Cube';
 
 import { readTextFile } from './globals';
@@ -17,16 +18,10 @@ import Camera from './Camera';
 import ShaderProgram, { Shader } from './rendering/gl/ShaderProgram';
 
 import Button from './Button';
-import { analyze } from 'web-audio-beat-detector';
 
-// analyze(framework.audioSourceBuffer.buffer).then((bpm) => {
-//   // the bpm could be analyzed 
-//   framework.songBPM = bpm;
-// })
-// .catch((err) => {
-//   // something went wrong 
-//   console.log("couldn't detect BPM");
-// });
+declare var amp: any;
+declare var fft: any;
+declare var peak: any;
 
 //global dead line
 let checkLine1: number;
@@ -61,6 +56,7 @@ let play = 0;
 //shapes
 let cube: Cube;
 let square: Square;
+let background: Background;
 
 //time
 let count: number = 0.0;
@@ -135,7 +131,6 @@ function play_music() {
   var musicStr = controls.Song;
   var musicPath = './src/resources/music/mp3/' + musicStr + '.mp3';
 
-  var mu = 0;
   fetch(musicPath)
     .then(r => r.arrayBuffer())
     .then(b => JukeBox.decodeAudioData(b))
@@ -145,10 +140,8 @@ function play_music() {
       audio_buf.loop = false;
       audio_buf.connect(JukeBox.destination);
       audio_buf.start(0);
-      mu++;
     });
-    console.log(mu);
-  console.log(`Music On!` + musicStr);
+    console.log(`Music On!` + musicStr);
 
   fetch(musicPath)
     .then(r => r.arrayBuffer())
@@ -232,6 +225,9 @@ function loadScene() {
 
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
+
+  background = new Background(vec3.fromValues(0, 0, 0));
+  background.create();
 }
 
 function loadButtonsEasy() {
@@ -782,7 +778,7 @@ function main() {
   loadScene();
   loadVisuals();
 
-  const camera = new Camera(vec3.fromValues(0, 5, 15), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(0, 2, 10), vec3.fromValues(0, 0, 0));
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.4, 0.3, 0.9, 1);
 
@@ -821,12 +817,14 @@ function main() {
   ]);
 
   const long_lambert = new ShaderProgram([
-    new Shader(gl.VERTEX_SHADER, require('./shaders/longboi-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/longboi-frag.glsl')),
+    new Shader(gl.VERTEX_SHADER, require('./shaders/torus-vert.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/torus-frag.glsl')),
   ]);
 
   //change fov
   //camera.fovy = 1.5;
+  // console.log("amp:" + amp);
+  // console.log("fft:" + FFT);
 
   var musicStr = controls.Song;
   var musicPath = './src/resources/music/mp3/' + musicStr + '.mp3';
@@ -871,6 +869,12 @@ function main() {
     //mario
     lambert.setGeometryColor(base_color);
     renderer.render(camera, lambert, [mario]);
+    
+    let background_col = vec4.fromValues(200 / 255, 60 / 255, 200 / 255, 1);
+    
+    //background
+    lambert.setGeometryColor(background_col);
+    renderer.render(camera, lambert, [background]);
 
     //long boi
     long_lambert.setGeometryColor(base_color);

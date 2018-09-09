@@ -3,7 +3,7 @@ import Drawable from '../rendering/gl/Drawable';
 import {gl} from '../globals';
 import Mesh from 'geometry/Mesh';
 
-class City extends Drawable {
+class Track extends Drawable {
     indices: Uint32Array;
     positions: Float32Array;
     normals: Float32Array;
@@ -110,4 +110,4 @@ translateVertices(pos : vec3) {
   }
 };
 
-export default City;
+export default Track;
